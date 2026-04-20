@@ -12,7 +12,6 @@
       --muted: #b6b6b6;
       --btn: #34453a;
       --btn-active: #4e6a56;
-      --danger: #d05d5d;
       --accent: #d8aa72;
       --cyan: #7ed6ff;
     }
@@ -83,6 +82,18 @@
     .action-btn:disabled { opacity: 0.4; filter: grayscale(1); }
     .action-btn small { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
     .limit-info { color: var(--cyan); }
+    .squad-bar {
+      position: absolute; left: 10px; top: 82px; z-index: 35; pointer-events: auto;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .squad-slot {
+      width: 44px; height: 44px; border-radius: 8px; border: 1px solid #58635b;
+      background: rgba(24, 34, 28, 0.95); color: var(--text); font-size: 15px; font-weight: 900;
+      padding: 3px 0; line-height: 1;
+    }
+    .squad-slot small { display: block; margin-top: 4px; color: var(--cyan); font-size: 10px; }
+    .squad-slot.empty { opacity: 0.45; }
+    .squad-slot.join-target { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(216,170,114,0.22); }
 
     #msgBox {
       position: absolute; top: 74px; left: 50%; transform: translateX(-50%);
@@ -128,23 +139,36 @@
     </div>
 
     <div id="msgBox">Mensagem</div>
+    <div id="squadBar" class="squad-bar hidden">
+      <button id="squadSlot0" class="squad-slot" onclick="Game.selectSquad(0)">1<small>0</small></button>
+      <button id="squadSlot1" class="squad-slot" onclick="Game.selectSquad(1)">2<small>0</small></button>
+      <button id="squadSlot2" class="squad-slot" onclick="Game.selectSquad(2)">3<small>0</small></button>
+      <button id="squadSlot3" class="squad-slot" onclick="Game.selectSquad(3)">4<small>0</small></button>
+    </div>
 
     <div class="hud hud-bottom">
       <div id="actions">
         <div id="actionTabs">
-          <button id="openBuild" class="action-btn" onclick="UI.showActionMode('build')">Construir<small>Estruturas</small></button>
-          <button id="openTrain" class="action-btn" onclick="UI.showActionMode('train')">Recrutar<small>Tropas</small></button>
-        </div>
-        <div id="buildActions" class="action-group hidden">
-          <button id="buildMine" class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small>10M <span id="lim-2" class="limit-info">(0/2)</span></small></button>
-          <button id="buildLumber" class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small>10M <span id="lim-3" class="limit-info">(0/2)</span></small></button>
-          <button id="buildFarm" class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small>10M 5P <span id="lim-4" class="limit-info">(0/1)</span></small></button>
-          <button id="buildBarracks" class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small>20M 20P <span id="lim-5" class="limit-info">(0/1)</span></small></button>
-          <button id="cancelBuild" class="action-btn hidden" onclick="UI.cancelBuild()" style="border-color:#b96a6a;color:#ffd0d0">Cancelar<small>Construcao</small></button>
-        </div>
+        <button id="openBuild" class="action-btn" onclick="UI.showActionMode('build')">Construir<small>Estruturas</small></button>
+        <button id="openTrain" class="action-btn" onclick="UI.showActionMode('train')">Recrutar<small>Tropas</small></button>
+      </div>
+      <button id="upgradeBuilding" class="action-btn hidden" onclick="Game.upgradeSelectedBuilding()">Melhorar<small>Estrutura</small></button>
+      <div id="squadActions" class="action-group hidden">
+        <button id="createSquad" class="action-btn" onclick="Game.createSquadFromSelection()">Criar<small>Esquadrao</small></button>
+        <button id="joinSquad" class="action-btn" onclick="Game.startJoinSquad()">Juntar<small>Ao esquadrao</small></button>
+      </div>
+      <div id="buildActions" class="action-group hidden">
+        <button class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small>10M <span id="lim-2" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small>10M <span id="lim-3" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small>10M 5P <span id="lim-4" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small>20M 20P <span id="lim-5" class="limit-info">(0/1)</span></small></button>
+        <button id="cancelBuild" class="action-btn hidden" onclick="UI.cancelBuild()" style="border-color:#b96a6a;color:#ffd0d0">Cancelar<small>Construcao</small></button>
+      </div>
         <div id="trainActions" class="action-group hidden">
           <div id="trainInfo" class="action-info">Selecione um quartel para ver a fila.</div>
-          <button id="spawnUnit" class="action-btn hidden" onclick="Game.requestUnit()">Soldado<small>10G</small></button>
+          <button id="spawnUnit" class="action-btn hidden" onclick="Game.requestUnit(U_SOLDIER)">Soldado<small>10G</small></button>
+          <button id="spawnArcher" class="action-btn hidden" onclick="Game.requestUnit(U_ARCHER)">Arqueiro<small>14G</small></button>
+          <button id="setRally" class="action-btn hidden" onclick="UI.startRallyPoint()">Ponto<small>Reuniao</small></button>
         </div>
       </div>
     </div>
@@ -167,7 +191,6 @@ const MAP_SZ = 60;
 const WORLD_SZ = TILE * MAP_SZ;
 const MAX_U = 512;
 const MAX_B = 192;
-const MAX_F = 5;
 const FIXED_STEP = 1 / 30;
 const ECON_INTERVAL = 2.0;
 const BOT_INTERVAL = 1.0;
@@ -176,11 +199,17 @@ const HASH_W = Math.ceil(WORLD_SZ / HASH_CELL_SIZE);
 const HASH_H = Math.ceil(WORLD_SZ / HASH_CELL_SIZE);
 const HASH_COUNT = HASH_W * HASH_H;
 const MAX_SELECTION = 64;
-const UNIT_CAP = 60;
+const MAX_SQUADS = 4;
 const TAP_SLOP2 = 144;
+const TOUCH_SELECT_HOLD_MS = 180;
+const DOUBLE_TAP_MS = 330;
+const DOUBLE_TAP_DIST2 = 28 * 28;
+const BUILD_CLEARANCE_TILES = 1;
 const RETARGET_INTERVAL = 0.35;
 const TRAIN_TIME = 3.0;
 const MAX_TRAIN_QUEUE = 5;
+const MAX_BUILD_LEVEL = 3;
+const HALL_UNIT_CAP_STEP = 15;
 const BOT_TRAIN_DELAY = 14.0;
 const BOT_ARMY_SOFT_CAP = 6;
 const BOT_ATTACK_MIN_ARMY = 6;
@@ -195,6 +224,9 @@ const B_MINE = 2;
 const B_WOOD = 3;
 const B_FARM = 4;
 const B_BARR = 5;
+
+const U_SOLDIER = 1;
+const U_ARCHER = 2;
 
 // Estados de unidade
 const STATE_IDLE = 0;
@@ -218,16 +250,19 @@ const BuildCfg = {
 };
 
 const UnitCfg = {
-  hp: 100,
-  speed: 58,
-  range: 26,
-  aggro: 110,
-  chase: 180,
-  vision: 150,
-  cooldown: 0.7,
-  damage: 10,
-  hitRadius: 8,
-  grainCost: 10
+  name: ['', 'Soldado', 'Arqueiro'],
+  hp: new Int16Array([0, 100, 70]),
+  speed: new Float32Array([0, 58, 54]),
+  range: new Float32Array([0, 26, 118]),
+  aggro: new Float32Array([0, 110, 140]),
+  chase: new Float32Array([0, 180, 220]),
+  vision: new Float32Array([0, 150, 165]),
+  cooldown: new Float32Array([0, 0.7, 1.05]),
+  damage: new Int16Array([0, 10, 8]),
+  hitRadius: new Float32Array([0, 8, 7]),
+  grainCost: new Int16Array([0, 10, 14]),
+  trainTime: new Float32Array([0, TRAIN_TIME, 4.2]),
+  barrLevel: new Uint8Array([0, 1, 2])
 };
 
 const canvas = document.getElementById('gameCanvas');
@@ -243,6 +278,7 @@ const hashNext = new Int16Array(MAX_U).fill(-1);
 const Units = {
   active: new Uint8Array(MAX_U),
   uid: new Int32Array(MAX_U),
+  kind: new Uint8Array(MAX_U),
   faction: new Uint8Array(MAX_U),
   x: new Float32Array(MAX_U),
   y: new Float32Array(MAX_U),
@@ -280,9 +316,14 @@ const Builds = {
   ty: new Int16Array(MAX_B),
   w: new Int8Array(MAX_B),
   h: new Int8Array(MAX_B),
+  level: new Uint8Array(MAX_B),
   hp: new Int16Array(MAX_B),
   queue: new Float32Array(MAX_B),
   queueCount: new Uint8Array(MAX_B),
+  queueKind: new Uint8Array(MAX_B * MAX_TRAIN_QUEUE),
+  hasRally: new Uint8Array(MAX_B),
+  rallyX: new Float32Array(MAX_B),
+  rallyY: new Float32Array(MAX_B),
   flash: new Float32Array(MAX_B)
 };
 
@@ -307,12 +348,20 @@ const Sel = {
   ids: new Int16Array(MAX_SELECTION)
 };
 
+const Squads = {
+  count: new Uint8Array(MAX_SQUADS),
+  ids: new Int16Array(MAX_SQUADS * MAX_SELECTION)
+};
+Squads.ids.fill(-1);
+
 const Engine = {
   running: false,
   uidGen: 1,
   cam: { x: WORLD_SZ / 2, y: WORLD_SZ / 2, z: 1 },
   selectedBuilding: -1,
   buildType: 0,
+  rallyBuilding: -1,
+  joinSquadMode: false,
   placingStart: false,
   pendingBotCount: 0,
   msgTimer: 0,
@@ -322,12 +371,17 @@ const Engine = {
   lastTime: 0,
   acc: 0,
   mini: { x: 0, y: 0, size: 0 },
+  lastTapTime: 0,
+  lastTapKind: 0,
+  lastTapSx: 0,
+  lastTapSy: 0,
   drag: {
     active: false,
     pointerId: -1,
     pointerType: '',
     button: 0,
     mode: 0, // 0 nenhum, 1 tap, 2 camera, 3 select, 4 minimapa
+    downTime: 0,
     originSx: 0, originSy: 0,
     startSx: 0, startSy: 0,
     sx: 0, sy: 0,
@@ -394,10 +448,53 @@ function hashIndex(x, y) {
 function isInsideMapTile(tx, ty) { return tx >= 0 && ty >= 0 && tx < MAP_SZ && ty < MAP_SZ; }
 function factionColor(fid) { return fid === 0 ? '#5a8761' : ['#b64242','#c86f2d','#6c53c8','#aa3d78'][fid - 1] || '#b64242'; }
 function buildingLabel(type) { return BuildCfg[type].name; }
+function unitLabel(type) { return UnitCfg.name[type] || 'Unidade'; }
+function queueSlotIndex(bId, slot) { return bId * MAX_TRAIN_QUEUE + slot; }
+function queuedUnitType(bId) { return Builds.queueCount[bId] > 0 ? Builds.queueKind[queueSlotIndex(bId, 0)] : 0; }
+function unitTrainTime(type) { return UnitCfg.trainTime[type] || TRAIN_TIME; }
+function unitGrainCost(type) { return UnitCfg.grainCost[type] || 0; }
+function buildingMaxHp(type, level) {
+  const base = BuildCfg[type].hp;
+  if (type === B_HALL) return base + (level - 1) * 300;
+  if (type === B_BARR) return base + (level - 1) * 180;
+  return base;
+}
+function upgradeCostW(type, nextLevel) { return type === B_HALL ? nextLevel * 45 : (type === B_BARR ? nextLevel * 35 : 0); }
+function upgradeCostS(type, nextLevel) { return type === B_HALL ? nextLevel * 35 : (type === B_BARR ? nextLevel * 35 : 0); }
+function upgradeCostG(type, nextLevel) { return type === B_HALL ? nextLevel * 10 : (type === B_BARR ? nextLevel * 8 : 0); }
+
+function setQueueTimerForNext(bId) {
+  const nextType = queuedUnitType(bId);
+  Builds.queue[bId] = nextType ? unitTrainTime(nextType) : 0;
+}
+
+function pushUnitQueue(bId, unitType) {
+  const count = Builds.queueCount[bId];
+  if (count >= MAX_TRAIN_QUEUE) return false;
+  Builds.queueKind[queueSlotIndex(bId, count)] = unitType;
+  Builds.queueCount[bId]++;
+  if (count === 0) setQueueTimerForNext(bId);
+  return true;
+}
+
+function popUnitQueue(bId) {
+  const count = Builds.queueCount[bId];
+  if (count === 0) return 0;
+  const unitType = Builds.queueKind[queueSlotIndex(bId, 0)];
+  for (let slot = 1; slot < count; slot++) {
+    Builds.queueKind[queueSlotIndex(bId, slot - 1)] = Builds.queueKind[queueSlotIndex(bId, slot)];
+  }
+  Builds.queueKind[queueSlotIndex(bId, count - 1)] = 0;
+  Builds.queueCount[bId]--;
+  setQueueTimerForNext(bId);
+  return unitType;
+}
 
 function clearSelection() {
   Sel.count = 0;
   Engine.selectedBuilding = -1;
+  Engine.joinSquadMode = false;
+  UI.actionMode = 'root';
   UI.updateSelectionInfo();
 }
 
@@ -405,12 +502,16 @@ function setSingleSelection(id) {
   Sel.count = 1;
   Sel.ids[0] = id;
   Engine.selectedBuilding = -1;
+  Engine.joinSquadMode = false;
+  UI.actionMode = 'root';
   UI.updateSelectionInfo();
 }
 
 function selectBuilding(id) {
   Sel.count = 0;
   Engine.selectedBuilding = id;
+  Engine.joinSquadMode = false;
+  UI.actionMode = Builds.active[id] && Builds.faction[id] === 0 && Builds.type[id] === B_BARR ? 'train' : 'root';
   UI.updateSelectionInfo();
 }
 
@@ -462,11 +563,46 @@ function payForBuild(fId, type) {
   f.grain -= c.costG;
 }
 
+function canUpgradeBuilding(bId) {
+  if (!Builds.active[bId]) return false;
+  const type = Builds.type[bId];
+  if (type !== B_HALL && type !== B_BARR) return false;
+  if (Builds.level[bId] >= MAX_BUILD_LEVEL) return false;
+  const f = Factions[Builds.faction[bId]];
+  const next = Builds.level[bId] + 1;
+  return f.wood >= upgradeCostW(type, next) && f.stone >= upgradeCostS(type, next) && f.grain >= upgradeCostG(type, next);
+}
+
+function upgradeBuilding(bId) {
+  if (!canUpgradeBuilding(bId)) return false;
+  const type = Builds.type[bId];
+  const f = Factions[Builds.faction[bId]];
+  const next = Builds.level[bId] + 1;
+  const oldMax = buildingMaxHp(type, Builds.level[bId]);
+  const newMax = buildingMaxHp(type, next);
+  f.wood -= upgradeCostW(type, next);
+  f.stone -= upgradeCostS(type, next);
+  f.grain -= upgradeCostG(type, next);
+  Builds.level[bId] = next;
+  Builds.hp[bId] = Math.min(newMax, Builds.hp[bId] + (newMax - oldMax));
+  Builds.flash[bId] = FLASH_MAX;
+  if (Builds.faction[bId] === 0) {
+    UI.updateRes();
+    UI.updateSelectionInfo();
+  }
+  return true;
+}
+
 function canPlaceBuilding(tx, ty, w, h) {
   if (tx < 0 || ty < 0 || tx + w > MAP_SZ || ty + h > MAP_SZ) return false;
-  for (let yy = 0; yy < h; yy++) {
-    for (let xx = 0; xx < w; xx++) {
-      if (mapGrid[(ty + yy) * MAP_SZ + (tx + xx)] !== -1) return false;
+  const x0 = Math.max(0, tx - BUILD_CLEARANCE_TILES);
+  const y0 = Math.max(0, ty - BUILD_CLEARANCE_TILES);
+  const x1 = Math.min(MAP_SZ, tx + w + BUILD_CLEARANCE_TILES);
+  const y1 = Math.min(MAP_SZ, ty + h + BUILD_CLEARANCE_TILES);
+  for (let yy = y0; yy < y1; yy++) {
+    const row = yy * MAP_SZ;
+    for (let xx = x0; xx < x1; xx++) {
+      if (mapGrid[row + xx] !== -1) return false;
     }
   }
   return true;
@@ -486,9 +622,14 @@ function spawnBuilding(factionId, type, tx, ty) {
   Builds.ty[id] = ty;
   Builds.w[id] = cfg.w;
   Builds.h[id] = cfg.h;
-  Builds.hp[id] = cfg.hp;
+  Builds.level[id] = 1;
+  Builds.hp[id] = buildingMaxHp(type, 1);
   Builds.queue[id] = 0;
   Builds.queueCount[id] = 0;
+  for (let slot = 0; slot < MAX_TRAIN_QUEUE; slot++) Builds.queueKind[queueSlotIndex(id, slot)] = 0;
+  Builds.hasRally[id] = 0;
+  Builds.rallyX[id] = 0;
+  Builds.rallyY[id] = 0;
   Builds.flash[id] = 0;
 
   for (let yy = 0; yy < cfg.h; yy++) {
@@ -575,15 +716,18 @@ function destroyBuilding(id) {
   }
   if (type !== B_HALL && Factions[fId].current[type] > 0) Factions[fId].current[type]--;
   if (Engine.selectedBuilding === id) Engine.selectedBuilding = -1;
+  if (Engine.rallyBuilding === id) Engine.rallyBuilding = -1;
   Builds.active[id] = 0;
   bFree.push(id);
 }
 
-function spawnUnit(factionId, x, y) {
+function spawnUnit(factionId, x, y, unitType) {
   if (uFree.length === 0) return -1;
+  if (!unitType) unitType = U_SOLDIER;
   const id = uFree.pop();
   Units.active[id] = 1;
   Units.uid[id] = ++Engine.uidGen;
+  Units.kind[id] = unitType;
   Units.faction[id] = factionId;
   Units.x[id] = x;
   Units.y[id] = y;
@@ -591,7 +735,7 @@ function spawnUnit(factionId, x, y) {
   Units.ty[id] = y;
   Units.homeX[id] = x;
   Units.homeY[id] = y;
-  Units.hp[id] = UnitCfg.hp;
+  Units.hp[id] = UnitCfg.hp[unitType];
   Units.state[id] = STATE_IDLE;
   Units.targetType[id] = 0;
   Units.targetId[id] = -1;
@@ -599,12 +743,12 @@ function spawnUnit(factionId, x, y) {
   Units.cooldown[id] = 0;
   Units.scanTimer[id] = (id % 5) * 0.07;
   Units.flash[id] = 0;
-  Units.attackRange[id] = UnitCfg.range;
-  Units.aggroRange[id] = UnitCfg.aggro;
-  Units.chaseRange[id] = UnitCfg.chase;
-  Units.damage[id] = UnitCfg.damage;
-  Units.speed[id] = UnitCfg.speed;
-  Units.visionRange[id] = UnitCfg.vision;
+  Units.attackRange[id] = UnitCfg.range[unitType];
+  Units.aggroRange[id] = UnitCfg.aggro[unitType];
+  Units.chaseRange[id] = UnitCfg.chase[unitType];
+  Units.damage[id] = UnitCfg.damage[unitType];
+  Units.speed[id] = UnitCfg.speed[unitType];
+  Units.visionRange[id] = UnitCfg.vision[unitType];
   Units.order[id] = ORDER_NONE;
   Units.hasWaypoint[id] = 0;
   Units.blockedTime[id] = 0;
@@ -613,6 +757,7 @@ function spawnUnit(factionId, x, y) {
 
 function killUnit(id) {
   if (!Units.active[id]) return;
+  const wasPlayerUnit = Units.faction[id] === 0;
   if (Sel.count > 0) {
     let write = 0;
     for (let i = 0; i < Sel.count; i++) {
@@ -620,8 +765,10 @@ function killUnit(id) {
     }
     Sel.count = write;
   }
+  removeUnitFromSquads(id);
   Units.active[id] = 0;
   uFree.push(id);
+  if (wasPlayerUnit) UI.updateSelectionInfo();
 }
 
 function setUnitTargetUnit(uId, targetId) {
@@ -716,6 +863,7 @@ function acquireVisibleTarget(uId) {
 
 function issueMoveOrder(x, y) {
   if (Sel.count === 0) return;
+  Engine.joinSquadMode = false;
   const cols = Math.min(Sel.count, 6);
   const spacing = 18;
   for (let i = 0; i < Sel.count; i++) {
@@ -737,31 +885,9 @@ function issueMoveOrder(x, y) {
   addPing(x, y);
 }
 
-function issueAttackMoveOrder(x, y) {
-  if (Sel.count === 0) return;
-  const cols = Math.min(Sel.count, 6);
-  const spacing = 18;
-  for (let i = 0; i < Sel.count; i++) {
-    const id = Sel.ids[i];
-    if (!Units.active[id]) continue;
-    const col = i % cols;
-    const row = (i / cols) | 0;
-    const ox = (col - (cols - 1) * 0.5) * spacing;
-    const oy = row * spacing;
-    Units.tx[id] = clamp(x + ox, 8, WORLD_SZ - 8);
-    Units.ty[id] = clamp(y + oy, 8, WORLD_SZ - 8);
-    Units.homeX[id] = Units.x[id];
-    Units.homeY[id] = Units.y[id];
-    Units.state[id] = STATE_ATTACK_MOVE;
-    Units.order[id] = ORDER_ATTACK_MOVE;
-    clearWaypoint(id);
-    clearUnitTarget(id);
-  }
-  addPing(x, y);
-}
-
 function issueAttackOrderUnit(targetId) {
   if (Sel.count === 0) return;
+  Engine.joinSquadMode = false;
   for (let i = 0; i < Sel.count; i++) {
     const id = Sel.ids[i];
     if (!Units.active[id]) continue;
@@ -777,6 +903,7 @@ function issueAttackOrderUnit(targetId) {
 
 function issueAttackOrderBuilding(bId) {
   if (Sel.count === 0) return;
+  Engine.joinSquadMode = false;
   const cx = (Builds.tx[bId] + Builds.w[bId] * 0.5) * TILE;
   const cy = (Builds.ty[bId] + Builds.h[bId] * 0.5) * TILE;
   for (let i = 0; i < Sel.count; i++) {
@@ -917,7 +1044,7 @@ function dealDamageToUnit(attackerId, targetId, amount) {
     killUnit(targetId);
     return;
   }
-  if (Units.active[targetId] && Units.faction[targetId] !== Units.faction[attackerId]) {
+  if (Units.active[targetId] && Units.faction[targetId] !== Units.faction[attackerId] && (Units.order[targetId] === ORDER_NONE || Units.order[targetId] === ORDER_ATTACK_MOVE)) {
     setUnitTargetUnit(targetId, attackerId);
     Units.state[targetId] = STATE_ATTACK;
     Units.homeX[targetId] = Units.x[targetId];
@@ -932,10 +1059,6 @@ function dealDamageToBuilding(targetId, amount) {
   if (Builds.hp[targetId] <= 0) destroyBuilding(targetId);
 }
 
-function collidesBuilding(x, y) {
-  return blockedBuildingAt(x, y) !== -1;
-}
-
 function blockedBuildingAt(x, y) {
   const gx = Math.floor(x / TILE);
   const gy = Math.floor(y / TILE);
@@ -944,7 +1067,7 @@ function blockedBuildingAt(x, y) {
 }
 
 function isStandable(x, y) {
-  return x >= 8 && y >= 8 && x <= WORLD_SZ - 8 && y <= WORLD_SZ - 8 && !collidesBuilding(x, y);
+  return x >= 8 && y >= 8 && x <= WORLD_SZ - 8 && y <= WORLD_SZ - 8 && blockedBuildingAt(x, y) === -1;
 }
 
 function hasClearStepToward(sx, sy, tx, ty) {
@@ -1050,6 +1173,47 @@ function findSpawnPointAroundBuilding(bId, out) {
   return false;
 }
 
+function setUnitMoveOrder(id, x, y) {
+  Units.tx[id] = clamp(x, 8, WORLD_SZ - 8);
+  Units.ty[id] = clamp(y, 8, WORLD_SZ - 8);
+  Units.homeX[id] = Units.tx[id];
+  Units.homeY[id] = Units.ty[id];
+  Units.state[id] = STATE_MOVE;
+  Units.order[id] = ORDER_MOVE;
+  clearWaypoint(id);
+  clearUnitTarget(id);
+}
+
+function chooseBarracksLoiterPoint(bId, uId, out) {
+  const cx = (Builds.tx[bId] + Builds.w[bId] * 0.5) * TILE;
+  const cy = (Builds.ty[bId] + Builds.h[bId] * 0.5) * TILE;
+  const seed = Units.uid[uId] + bId * 17;
+  const angle = seed * 2.399963;
+  const radius = 48 + (seed % 4) * 16;
+  let x = clamp(cx + Math.cos(angle) * radius, 8, WORLD_SZ - 8);
+  let y = clamp(cy + Math.sin(angle) * radius, 8, WORLD_SZ - 8);
+  if (!isStandable(x, y) && !findSpawnPointAroundBuilding(bId, out)) {
+    out[0] = Units.x[uId];
+    out[1] = Units.y[uId];
+    return;
+  }
+  if (isStandable(x, y)) {
+    out[0] = x;
+    out[1] = y;
+  }
+}
+
+function sendFreshUnitFromBarracks(uId, bId) {
+  if (Builds.hasRally[bId]) {
+    setUnitMoveOrder(uId, Builds.rallyX[bId], Builds.rallyY[bId]);
+    return;
+  }
+  if (Builds.faction[bId] !== 0) {
+    chooseBarracksLoiterPoint(bId, uId, TargetPoint);
+    setUnitMoveOrder(uId, TargetPoint[0], TargetPoint[1]);
+  }
+}
+
 function moveUnitStep(id, dt, targetX, targetY) {
   let moveX = targetX;
   let moveY = targetY;
@@ -1121,8 +1285,8 @@ function updateUnits(dt) {
     if (Units.scanTimer[i] > 0) Units.scanTimer[i] -= dt;
     if (Units.flash[i] > 0) Units.flash[i] -= dt;
 
-    // Auto aquisição de alvo se estiver ocioso ou se estiver movendo e um inimigo entrou em alcance.
-    if ((Units.state[i] === STATE_IDLE || Units.state[i] === STATE_MOVE || Units.state[i] === STATE_ATTACK_MOVE) && Units.scanTimer[i] <= 0) {
+    // Ordem manual de movimento tem prioridade; auto-ataque só assume tropas ociosas ou em ataque-movimento.
+    if ((Units.state[i] === STATE_IDLE || Units.state[i] === STATE_ATTACK_MOVE) && Units.scanTimer[i] <= 0) {
       Units.scanTimer[i] = RETARGET_INTERVAL + (i % 3) * 0.03;
       acquireVisibleTarget(i);
     }
@@ -1172,7 +1336,7 @@ function updateUnits(dt) {
         if (Units.cooldown[i] <= 0) {
           if (Units.targetType[i] === 1) dealDamageToUnit(i, Units.targetId[i], Units.damage[i]);
           else if (Units.targetType[i] === 2) dealDamageToBuilding(Units.targetId[i], Units.damage[i]);
-          Units.cooldown[i] = UnitCfg.cooldown;
+          Units.cooldown[i] = UnitCfg.cooldown[Units.kind[i]];
         }
       } else {
         Units.state[i] = STATE_CHASE;
@@ -1205,15 +1369,20 @@ function updateEconomy(dt) {
   UI.updateRes();
 }
 
-function queueUnitFromBarracks(bId) {
+function queueUnitFromBarracks(bId, unitType) {
   if (!Builds.active[bId] || Builds.type[bId] !== B_BARR) return false;
+  if (!unitType) unitType = U_SOLDIER;
+  if (Builds.level[bId] < UnitCfg.barrLevel[unitType]) return false;
   const f = Factions[Builds.faction[bId]];
   if (Builds.queueCount[bId] >= MAX_TRAIN_QUEUE) return false;
   if (!canQueueUnit(Builds.faction[bId])) return false;
-  if (f.grain < UnitCfg.grainCost) return false;
-  f.grain -= UnitCfg.grainCost;
-  Builds.queueCount[bId]++;
-  if (Builds.queue[bId] <= 0) Builds.queue[bId] = TRAIN_TIME;
+  const cost = unitGrainCost(unitType);
+  if (f.grain < cost) return false;
+  f.grain -= cost;
+  if (!pushUnitQueue(bId, unitType)) {
+    f.grain += cost;
+    return false;
+  }
   if (Builds.faction[bId] === 0) UI.updateRes();
   return true;
 }
@@ -1224,41 +1393,40 @@ function updateProduction(dt) {
     Builds.queue[i] -= dt;
     if (Builds.queue[i] <= 0) {
       const fId = Builds.faction[i];
+      const unitType = queuedUnitType(i) || U_SOLDIER;
+      const refund = unitGrainCost(unitType);
       if (!canTrainUnit(fId)) {
-        Factions[fId].grain += UnitCfg.grainCost;
-        if (Builds.queueCount[i] > 0) Builds.queueCount[i]--;
+        Factions[fId].grain += refund;
+        popUnitQueue(i);
         if (fId === 0) {
           UI.updateRes();
           UI.msg('Limite de unidades atingido.', true);
         }
-        Builds.queue[i] = Builds.queueCount[i] > 0 ? TRAIN_TIME : 0;
         continue;
       }
       if (!findSpawnPointAroundBuilding(i, SpawnPoint)) {
-        Factions[fId].grain += UnitCfg.grainCost;
+        Factions[fId].grain += refund;
         if (fId === 0) {
           UI.updateRes();
           UI.msg('Sem espaço livre para a unidade.', true);
         }
-        if (Builds.queueCount[i] > 0) Builds.queueCount[i]--;
-        Builds.queue[i] = Builds.queueCount[i] > 0 ? TRAIN_TIME : 0;
+        popUnitQueue(i);
         continue;
       }
-      const u = spawnUnit(fId, SpawnPoint[0], SpawnPoint[1]);
+      const u = spawnUnit(fId, SpawnPoint[0], SpawnPoint[1], unitType);
       if (u === -1) {
-        Factions[fId].grain += UnitCfg.grainCost;
+        Factions[fId].grain += refund;
         if (fId === 0) {
           UI.updateRes();
           UI.msg('Não foi possível criar a unidade.', true);
         }
-        if (Builds.queueCount[i] > 0) Builds.queueCount[i]--;
-        Builds.queue[i] = Builds.queueCount[i] > 0 ? TRAIN_TIME : 0;
+        popUnitQueue(i);
         continue;
       }
       Units.homeX[u] = Units.x[u];
       Units.homeY[u] = Units.y[u];
-      if (Builds.queueCount[i] > 0) Builds.queueCount[i]--;
-      Builds.queue[i] = Builds.queueCount[i] > 0 ? TRAIN_TIME : 0;
+      sendFreshUnitFromBarracks(u, i);
+      popUnitQueue(i);
     }
   }
 }
@@ -1292,12 +1460,21 @@ function countQueuedUnitsByFaction(fId) {
   return c;
 }
 
+function getUnitCap(fId) {
+  for (let i = 0; i < MAX_B; i++) {
+    if (Builds.active[i] && Builds.faction[i] === fId && Builds.type[i] === B_HALL) {
+      return Builds.level[i] * HALL_UNIT_CAP_STEP;
+    }
+  }
+  return 0;
+}
+
 function canTrainUnit(fId) {
-  return uFree.length > 0 && countUnitsByFaction(fId) < UNIT_CAP;
+  return uFree.length > 0 && countUnitsByFaction(fId) < getUnitCap(fId);
 }
 
 function canQueueUnit(fId) {
-  return uFree.length > 0 && countUnitsByFaction(fId) + countQueuedUnitsByFaction(fId) < UNIT_CAP;
+  return uFree.length > 0 && countUnitsByFaction(fId) + countQueuedUnitsByFaction(fId) < getUnitCap(fId);
 }
 
 function findBuildingOfType(fId, type) {
@@ -1514,8 +1691,15 @@ function updateBots(dt) {
 
     const army = countUnitsByFaction(fId);
     const barr = findBuildingOfType(fId, B_BARR);
-    if (barr !== -1 && f.aiTrainCooldown <= 0 && army < BOT_ARMY_SOFT_CAP) {
-      if (queueUnitFromBarracks(barr)) f.aiTrainCooldown = BOT_TRAIN_DELAY;
+    if (Builds.level[hall] < 2 && army >= 5 && canUpgradeBuilding(hall)) {
+      if (upgradeBuilding(hall)) continue;
+    }
+    if (barr !== -1 && Builds.level[barr] < 2 && army >= 3 && canUpgradeBuilding(barr)) {
+      if (upgradeBuilding(barr)) continue;
+    }
+    if (barr !== -1 && f.aiTrainCooldown <= 0 && army + countQueuedUnitsByFaction(fId) < BOT_ARMY_SOFT_CAP) {
+      const unitType = Builds.level[barr] >= UnitCfg.barrLevel[U_ARCHER] && army >= 3 && ((army + fId + f.aiPhase) % 3 === 0) ? U_ARCHER : U_SOLDIER;
+      if (queueUnitFromBarracks(barr, unitType)) f.aiTrainCooldown = BOT_TRAIN_DELAY;
       else f.aiTrainCooldown = 1.5;
     }
 
@@ -1709,7 +1893,7 @@ function render() {
       ctx.strokeRect(x - 2, y - 2, w + 4, h + 4);
     }
 
-    const hpMax = BuildCfg[Builds.type[i]].hp;
+    const hpMax = buildingMaxHp(Builds.type[i], Builds.level[i]);
     const barW = w - 8;
     const ratio = Math.max(0, Builds.hp[i] / hpMax);
     ctx.fillStyle = '#111';
@@ -1729,13 +1913,44 @@ function render() {
       ctx.textAlign = 'center';
       ctx.fillText(`Fila ${Builds.queueCount[i]}`, x + w * 0.5, y + h * 0.5 + 4 / Engine.cam.z);
     }
+
+    if ((Builds.type[i] === B_HALL || Builds.type[i] === B_BARR) && Builds.level[i] > 1) {
+      ctx.fillStyle = 'rgba(255,255,255,0.82)';
+      ctx.font = `${10 / Engine.cam.z}px system-ui`;
+      ctx.textAlign = 'right';
+      ctx.fillText(`Nv ${Builds.level[i]}`, x + w - 5, y + h - 6);
+    }
+
+    if (Engine.selectedBuilding === i && Builds.type[i] === B_BARR && Builds.hasRally[i]) {
+      const cx = x + w * 0.5;
+      const cy = y + h * 0.5;
+      ctx.strokeStyle = 'rgba(126,214,255,0.72)';
+      ctx.lineWidth = 1.5 / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(Builds.rallyX[i], Builds.rallyY[i]); ctx.stroke();
+      ctx.fillStyle = 'rgba(126,214,255,0.9)';
+      ctx.beginPath(); ctx.arc(Builds.rallyX[i], Builds.rallyY[i], 7, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0b0b0b';
+      ctx.stroke();
+    }
   }
 
   // Unidades
   for (let i = 0; i < MAX_U; i++) {
     if (!Units.active[i]) continue;
+    const uType = Units.kind[i] || U_SOLDIER;
+    const hitRadius = UnitCfg.hitRadius[uType];
     ctx.fillStyle = factionColor(Units.faction[i]);
-    ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], UnitCfg.hitRadius, 0, Math.PI * 2); ctx.fill();
+    if (uType === U_ARCHER) {
+      ctx.beginPath();
+      ctx.moveTo(Units.x[i], Units.y[i] - hitRadius);
+      ctx.lineTo(Units.x[i] + hitRadius, Units.y[i]);
+      ctx.lineTo(Units.x[i], Units.y[i] + hitRadius);
+      ctx.lineTo(Units.x[i] - hitRadius, Units.y[i]);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], hitRadius, 0, Math.PI * 2); ctx.fill();
+    }
     ctx.strokeStyle = '#111';
     ctx.lineWidth = 1 / Engine.cam.z;
     ctx.stroke();
@@ -1755,10 +1970,10 @@ function render() {
     if (Units.flash[i] > 0) {
       const a = Units.flash[i] / FLASH_MAX;
       ctx.fillStyle = `rgba(255,245,190,${0.75 * a})`;
-      ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], UnitCfg.hitRadius + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], hitRadius + 2, 0, Math.PI * 2); ctx.fill();
     }
 
-    const hpRatio = Math.max(0, Units.hp[i] / UnitCfg.hp);
+    const hpRatio = Math.max(0, Units.hp[i] / UnitCfg.hp[uType]);
     ctx.fillStyle = '#111';
     ctx.fillRect(Units.x[i] - 10, Units.y[i] - 16, 20, 3);
     ctx.fillStyle = '#78df88';
@@ -1781,6 +1996,13 @@ function render() {
     const ok = canPlaceBuilding(gx, gy, cfg.w, cfg.h) && canAfford(0, Engine.buildType) && Factions[0].current[Engine.buildType] < Factions[0].limits[Engine.buildType];
     ctx.fillStyle = ok ? 'rgba(0,255,100,0.28)' : 'rgba(255,0,0,0.28)';
     ctx.fillRect(gx * TILE, gy * TILE, cfg.w * TILE, cfg.h * TILE);
+    const cx0 = Math.max(0, gx - BUILD_CLEARANCE_TILES);
+    const cy0 = Math.max(0, gy - BUILD_CLEARANCE_TILES);
+    const cx1 = Math.min(MAP_SZ, gx + cfg.w + BUILD_CLEARANCE_TILES);
+    const cy1 = Math.min(MAP_SZ, gy + cfg.h + BUILD_CLEARANCE_TILES);
+    ctx.strokeStyle = ok ? 'rgba(255,240,190,0.42)' : 'rgba(255,110,110,0.55)';
+    ctx.lineWidth = 1 / Engine.cam.z;
+    ctx.strokeRect(cx0 * TILE, cy0 * TILE, (cx1 - cx0) * TILE, (cy1 - cy0) * TILE);
   }
 
   if (Engine.placingStart) {
@@ -1793,6 +2015,13 @@ function render() {
     const ok = canPlaceBuilding(gx, gy, cfg.w, cfg.h);
     ctx.fillStyle = ok ? 'rgba(216,170,114,0.28)' : 'rgba(255,0,0,0.28)';
     ctx.fillRect(gx * TILE, gy * TILE, cfg.w * TILE, cfg.h * TILE);
+    const cx0 = Math.max(0, gx - BUILD_CLEARANCE_TILES);
+    const cy0 = Math.max(0, gy - BUILD_CLEARANCE_TILES);
+    const cx1 = Math.min(MAP_SZ, gx + cfg.w + BUILD_CLEARANCE_TILES);
+    const cy1 = Math.min(MAP_SZ, gy + cfg.h + BUILD_CLEARANCE_TILES);
+    ctx.strokeStyle = ok ? 'rgba(255,240,190,0.42)' : 'rgba(255,110,110,0.55)';
+    ctx.lineWidth = 1 / Engine.cam.z;
+    ctx.strokeRect(cx0 * TILE, cy0 * TILE, (cx1 - cx0) * TILE, (cy1 - cy0) * TILE);
     ctx.strokeStyle = ok ? 'rgba(255,240,190,0.95)' : 'rgba(255,90,90,0.95)';
     ctx.lineWidth = 2 / Engine.cam.z;
     ctx.strokeRect(gx * TILE, gy * TILE, cfg.w * TILE, cfg.h * TILE);
@@ -1829,6 +2058,14 @@ function render() {
     ctx.textAlign = 'center';
     ctx.fillText('Escolha onde construir sua prefeitura', canvas.width * 0.5, 104);
   }
+  if (Engine.rallyBuilding !== -1) {
+    ctx.fillStyle = 'rgba(0,0,0,0.68)';
+    ctx.fillRect(canvas.width * 0.5 - 155, 82, 310, 34);
+    ctx.fillStyle = '#7ed6ff';
+    ctx.font = '13px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('Toque no mapa para o ponto de reuniao', canvas.width * 0.5, 104);
+  }
   drawMinimap();
 }
 
@@ -1838,6 +2075,100 @@ function screenToWorldUpdate(e) {
   Engine.drag.wy = Temp[1];
 }
 
+function addUnitToSelection(id) {
+  if (id === -1 || !Units.active[id] || Units.faction[id] !== 0) return;
+  for (let i = 0; i < Sel.count; i++) {
+    if (Sel.ids[i] === id) return;
+  }
+  if (Sel.count < MAX_SELECTION) Sel.ids[Sel.count++] = id;
+}
+
+function squadOffset(slot) {
+  return slot * MAX_SELECTION;
+}
+
+function cleanSquad(slot) {
+  let write = 0;
+  const base = squadOffset(slot);
+  const count = Squads.count[slot];
+  for (let i = 0; i < count; i++) {
+    const id = Squads.ids[base + i];
+    if (id < 0 || !Units.active[id] || Units.faction[id] !== 0) continue;
+    let dup = false;
+    for (let k = 0; k < write; k++) {
+      if (Squads.ids[base + k] === id) { dup = true; break; }
+    }
+    if (!dup) Squads.ids[base + write++] = id;
+  }
+  for (let i = write; i < count; i++) Squads.ids[base + i] = -1;
+  Squads.count[slot] = write;
+  return write;
+}
+
+function hasAnySquad() {
+  for (let i = 0; i < MAX_SQUADS; i++) {
+    if (cleanSquad(i) > 0) return true;
+  }
+  return false;
+}
+
+function removeUnitFromSquads(id) {
+  for (let slot = 0; slot < MAX_SQUADS; slot++) {
+    const base = squadOffset(slot);
+    const count = Squads.count[slot];
+    let write = 0;
+    for (let i = 0; i < count; i++) {
+      const uId = Squads.ids[base + i];
+      if (uId !== id) Squads.ids[base + write++] = uId;
+    }
+    for (let i = write; i < count; i++) Squads.ids[base + i] = -1;
+    Squads.count[slot] = write;
+  }
+}
+
+function copySelectionToSquad(slot, append) {
+  if (slot < 0 || slot >= MAX_SQUADS || Sel.count === 0) return false;
+  const base = squadOffset(slot);
+  let count = append ? cleanSquad(slot) : 0;
+  if (!append) {
+    for (let i = 0; i < MAX_SELECTION; i++) Squads.ids[base + i] = -1;
+  }
+  for (let i = 0; i < Sel.count && count < MAX_SELECTION; i++) {
+    const id = Sel.ids[i];
+    if (!Units.active[id] || Units.faction[id] !== 0) continue;
+    let exists = false;
+    for (let k = 0; k < count; k++) {
+      if (Squads.ids[base + k] === id) { exists = true; break; }
+    }
+    if (!exists) Squads.ids[base + count++] = id;
+  }
+  Squads.count[slot] = count;
+  return count > 0;
+}
+
+function selectSquadUnits(slot) {
+  const count = cleanSquad(slot);
+  Sel.count = 0;
+  Engine.selectedBuilding = -1;
+  UI.actionMode = 'root';
+  for (let i = 0; i < count; i++) {
+    addUnitToSelection(Squads.ids[squadOffset(slot) + i]);
+  }
+  Engine.joinSquadMode = false;
+  UI.updateSelectionInfo();
+}
+
+function selectUnitsOfType(unitType) {
+  Sel.count = 0;
+  Engine.selectedBuilding = -1;
+  Engine.joinSquadMode = false;
+  UI.actionMode = 'root';
+  for (let i = 0; i < MAX_U && Sel.count < MAX_SELECTION; i++) {
+    if (Units.active[i] && Units.faction[i] === 0 && Units.kind[i] === unitType) addUnitToSelection(i);
+  }
+  UI.updateSelectionInfo();
+}
+
 function finalizeSelectionBox() {
   const x0 = Math.min(Engine.drag.boxX0, Engine.drag.boxX1);
   const y0 = Math.min(Engine.drag.boxY0, Engine.drag.boxY1);
@@ -1845,10 +2176,12 @@ function finalizeSelectionBox() {
   const y1 = Math.max(Engine.drag.boxY0, Engine.drag.boxY1);
   Sel.count = 0;
   Engine.selectedBuilding = -1;
+  UI.actionMode = 'root';
+  addUnitToSelection(Engine.drag.overOwnUnit);
   for (let i = 0; i < MAX_U && Sel.count < MAX_SELECTION; i++) {
     if (!Units.active[i] || Units.faction[i] !== 0) continue;
     if (Units.x[i] >= x0 && Units.x[i] <= x1 && Units.y[i] >= y0 && Units.y[i] <= y1) {
-      Sel.ids[Sel.count++] = i;
+      addUnitToSelection(i);
     }
   }
   UI.updateSelectionInfo();
@@ -1856,24 +2189,48 @@ function finalizeSelectionBox() {
 
 function issueCommandAt(wx, wy) {
   if (Sel.count === 0) return;
+  Engine.lastTapTime = 0;
+  Engine.lastTapKind = 0;
   const enemyUnit = pickEnemyUnitAt(wx, wy, 0);
   const enemyBuilding = pickEnemyBuildingAt(wx, wy, 0);
   if (enemyUnit !== -1 && Units.faction[enemyUnit] !== 0) issueAttackOrderUnit(enemyUnit);
   else if (enemyBuilding !== -1) issueAttackOrderBuilding(enemyBuilding);
   else issueMoveOrder(wx, wy);
+  UI.updateSelectionInfo();
 }
 
-function handlePrimaryTap(wx, wy, pointerType) {
+function handlePrimaryTap(wx, wy, pointerType, sx, sy) {
   const ownUnit = pickUnitAt(wx, wy, 0);
   const ownBuilding = findOwnBuildingAt(wx, wy, 0);
 
   if (ownUnit !== -1) {
-    setSingleSelection(ownUnit);
+    const now = performance.now();
+    const tapDx = sx - Engine.lastTapSx;
+    const tapDy = sy - Engine.lastTapSy;
+    const unitType = Units.kind[ownUnit] || U_SOLDIER;
+    if (Engine.lastTapKind === unitType && now - Engine.lastTapTime <= DOUBLE_TAP_MS && tapDx * tapDx + tapDy * tapDy <= DOUBLE_TAP_DIST2) {
+      selectUnitsOfType(unitType);
+      UI.msg(`${unitLabel(unitType)} selecionados.`, false);
+      Engine.lastTapTime = 0;
+      Engine.lastTapKind = 0;
+    } else {
+      setSingleSelection(ownUnit);
+      Engine.lastTapTime = now;
+      Engine.lastTapKind = unitType;
+      Engine.lastTapSx = sx;
+      Engine.lastTapSy = sy;
+    }
   } else if (ownBuilding !== -1) {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
     selectBuilding(ownBuilding);
   } else if (pointerType !== 'mouse' && Sel.count > 0) {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
     issueCommandAt(wx, wy);
   } else {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
     clearSelection();
   }
 }
@@ -1884,6 +2241,8 @@ function resetDrag() {
   Engine.drag.pointerType = '';
   Engine.drag.button = 0;
   Engine.drag.mode = 0;
+  Engine.drag.downTime = 0;
+  Engine.drag.overOwnUnit = -1;
 }
 
 canvas.addEventListener('pointerdown', (e) => {
@@ -1895,6 +2254,7 @@ canvas.addEventListener('pointerdown', (e) => {
   Engine.drag.pointerType = e.pointerType || 'mouse';
   Engine.drag.button = e.button || 0;
   Engine.drag.mode = 1;
+  Engine.drag.downTime = performance.now();
   Engine.drag.originSx = Engine.drag.startSx = Engine.drag.sx = e.clientX;
   Engine.drag.originSy = Engine.drag.startSy = Engine.drag.sy = e.clientY;
   if (isOnMinimap(e.clientX, e.clientY)) {
@@ -1929,9 +2289,11 @@ canvas.addEventListener('pointermove', (e) => {
   if (Engine.drag.mode === 1 && moved > TAP_SLOP2) {
     const mouse = Engine.drag.pointerType === 'mouse';
     const panButton = mouse && (Engine.drag.button === 1 || Engine.drag.button === 2);
+    const heldForSelect = !mouse && performance.now() - Engine.drag.downTime >= TOUCH_SELECT_HOLD_MS;
+    const touchSelect = !mouse && (Engine.drag.overOwnUnit !== -1 || heldForSelect);
     if (panButton) {
       Engine.drag.mode = 2;
-    } else if (mouse || Engine.drag.overOwnUnit !== -1) {
+    } else if (mouse || touchSelect) {
       Engine.drag.mode = 3;
       Engine.drag.boxX0 = Engine.drag.startWx;
       Engine.drag.boxY0 = Engine.drag.startWy;
@@ -1976,6 +2338,17 @@ canvas.addEventListener('pointerup', (e) => {
     return;
   }
 
+  if (Engine.rallyBuilding !== -1) {
+    if (mouse && button === 2) {
+      Engine.rallyBuilding = -1;
+      UI.updateSelectionInfo();
+    } else if (tap) {
+      Game.setRallyPoint(Engine.rallyBuilding, Engine.drag.wx, Engine.drag.wy);
+    }
+    resetDrag();
+    return;
+  }
+
   if (Engine.buildType !== 0) {
     if (mouse && button === 2) {
       UI.cancelBuild();
@@ -1990,7 +2363,7 @@ canvas.addEventListener('pointerup', (e) => {
     if (f.current[type] >= f.limits[type]) UI.msg('Limite atingido para esta construção.', true);
     else if (bFree.length === 0) UI.msg('Limite global de construções atingido.', true);
     else if (!canAfford(0, type)) UI.msg('Recursos insuficientes.', true);
-    else if (!canPlaceBuilding(gx, gy, cfg.w, cfg.h)) UI.msg('Local inválido ou ocupado.', true);
+    else if (!canPlaceBuilding(gx, gy, cfg.w, cfg.h)) UI.msg('Local invalido, ocupado ou perto demais.', true);
     else {
       payForBuild(0, type);
       const b = spawnBuilding(0, type, gx, gy);
@@ -2013,7 +2386,7 @@ canvas.addEventListener('pointerup', (e) => {
   if (tap) {
     const wx = Engine.drag.wx, wy = Engine.drag.wy;
     if (mouse && button === 2) issueCommandAt(wx, wy);
-    else if (!mouse || button === 0) handlePrimaryTap(wx, wy, Engine.drag.pointerType);
+    else if (!mouse || button === 0) handlePrimaryTap(wx, wy, Engine.drag.pointerType, e.clientX, e.clientY);
   }
 
   resetDrag();
@@ -2034,7 +2407,15 @@ const UI = {
   selectionText: '',
   spawnVisible: false,
   spawnText: '',
+  archerVisible: false,
+  archerText: '',
+  rallyVisible: false,
+  rallyText: '',
+  upgradeVisible: false,
+  upgradeText: '',
+  squadActionsVisible: false,
   actionMode: 'root',
+  panelMode: '',
   toBotMenu() {
     document.getElementById('mainMenu').classList.add('hidden');
     document.getElementById('endMenu').classList.add('hidden');
@@ -2058,12 +2439,14 @@ const UI = {
     UI.updateSelectionInfo();
   },
   updateActionPanels() {
+    const mode = Engine.buildType !== 0 ? 'build' : (Engine.placingStart ? 'root' : UI.actionMode);
+    if (UI.panelMode === mode) return;
+    UI.panelMode = mode;
     const buildActions = document.getElementById('buildActions');
     const trainActions = document.getElementById('trainActions');
     const openBuild = document.getElementById('openBuild');
     const openTrain = document.getElementById('openTrain');
     if (!buildActions || !trainActions) return;
-    const mode = Engine.buildType !== 0 ? 'build' : (Engine.placingStart ? 'root' : UI.actionMode);
     buildActions.classList.toggle('hidden', mode !== 'build');
     trainActions.classList.toggle('hidden', mode !== 'train');
     if (openBuild) openBuild.classList.toggle('active', mode === 'build');
@@ -2080,6 +2463,7 @@ const UI = {
       return;
     }
     Engine.buildType = type;
+    Engine.rallyBuilding = -1;
     UI.actionMode = 'build';
     document.getElementById('cancelBuild').classList.remove('hidden');
     UI.updateActionPanels();
@@ -2090,6 +2474,16 @@ const UI = {
     document.getElementById('cancelBuild').classList.add('hidden');
     UI.updateActionPanels();
     UI.updateSelectionInfo();
+  },
+  startRallyPoint() {
+    const bId = Engine.selectedBuilding;
+    if (bId === -1 || !Builds.active[bId] || Builds.type[bId] !== B_BARR || Builds.faction[bId] !== 0) {
+      UI.msg('Selecione um quartel seu.', true);
+      return;
+    }
+    Engine.buildType = 0;
+    Engine.rallyBuilding = bId;
+    UI.msg('Toque no mapa para definir o ponto de reuniao.', false);
   },
   msg(txt, err) {
     const box = document.getElementById('msgBox');
@@ -2166,6 +2560,134 @@ const UI = {
     }
     if (trainInfo && trainInfo.textContent !== trainText) trainInfo.textContent = trainText;
     UI.updateActionPanels();
+  },
+  updateSelectionInfo() {
+    const label = document.getElementById('selectionInfo');
+    const spawn = document.getElementById('spawnUnit');
+    const archer = document.getElementById('spawnArcher');
+    const rally = document.getElementById('setRally');
+    const upgrade = document.getElementById('upgradeBuilding');
+    const squadActions = document.getElementById('squadActions');
+    const joinSquad = document.getElementById('joinSquad');
+    const trainInfo = document.getElementById('trainInfo');
+    let text = 'Sem selecao';
+    let showSpawn = false;
+    let showArcher = false;
+    let showRally = false;
+    let showUpgrade = false;
+    let showSquadActions = false;
+    let spawnHtml = `Soldado<small>${unitGrainCost(U_SOLDIER)}G</small>`;
+    let archerHtml = `Arqueiro<small>${unitGrainCost(U_ARCHER)}G</small>`;
+    let rallyHtml = 'Ponto<small>Reuniao</small>';
+    let upgradeHtml = 'Melhorar<small>Estrutura</small>';
+    let trainText = 'Selecione um quartel para ver a fila.';
+
+    if (Engine.placingStart) {
+      text = 'Escolha sua prefeitura inicial';
+    } else if (Engine.rallyBuilding !== -1) {
+      text = 'Definindo ponto de reuniao';
+    } else if (Engine.buildType !== 0) {
+      text = 'Posicione: ' + buildingLabel(Engine.buildType);
+    } else if (Engine.selectedBuilding !== -1) {
+      const bId = Engine.selectedBuilding;
+      const bType = Builds.type[bId];
+      text = buildingLabel(bType);
+
+      if (bType === B_HALL || bType === B_BARR) {
+        text = `${buildingLabel(bType)} Nv ${Builds.level[bId]}`;
+        if (bType === B_HALL) text += ` - limite ${getUnitCap(Builds.faction[bId])}`;
+        if (Builds.faction[bId] === 0 && Builds.level[bId] < MAX_BUILD_LEVEL) {
+          const next = Builds.level[bId] + 1;
+          showUpgrade = true;
+          upgradeHtml = `Melhorar<small>${upgradeCostW(bType, next)}M ${upgradeCostS(bType, next)}P ${upgradeCostG(bType, next)}G</small>`;
+        }
+      }
+
+      if (bType === B_BARR) {
+        const q = Builds.queueCount[bId];
+        const t = Math.ceil(Builds.queue[bId]);
+        const firstType = queuedUnitType(bId);
+        text = q > 0 ? `Quartel Nv ${Builds.level[bId]} - Fila ${q}/${MAX_TRAIN_QUEUE} (${t}s)` : `Quartel Nv ${Builds.level[bId]} - Fila 0/${MAX_TRAIN_QUEUE}`;
+        trainText = q > 0 ? `Fila: ${q}/${MAX_TRAIN_QUEUE}. Treinando ${unitLabel(firstType)} em ${t}s.` : `Fila do quartel: 0/${MAX_TRAIN_QUEUE}.`;
+        trainText += Builds.hasRally[bId] ? ' Ponto de reuniao definido.' : ' Sem ponto de reuniao.';
+        if (Builds.level[bId] < UnitCfg.barrLevel[U_ARCHER]) trainText += ' Arqueiro exige quartel nv2.';
+        spawnHtml = q >= MAX_TRAIN_QUEUE ? 'Soldado<small>Fila cheia</small>' : (!canQueueUnit(0) ? 'Soldado<small>Limite</small>' : `Soldado<small>${unitGrainCost(U_SOLDIER)}G Fila ${q}/${MAX_TRAIN_QUEUE}</small>`);
+        archerHtml = q >= MAX_TRAIN_QUEUE ? 'Arqueiro<small>Fila cheia</small>' : (!canQueueUnit(0) ? 'Arqueiro<small>Limite</small>' : `Arqueiro<small>${unitGrainCost(U_ARCHER)}G Nv2</small>`);
+        rallyHtml = Builds.hasRally[bId] ? 'Ponto<small>Alterar</small>' : 'Ponto<small>Reuniao</small>';
+        showSpawn = Builds.faction[bId] === 0;
+        showArcher = Builds.faction[bId] === 0 && Builds.level[bId] >= UnitCfg.barrLevel[U_ARCHER];
+        showRally = Builds.faction[bId] === 0;
+      }
+    } else if (Sel.count > 0) {
+      text = Sel.count === 1 ? '1 unidade selecionada' : `${Sel.count} unidades selecionadas`;
+      showSquadActions = true;
+    }
+
+    if (UI.selectionText !== text) {
+      label.textContent = text;
+      UI.selectionText = text;
+    }
+    if (UI.spawnVisible !== showSpawn) {
+      spawn.classList.toggle('hidden', !showSpawn);
+      UI.spawnVisible = showSpawn;
+    }
+    if (UI.spawnText !== spawnHtml) {
+      spawn.innerHTML = spawnHtml;
+      UI.spawnText = spawnHtml;
+    }
+    if (archer && UI.archerVisible !== showArcher) {
+      archer.classList.toggle('hidden', !showArcher);
+      UI.archerVisible = showArcher;
+    }
+    if (archer && UI.archerText !== archerHtml) {
+      archer.innerHTML = archerHtml;
+      UI.archerText = archerHtml;
+    }
+    if (rally && UI.rallyVisible !== showRally) {
+      rally.classList.toggle('hidden', !showRally);
+      UI.rallyVisible = showRally;
+    }
+    if (rally && UI.rallyText !== rallyHtml) {
+      rally.innerHTML = rallyHtml;
+      UI.rallyText = rallyHtml;
+    }
+    if (upgrade && UI.upgradeVisible !== showUpgrade) {
+      upgrade.classList.toggle('hidden', !showUpgrade);
+      UI.upgradeVisible = showUpgrade;
+    }
+    if (upgrade && UI.upgradeText !== upgradeHtml) {
+      upgrade.innerHTML = upgradeHtml;
+      UI.upgradeText = upgradeHtml;
+    }
+    if (squadActions && UI.squadActionsVisible !== showSquadActions) {
+      squadActions.classList.toggle('hidden', !showSquadActions);
+      UI.squadActionsVisible = showSquadActions;
+    }
+    if (joinSquad) {
+      const anySquad = hasAnySquad();
+      joinSquad.disabled = !anySquad || Sel.count === 0;
+      joinSquad.classList.toggle('active', Engine.joinSquadMode);
+      joinSquad.innerHTML = Engine.joinSquadMode ? 'Escolha<small>Quadrado</small>' : (anySquad ? 'Juntar<small>Ao esquadrao</small>' : 'Juntar<small>Sem esquadrao</small>');
+    }
+    if (trainInfo && trainInfo.textContent !== trainText) trainInfo.textContent = trainText;
+    UI.updateSquadPanel();
+    UI.updateActionPanels();
+  },
+  updateSquadPanel() {
+    const bar = document.getElementById('squadBar');
+    if (!bar) return;
+    let anyVisible = Engine.joinSquadMode;
+    for (let slot = 0; slot < MAX_SQUADS; slot++) {
+      const btn = document.getElementById('squadSlot' + slot);
+      const count = cleanSquad(slot);
+      if (count > 0) anyVisible = true;
+      if (!btn) continue;
+      btn.innerHTML = `${slot + 1}<small>${count}</small>`;
+      btn.disabled = count === 0 && !Engine.joinSquadMode;
+      btn.classList.toggle('empty', count === 0);
+      btn.classList.toggle('join-target', Engine.joinSquadMode);
+    }
+    bar.classList.toggle('hidden', !anyVisible);
   }
 };
 
@@ -2182,23 +2704,47 @@ const Game = {
     Sel.count = 0;
     Engine.selectedBuilding = -1;
     Engine.buildType = 0;
+    Engine.rallyBuilding = -1;
+    Engine.joinSquadMode = false;
     Engine.placingStart = false;
     Engine.pendingBotCount = 0;
     Engine.msgTimer = 0;
     UI.actionMode = 'root';
+    UI.panelMode = '';
     UI.selectionText = '';
     UI.spawnVisible = false;
     UI.spawnText = '';
+    UI.archerVisible = false;
+    UI.archerText = '';
+    UI.rallyVisible = false;
+    UI.rallyText = '';
+    UI.upgradeVisible = false;
+    UI.upgradeText = '';
+    UI.squadActionsVisible = false;
+    Squads.count.fill(0);
+    Squads.ids.fill(-1);
     const cancelBtn = document.getElementById('cancelBuild');
     if (cancelBtn) cancelBtn.classList.add('hidden');
     const spawnBtn = document.getElementById('spawnUnit');
     if (spawnBtn) spawnBtn.classList.add('hidden');
+    const archerBtn = document.getElementById('spawnArcher');
+    if (archerBtn) archerBtn.classList.add('hidden');
+    const rallyBtn = document.getElementById('setRally');
+    if (rallyBtn) rallyBtn.classList.add('hidden');
+    const upgradeBtn = document.getElementById('upgradeBuilding');
+    if (upgradeBtn) upgradeBtn.classList.add('hidden');
+    const squadActions = document.getElementById('squadActions');
+    if (squadActions) squadActions.classList.add('hidden');
+    const squadBar = document.getElementById('squadBar');
+    if (squadBar) squadBar.classList.add('hidden');
     Engine.econAcc = 0;
     Engine.botAcc = 0;
     Engine.uidGen = 1;
     Engine.cam.x = WORLD_SZ / 2;
     Engine.cam.y = WORLD_SZ / 2;
     Engine.cam.z = 1;
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
     Pings.count = 0;
   },
   start(botCount) {
@@ -2258,9 +2804,103 @@ const Game = {
     UI.cancelBuild();
     UI.showEnd(victory);
   },
-  requestUnit() {
+  setRallyPoint(bId, wx, wy) {
+    if (!Builds.active[bId] || Builds.type[bId] !== B_BARR || Builds.faction[bId] !== 0) return;
+    const x = clamp(wx, 8, WORLD_SZ - 8);
+    const y = clamp(wy, 8, WORLD_SZ - 8);
+    if (!isStandable(x, y)) {
+      UI.msg('Escolha um ponto livre para a reuniao.', true);
+      return;
+    }
+    Builds.hasRally[bId] = 1;
+    Builds.rallyX[bId] = x;
+    Builds.rallyY[bId] = y;
+    Engine.rallyBuilding = -1;
+    addPing(Builds.rallyX[bId], Builds.rallyY[bId]);
+    UI.msg('Ponto de reuniao definido.', false);
+    UI.updateSelectionInfo();
+  },
+  createSquadFromSelection() {
+    if (Sel.count === 0) {
+      UI.msg('Selecione unidades primeiro.', true);
+      return;
+    }
+    for (let slot = 0; slot < MAX_SQUADS; slot++) {
+      if (cleanSquad(slot) === 0) {
+        copySelectionToSquad(slot, false);
+        Engine.joinSquadMode = false;
+        UI.msg(`Esquadrao ${slot + 1} criado.`, false);
+        UI.updateSelectionInfo();
+        return;
+      }
+    }
+    UI.msg('Todos os esquadroes ja existem. Use juntar.', true);
+  },
+  startJoinSquad() {
+    if (Sel.count === 0) {
+      UI.msg('Selecione unidades primeiro.', true);
+      return;
+    }
+    if (!hasAnySquad()) {
+      UI.msg('Crie um esquadrao primeiro.', true);
+      return;
+    }
+    Engine.joinSquadMode = true;
+    UI.msg('Toque em um quadrado para juntar as unidades.', false);
+    UI.updateSelectionInfo();
+  },
+  selectSquad(slot) {
+    if (slot < 0 || slot >= MAX_SQUADS) return;
+    if (Engine.joinSquadMode) {
+      if (Sel.count === 0) {
+        Engine.joinSquadMode = false;
+        UI.updateSelectionInfo();
+        return;
+      }
+      if (copySelectionToSquad(slot, true)) {
+        Engine.joinSquadMode = false;
+        UI.msg(`Unidades adicionadas ao esquadrao ${slot + 1}.`, false);
+        UI.updateSelectionInfo();
+      }
+      return;
+    }
+    if (cleanSquad(slot) === 0) {
+      UI.msg('Esquadrao vazio.', true);
+      UI.updateSquadPanel();
+      return;
+    }
+    selectSquadUnits(slot);
+    UI.msg(`Esquadrao ${slot + 1} selecionado.`, false);
+  },
+  upgradeSelectedBuilding() {
+    const bId = Engine.selectedBuilding;
+    if (bId === -1 || !Builds.active[bId] || Builds.faction[bId] !== 0) {
+      UI.msg('Selecione uma estrutura sua.', true);
+      return;
+    }
+    if (Builds.type[bId] !== B_HALL && Builds.type[bId] !== B_BARR) {
+      UI.msg('Esta estrutura nao pode ser melhorada.', true);
+      return;
+    }
+    if (Builds.level[bId] >= MAX_BUILD_LEVEL) {
+      UI.msg('Nivel maximo atingido.', true);
+      return;
+    }
+    if (!canUpgradeBuilding(bId)) {
+      UI.msg('Recursos insuficientes para melhorar.', true);
+      return;
+    }
+    upgradeBuilding(bId);
+    UI.msg(`${buildingLabel(Builds.type[bId])} no nivel ${Builds.level[bId]}.`, false);
+  },
+  requestUnit(unitType) {
+    if (!unitType) unitType = U_SOLDIER;
     if (Engine.selectedBuilding === -1 || !Builds.active[Engine.selectedBuilding] || Builds.type[Engine.selectedBuilding] !== B_BARR) {
       UI.msg('Selecione um quartel.', true);
+      return;
+    }
+    if (Builds.level[Engine.selectedBuilding] < UnitCfg.barrLevel[unitType]) {
+      UI.msg(`${unitLabel(unitType)} exige quartel nivel ${UnitCfg.barrLevel[unitType]}.`, true);
       return;
     }
     if (!canQueueUnit(0)) {
@@ -2271,11 +2911,11 @@ const Game = {
       UI.msg('Fila do quartel cheia.', true);
       return;
     }
-    if (Factions[0].grain < UnitCfg.grainCost) {
-      UI.msg('Grao insuficiente para treinar soldado.', true);
+    if (Factions[0].grain < unitGrainCost(unitType)) {
+      UI.msg(`Grao insuficiente para treinar ${unitLabel(unitType)}.`, true);
       return;
     }
-    if (!queueUnitFromBarracks(Engine.selectedBuilding)) {
+    if (!queueUnitFromBarracks(Engine.selectedBuilding, unitType)) {
       UI.msg('Nao foi possivel adicionar a unidade na fila.', true);
       return;
     }
