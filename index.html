@@ -61,7 +61,17 @@
     .res-icon { width: 12px; height: 12px; border-radius: 3px; }
     #selectionInfo { color: var(--accent); font-size: 12px; font-weight: 800; }
     #actions {
+      display: flex; flex-direction: column; gap: 8px; justify-content: center; align-items: center;
+    }
+    #actionTabs {
+      display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;
+    }
+    .action-group {
       display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center;
+    }
+    .action-info {
+      color: var(--muted); font-size: 11px; font-weight: 700; min-width: min(260px, 86vw);
+      text-align: center; padding: 4px 8px;
     }
     .action-btn {
       background: var(--btn); color: var(--text); border: 1px solid #58635b; border-radius: 8px;
@@ -69,6 +79,7 @@
       pointer-events: auto;
     }
     .action-btn:active:not(:disabled) { background: var(--btn-active); transform: scale(0.97); }
+    .action-btn.active { background: var(--btn-active); border-color: var(--accent); }
     .action-btn:disabled { opacity: 0.4; filter: grayscale(1); }
     .action-btn small { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
     .limit-info { color: var(--cyan); }
@@ -120,12 +131,21 @@
 
     <div class="hud hud-bottom">
       <div id="actions">
-        <button id="buildMine" class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small>10M <span id="lim-2" class="limit-info">(0/2)</span></small></button>
-        <button id="buildLumber" class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small>10M <span id="lim-3" class="limit-info">(0/2)</span></small></button>
-        <button id="buildFarm" class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small>10M 5P <span id="lim-4" class="limit-info">(0/1)</span></small></button>
-        <button id="buildBarracks" class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small>20M 20P <span id="lim-5" class="limit-info">(0/1)</span></small></button>
-        <button id="spawnUnit" class="action-btn hidden" onclick="Game.requestUnit()">Soldado<small>10G</small></button>
-        <button id="cancelBuild" class="action-btn hidden" onclick="UI.cancelBuild()" style="border-color:#b96a6a;color:#ffd0d0">Cancelar<small>Construção</small></button>
+        <div id="actionTabs">
+          <button id="openBuild" class="action-btn" onclick="UI.showActionMode('build')">Construir<small>Estruturas</small></button>
+          <button id="openTrain" class="action-btn" onclick="UI.showActionMode('train')">Recrutar<small>Tropas</small></button>
+        </div>
+        <div id="buildActions" class="action-group hidden">
+          <button id="buildMine" class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small>10M <span id="lim-2" class="limit-info">(0/2)</span></small></button>
+          <button id="buildLumber" class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small>10M <span id="lim-3" class="limit-info">(0/2)</span></small></button>
+          <button id="buildFarm" class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small>10M 5P <span id="lim-4" class="limit-info">(0/1)</span></small></button>
+          <button id="buildBarracks" class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small>20M 20P <span id="lim-5" class="limit-info">(0/1)</span></small></button>
+          <button id="cancelBuild" class="action-btn hidden" onclick="UI.cancelBuild()" style="border-color:#b96a6a;color:#ffd0d0">Cancelar<small>Construcao</small></button>
+        </div>
+        <div id="trainActions" class="action-group hidden">
+          <div id="trainInfo" class="action-info">Selecione um quartel para ver a fila.</div>
+          <button id="spawnUnit" class="action-btn hidden" onclick="Game.requestUnit()">Soldado<small>10G</small></button>
+        </div>
       </div>
     </div>
   </div>
@@ -165,6 +185,7 @@ const BOT_TRAIN_DELAY = 14.0;
 const BOT_ARMY_SOFT_CAP = 6;
 const BOT_ATTACK_MIN_ARMY = 6;
 const BOT_ATTACK_COOLDOWN = 18;
+const BOT_DEFENSE_RESERVE = 2;
 const START_MIN_DIST_TILES = 18;
 const FLASH_MAX = 0.22;
 
@@ -278,6 +299,8 @@ const Pings = {
   y: new Float32Array(16),
   t: new Float32Array(16)
 };
+
+const BotReserveIds = new Int16Array(8);
 
 const Sel = {
   count: 0,
@@ -924,6 +947,16 @@ function isStandable(x, y) {
   return x >= 8 && y >= 8 && x <= WORLD_SZ - 8 && y <= WORLD_SZ - 8 && !collidesBuilding(x, y);
 }
 
+function hasClearStepToward(sx, sy, tx, ty) {
+  const dx = tx - sx;
+  const dy = ty - sy;
+  const d2 = dx * dx + dy * dy;
+  if (d2 < 1) return true;
+  const d = Math.sqrt(d2);
+  const step = Math.min(24, d);
+  return blockedBuildingAt(sx + (dx / d) * step, sy + (dy / d) * step) === -1;
+}
+
 function trySetDetour(id, blockerId, finalX, finalY) {
   if (blockerId < 0 || !Builds.active[blockerId]) return false;
   const ux = Units.x[id];
@@ -932,7 +965,7 @@ function trySetDetour(id, blockerId, finalX, finalY) {
   let bestY = 0;
   let bestScore = 1e30;
 
-  for (let ring = 0; ring <= 3; ring++) {
+  for (let ring = 0; ring <= 6; ring++) {
     const leftTx = Builds.tx[blockerId] - 1 - ring;
     const rightTx = Builds.tx[blockerId] + Builds.w[blockerId] + ring;
     const topTy = Builds.ty[blockerId] - 1 - ring;
@@ -941,13 +974,13 @@ function trySetDetour(id, blockerId, finalX, finalY) {
     for (let tx = leftTx; tx <= rightTx; tx++) {
       const x = tx * TILE + TILE * 0.5;
       const topY = topTy * TILE + TILE * 0.5;
-      if (isStandable(x, topY)) {
+      if (isStandable(x, topY) && hasClearStepToward(ux, uy, x, topY)) {
         const fromUnit = distSq(ux, uy, x, topY);
         const score = distSq(x, topY, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = x; bestY = topY; }
       }
       const bottomY = bottomTy * TILE + TILE * 0.5;
-      if (isStandable(x, bottomY)) {
+      if (isStandable(x, bottomY) && hasClearStepToward(ux, uy, x, bottomY)) {
         const fromUnit = distSq(ux, uy, x, bottomY);
         const score = distSq(x, bottomY, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = x; bestY = bottomY; }
@@ -957,13 +990,13 @@ function trySetDetour(id, blockerId, finalX, finalY) {
     for (let ty = topTy + 1; ty < bottomTy; ty++) {
       const y = ty * TILE + TILE * 0.5;
       const leftX = leftTx * TILE + TILE * 0.5;
-      if (isStandable(leftX, y)) {
+      if (isStandable(leftX, y) && hasClearStepToward(ux, uy, leftX, y)) {
         const fromUnit = distSq(ux, uy, leftX, y);
         const score = distSq(leftX, y, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = leftX; bestY = y; }
       }
       const rightX = rightTx * TILE + TILE * 0.5;
-      if (isStandable(rightX, y)) {
+      if (isStandable(rightX, y) && hasClearStepToward(ux, uy, rightX, y)) {
         const fromUnit = distSq(ux, uy, rightX, y);
         const score = distSq(rightX, y, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = rightX; bestY = y; }
@@ -1056,10 +1089,18 @@ function moveUnitStep(id, dt, targetX, targetY) {
     const blockY = blockedBuildingAt(Units.x[id], ny);
     if (blockX === -1) {
       Units.x[id] = clamp(nx, 8, WORLD_SZ - 8);
-      Units.blockedTime[id] = 0;
+      Units.blockedTime[id] += dt;
+      if (blocker >= 0 && Units.blockedTime[id] > 0.22) {
+        if (trySetDetour(id, blocker, targetX, targetY)) return false;
+        Units.blockedTime[id] = 0;
+      }
     } else if (blockY === -1) {
       Units.y[id] = clamp(ny, 8, WORLD_SZ - 8);
-      Units.blockedTime[id] = 0;
+      Units.blockedTime[id] += dt;
+      if (blocker >= 0 && Units.blockedTime[id] > 0.22) {
+        if (trySetDetour(id, blocker, targetX, targetY)) return false;
+        Units.blockedTime[id] = 0;
+      }
     } else {
       Units.blockedTime[id] += dt;
       if (blocker < 0) blocker = blockX >= 0 ? blockX : blockY;
@@ -1168,7 +1209,7 @@ function queueUnitFromBarracks(bId) {
   if (!Builds.active[bId] || Builds.type[bId] !== B_BARR) return false;
   const f = Factions[Builds.faction[bId]];
   if (Builds.queueCount[bId] >= MAX_TRAIN_QUEUE) return false;
-  if (!canTrainUnit(Builds.faction[bId])) return false;
+  if (!canQueueUnit(Builds.faction[bId])) return false;
   if (f.grain < UnitCfg.grainCost) return false;
   f.grain -= UnitCfg.grainCost;
   Builds.queueCount[bId]++;
@@ -1243,8 +1284,20 @@ function countUnitsByFaction(fId) {
   return c;
 }
 
+function countQueuedUnitsByFaction(fId) {
+  let c = 0;
+  for (let i = 0; i < MAX_B; i++) {
+    if (Builds.active[i] && Builds.faction[i] === fId && Builds.type[i] === B_BARR) c += Builds.queueCount[i];
+  }
+  return c;
+}
+
 function canTrainUnit(fId) {
   return uFree.length > 0 && countUnitsByFaction(fId) < UNIT_CAP;
+}
+
+function canQueueUnit(fId) {
+  return uFree.length > 0 && countUnitsByFaction(fId) + countQueuedUnitsByFaction(fId) < UNIT_CAP;
 }
 
 function findBuildingOfType(fId, type) {
@@ -1318,10 +1371,44 @@ function tryBuildForFaction(fId, type, nearTx, nearTy, radius) {
   return false;
 }
 
-function orderFactionAttackMove(fId, x, y) {
+function markBotDefenseReserve(fId, reserve) {
+  BotReserveIds.fill(-1);
+  if (reserve <= 0) return 0;
+  const hall = findHall(fId);
+  if (hall === -1) return 0;
+  const hx = (Builds.tx[hall] + Builds.w[hall] * 0.5) * TILE;
+  const hy = (Builds.ty[hall] + Builds.h[hall] * 0.5) * TILE;
+  const limit = Math.min(reserve, BotReserveIds.length);
+  let found = 0;
+
+  for (let slot = 0; slot < limit; slot++) {
+    let best = -1;
+    let bestD = 1e30;
+    for (let i = 0; i < MAX_U; i++) {
+      if (!Units.active[i] || Units.faction[i] !== fId) continue;
+      let already = false;
+      for (let k = 0; k < found; k++) if (BotReserveIds[k] === i) { already = true; break; }
+      if (already) continue;
+      const d = distSq(hx, hy, Units.x[i], Units.y[i]);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    if (best === -1) break;
+    BotReserveIds[found++] = best;
+  }
+  return found;
+}
+
+function isReservedBotUnit(id, reserveCount) {
+  for (let i = 0; i < reserveCount; i++) if (BotReserveIds[i] === id) return true;
+  return false;
+}
+
+function orderFactionAttackMove(fId, x, y, reserve) {
+  const reserveCount = markBotDefenseReserve(fId, reserve || 0);
   let count = 0;
   for (let i = 0; i < MAX_U; i++) {
     if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    if (isReservedBotUnit(i, reserveCount)) continue;
     const col = count % 6;
     const row = (count / 6) | 0;
     Units.tx[i] = clamp(x + (col - 2.5) * 18, 8, WORLD_SZ - 8);
@@ -1336,7 +1423,7 @@ function orderFactionAttackMove(fId, x, y) {
   }
 }
 
-function orderFactionAttackVisible(fId, targetType, targetId) {
+function orderFactionAttackVisible(fId, targetType, targetId, reserve) {
   let tx = 0;
   let ty = 0;
   if (targetType === 1) {
@@ -1351,8 +1438,10 @@ function orderFactionAttackVisible(fId, targetType, targetId) {
     return;
   }
 
+  const reserveCount = markBotDefenseReserve(fId, reserve || 0);
   for (let i = 0; i < MAX_U; i++) {
     if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    if (isReservedBotUnit(i, reserveCount)) continue;
     Units.tx[i] = tx;
     Units.ty[i] = ty;
     Units.homeX[i] = Units.x[i];
@@ -1366,14 +1455,28 @@ function orderFactionAttackVisible(fId, targetType, targetId) {
 
 function chooseBotScoutPoint(fId) {
   const f = Factions[fId];
-  const slot = (f.aiPhase + fId) % 6;
+  const hall = findHall(fId);
+  let bx = WORLD_SZ * 0.5;
+  let by = WORLD_SZ * 0.5;
+  if (hall !== -1) {
+    bx = (Builds.tx[hall] + Builds.w[hall] * 0.5) * TILE;
+    by = (Builds.ty[hall] + Builds.h[hall] * 0.5) * TILE;
+  }
   f.aiPhase++;
-  if (slot === 0) { Temp[0] = WORLD_SZ * 0.5; Temp[1] = WORLD_SZ * 0.5; }
-  else if (slot === 1) { Temp[0] = WORLD_SZ * 0.25; Temp[1] = WORLD_SZ * 0.5; }
-  else if (slot === 2) { Temp[0] = WORLD_SZ * 0.75; Temp[1] = WORLD_SZ * 0.5; }
-  else if (slot === 3) { Temp[0] = WORLD_SZ * 0.5; Temp[1] = WORLD_SZ * 0.25; }
-  else if (slot === 4) { Temp[0] = WORLD_SZ * 0.5; Temp[1] = WORLD_SZ * 0.75; }
-  else { Temp[0] = WORLD_SZ * 0.5; Temp[1] = WORLD_SZ * 0.5; }
+  const seed = f.aiPhase * 97 + fId * 53;
+  const angle = seed * 2.399963;
+  const radius = WORLD_SZ * (0.22 + (seed % 5) * 0.075);
+  const sidePull = ((seed / 5) | 0) % 4;
+  let tx = bx + Math.cos(angle) * radius;
+  let ty = by + Math.sin(angle) * radius;
+
+  if (sidePull === 0) tx = (tx + WORLD_SZ * 0.18) * 0.5;
+  else if (sidePull === 1) tx = (tx + WORLD_SZ * 0.82) * 0.5;
+  else if (sidePull === 2) ty = (ty + WORLD_SZ * 0.18) * 0.5;
+  else ty = (ty + WORLD_SZ * 0.82) * 0.5;
+
+  Temp[0] = clamp(tx, TILE * 2, WORLD_SZ - TILE * 2);
+  Temp[1] = clamp(ty, TILE * 2, WORLD_SZ - TILE * 2);
 }
 
 function updateBots(dt) {
@@ -1418,10 +1521,10 @@ function updateBots(dt) {
 
     // Fase 3: ataque com número mínimo de unidades
     if (army >= BOT_ATTACK_MIN_ARMY && f.aiAttackCooldown <= 0) {
-      if (findVisibleEnemyForFaction(fId)) orderFactionAttackVisible(fId, Temp[0], Temp[1]);
+      if (findVisibleEnemyForFaction(fId)) orderFactionAttackVisible(fId, Temp[0], Temp[1], BOT_DEFENSE_RESERVE);
       else {
         chooseBotScoutPoint(fId);
-        orderFactionAttackMove(fId, Temp[0], Temp[1]);
+        orderFactionAttackMove(fId, Temp[0], Temp[1], BOT_DEFENSE_RESERVE);
       }
       f.aiAttackCooldown = BOT_ATTACK_COOLDOWN;
     }
@@ -1931,6 +2034,7 @@ const UI = {
   selectionText: '',
   spawnVisible: false,
   spawnText: '',
+  actionMode: 'root',
   toBotMenu() {
     document.getElementById('mainMenu').classList.add('hidden');
     document.getElementById('endMenu').classList.add('hidden');
@@ -1944,6 +2048,27 @@ const UI = {
     document.getElementById('endSubtitle').textContent = victory ? 'As prefeituras inimigas caíram.' : 'Sua prefeitura foi destruída.';
     document.getElementById('endMenu').classList.remove('hidden');
   },
+  showActionMode(mode) {
+    if (Engine.placingStart) {
+      UI.msg('Escolha a prefeitura inicial primeiro.', true);
+      return;
+    }
+    UI.actionMode = UI.actionMode === mode ? 'root' : mode;
+    UI.updateActionPanels();
+    UI.updateSelectionInfo();
+  },
+  updateActionPanels() {
+    const buildActions = document.getElementById('buildActions');
+    const trainActions = document.getElementById('trainActions');
+    const openBuild = document.getElementById('openBuild');
+    const openTrain = document.getElementById('openTrain');
+    if (!buildActions || !trainActions) return;
+    const mode = Engine.buildType !== 0 ? 'build' : (Engine.placingStart ? 'root' : UI.actionMode);
+    buildActions.classList.toggle('hidden', mode !== 'build');
+    trainActions.classList.toggle('hidden', mode !== 'train');
+    if (openBuild) openBuild.classList.toggle('active', mode === 'build');
+    if (openTrain) openTrain.classList.toggle('active', mode === 'train');
+  },
   prepBuild(type) {
     if (Engine.placingStart) {
       UI.msg('Escolha a prefeitura inicial primeiro.', true);
@@ -1955,12 +2080,15 @@ const UI = {
       return;
     }
     Engine.buildType = type;
+    UI.actionMode = 'build';
     document.getElementById('cancelBuild').classList.remove('hidden');
+    UI.updateActionPanels();
     UI.updateSelectionInfo();
   },
   cancelBuild() {
     Engine.buildType = 0;
     document.getElementById('cancelBuild').classList.add('hidden');
+    UI.updateActionPanels();
     UI.updateSelectionInfo();
   },
   msg(txt, err) {
@@ -2001,9 +2129,11 @@ const UI = {
   updateSelectionInfo() {
     const label = document.getElementById('selectionInfo');
     const spawn = document.getElementById('spawnUnit');
+    const trainInfo = document.getElementById('trainInfo');
     let text = 'Sem seleção';
     let showSpawn = false;
     let spawnHtml = 'Soldado<small>10G</small>';
+    let trainText = 'Selecione um quartel para ver a fila.';
     if (Engine.placingStart) {
       text = 'Escolha sua prefeitura inicial';
     } else if (Engine.buildType !== 0) {
@@ -2015,7 +2145,8 @@ const UI = {
         const q = Builds.queueCount[bId];
         const t = Math.ceil(Builds.queue[bId]);
         text = q > 0 ? `Quartel - Fila ${q}/${MAX_TRAIN_QUEUE} (${t}s)` : `Quartel - Fila 0/${MAX_TRAIN_QUEUE}`;
-        spawnHtml = q >= MAX_TRAIN_QUEUE ? 'Soldado<small>Fila cheia</small>' : `Soldado<small>10G Fila ${q}/${MAX_TRAIN_QUEUE}</small>`;
+        trainText = q > 0 ? `Fila do quartel: ${q}/${MAX_TRAIN_QUEUE}. Proximo soldado em ${t}s.` : `Fila do quartel: 0/${MAX_TRAIN_QUEUE}.`;
+        spawnHtml = q >= MAX_TRAIN_QUEUE ? 'Soldado<small>Fila cheia</small>' : (!canQueueUnit(0) ? 'Soldado<small>Limite</small>' : `Soldado<small>10G Fila ${q}/${MAX_TRAIN_QUEUE}</small>`);
         showSpawn = true;
       }
     } else if (Sel.count > 0) {
@@ -2033,6 +2164,8 @@ const UI = {
       spawn.innerHTML = spawnHtml;
       UI.spawnText = spawnHtml;
     }
+    if (trainInfo && trainInfo.textContent !== trainText) trainInfo.textContent = trainText;
+    UI.updateActionPanels();
   }
 };
 
@@ -2052,6 +2185,14 @@ const Game = {
     Engine.placingStart = false;
     Engine.pendingBotCount = 0;
     Engine.msgTimer = 0;
+    UI.actionMode = 'root';
+    UI.selectionText = '';
+    UI.spawnVisible = false;
+    UI.spawnText = '';
+    const cancelBtn = document.getElementById('cancelBuild');
+    if (cancelBtn) cancelBtn.classList.add('hidden');
+    const spawnBtn = document.getElementById('spawnUnit');
+    if (spawnBtn) spawnBtn.classList.add('hidden');
     Engine.econAcc = 0;
     Engine.botAcc = 0;
     Engine.uidGen = 1;
@@ -2122,7 +2263,7 @@ const Game = {
       UI.msg('Selecione um quartel.', true);
       return;
     }
-    if (!canTrainUnit(0)) {
+    if (!canQueueUnit(0)) {
       UI.msg('Limite de unidades atingido.', true);
       return;
     }
