@@ -27,8 +27,9 @@
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       background: rgba(10, 14, 11, 0.97); color: var(--text);
     }
+    html.config-scroll, html.config-scroll body { touch-action: pan-y; }
     #botMenu {
-      justify-content: flex-start; overflow-y: auto;
+      display: block; overflow-y: auto;
       padding: max(10px, env(safe-area-inset-top, 0px)) 0 max(10px, env(safe-area-inset-bottom, 0px));
       touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     }
@@ -46,7 +47,7 @@
     .menu-btn:active { background: var(--btn-active); transform: scale(0.98); }
     .bot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .setup-panel {
-      width: min(760px, 94vw); max-height: calc(100dvh - 20px); overflow-y: auto;
+      width: min(760px, 94vw); max-height: none; overflow: visible; margin: 0 auto;
       padding: 18px; color: var(--text); background: rgba(16, 22, 18, 0.92);
       border: 1px solid #344039; border-radius: 8px; box-shadow: 0 18px 60px rgba(0,0,0,0.45);
       touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
@@ -556,6 +557,11 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
+
+function setConfigScroll(enabled) {
+  document.documentElement.classList.toggle('config-scroll', !!enabled);
+  document.body.classList.toggle('config-scroll', !!enabled);
+}
 
 function toWorld(sx, sy) {
   Temp[0] = (sx - canvas.width * 0.5) / Engine.cam.z + Engine.cam.x;
@@ -2800,6 +2806,7 @@ const UI = {
     UI.updateLobby();
   },
   toBotMenu() {
+    setConfigScroll(true);
     document.getElementById('mainMenu').classList.add('hidden');
     document.getElementById('endMenu').classList.add('hidden');
     document.getElementById('botMenu').classList.remove('hidden');
@@ -2807,6 +2814,7 @@ const UI = {
     UI.updateLobby();
   },
   showEnd(victory) {
+    setConfigScroll(false);
     document.getElementById('uiLayer').classList.add('hidden');
     document.getElementById('botMenu').classList.add('hidden');
     document.getElementById('mainMenu').classList.add('hidden');
@@ -3176,6 +3184,7 @@ const Game = {
     const cfg = options || {};
     configureMap(cfg.mapSize || MAP_SIZE_TILES[1]);
     Game.reset();
+    setConfigScroll(false);
     document.getElementById('botMenu').classList.add('hidden');
     document.getElementById('endMenu').classList.add('hidden');
     document.getElementById('uiLayer').classList.remove('hidden');
