@@ -45,7 +45,6 @@
       font-size: 20px; font-weight: 700; min-width: 220px; padding: 16px 28px; margin: 10px; cursor: pointer;
     }
     .menu-btn:active { background: var(--btn-active); transform: scale(0.98); }
-    .bot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .setup-panel {
       width: min(760px, 94vw); max-height: none; overflow: visible; margin: 0 auto;
       padding: 18px; color: var(--text); background: rgba(16, 22, 18, 0.92);
@@ -72,10 +71,10 @@
     .setup-choice.active, .setup-mini-btn.active {
       background: var(--btn-active); border-color: var(--accent);
     }
-    .setup-choice:disabled {
-      opacity: 0.45; filter: grayscale(1);
-    }
     .setup-choice small { display: block; color: var(--muted); font-size: 10px; margin-top: 2px; }
+    .setup-slider {
+      width: 100%; accent-color: var(--accent); touch-action: pan-y;
+    }
     .setup-counter {
       display: flex; align-items: center; justify-content: center; gap: 10px;
     }
@@ -108,45 +107,102 @@
       display: flex; flex-direction: column; justify-content: space-between;
     }
     .hud {
-      pointer-events: auto; background: var(--panel); color: var(--text);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.45);
+      pointer-events: auto; color: var(--text);
     }
     .hud-top {
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; padding: 10px 12px;
-      border-bottom: 1px solid #2d3730;
+      display: flex; align-items: center; gap: 6px; width: 100%;
+      padding: calc(env(safe-area-inset-top, 0px) + 6px) 8px 6px;
+      overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+      background: rgba(12, 17, 14, 0.86); border-bottom: 1px solid rgba(61,74,64,0.72);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.32); touch-action: pan-x;
     }
+    .hud-top * { touch-action: pan-x; }
+    .hud-top::-webkit-scrollbar { display: none; }
     .hud-bottom {
-      padding: 8px 10px calc(env(safe-area-inset-bottom, 0px) + 10px);
-      border-top: 1px solid #2d3730;
+      align-self: center; width: min(760px, 100%);
+      padding: 6px 8px calc(env(safe-area-inset-bottom, 0px) + 7px);
+      background: transparent; box-shadow: none;
     }
-    .res-item { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
-    .res-icon { width: 12px; height: 12px; border-radius: 3px; }
-    #selectionInfo { color: var(--accent); font-size: 12px; font-weight: 800; }
+    .res-item {
+      flex: 0 0 auto; min-width: 78px; min-height: 38px;
+      display: grid; grid-template-columns: 26px minmax(0, 1fr); grid-template-rows: 17px 10px;
+      align-items: center; column-gap: 6px; padding: 5px 7px;
+      background: rgba(29, 40, 33, 0.9); border: 1px solid rgba(112,128,116,0.48);
+      border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 3px 10px rgba(0,0,0,0.24);
+    }
+    .res-icon {
+      grid-row: 1 / 3; width: 26px; height: 26px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      color: #0d120f; font-size: 12px; font-weight: 950;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 5px rgba(0,0,0,0.25);
+    }
+    .res-item span { color: #fff; font-size: 16px; font-weight: 950; line-height: 1; }
+    .res-item small { color: var(--muted); font-size: 8px; font-weight: 850; text-transform: uppercase; line-height: 1; }
+    .res-item.warn { border-color: #d8aa72; }
+    .res-item.danger { border-color: #d86f62; }
+    #selectionInfo {
+      flex: 0 0 auto; min-width: 126px; max-width: 330px; min-height: 38px;
+      color: var(--accent); font-size: 11px; font-weight: 950; line-height: 1.12;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(20, 27, 22, 0.9); border: 1px solid rgba(216,170,114,0.34);
+      border-radius: 8px; padding: 5px 10px; text-align: center; white-space: normal; overflow: hidden;
+    }
+    .impl-card {
+      flex: 0 0 auto; display: grid; grid-template-columns: 26px minmax(70px, 1fr) auto; gap: 6px;
+      align-items: center; width: 214px; min-height: 38px; padding: 5px 8px;
+      background: rgba(40, 42, 29, 0.94); border: 1px solid rgba(216,170,114,0.7);
+      border-radius: 8px; box-shadow: 0 5px 14px rgba(0,0,0,0.24);
+    }
+    .impl-icon {
+      width: 26px; height: 26px; border-radius: 7px; background: var(--accent);
+      color: #16120b; display: flex; align-items: center; justify-content: center;
+      font-weight: 950; font-size: 12px;
+    }
+    .impl-title { min-width: 0; }
+    .impl-title span { display: block; color: #ffe7b8; font-size: 10px; font-weight: 950; text-transform: uppercase; line-height: 1; }
+    .impl-title small { display: block; color: var(--muted); font-size: 8px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    #valImplementation { color: #fff; font-size: 18px; font-weight: 950; min-width: 38px; text-align: right; }
+    .impl-track {
+      grid-column: 2 / 4; height: 4px; background: rgba(0,0,0,0.36);
+      border-radius: 8px; overflow: hidden;
+    }
+    #implementationBar { width: 100%; height: 100%; background: var(--accent); border-radius: 8px; }
+    .impl-card.ending { border-color: #e67862; }
+    .impl-card.ending #implementationBar { background: #e67862; }
     #actions {
-      display: flex; flex-direction: column; gap: 8px; justify-content: center; align-items: center;
+      display: flex; flex-direction: column; gap: 6px; justify-content: center; align-items: center;
     }
     #actionTabs {
-      display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;
+      display: flex; gap: 7px; justify-content: center; align-items: center;
+      padding: 5px; border-radius: 8px; background: rgba(12, 18, 15, 0.58);
+      border: 1px solid rgba(75,92,80,0.42); backdrop-filter: blur(2px);
     }
     .action-group {
-      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center;
+      display: flex; flex-wrap: nowrap; gap: 7px; justify-content: flex-start; align-items: center;
+      max-width: min(720px, 96vw); overflow-x: auto; padding: 5px; scrollbar-width: none;
+      border-radius: 8px; background: rgba(12, 18, 15, 0.64); border: 1px solid rgba(75,92,80,0.42);
+      touch-action: pan-x;
     }
+    .action-group * { touch-action: pan-x; }
+    .action-group::-webkit-scrollbar { display: none; }
     .action-info {
-      color: var(--muted); font-size: 11px; font-weight: 700; min-width: min(260px, 86vw);
-      text-align: center; padding: 4px 8px;
+      color: var(--muted); font-size: 11px; font-weight: 850; min-width: min(250px, 80vw);
+      text-align: center; padding: 7px 9px; border: 1px solid rgba(112,128,116,0.35);
+      border-radius: 8px; background: rgba(21, 29, 24, 0.86);
     }
     .action-btn {
-      background: var(--btn); color: var(--text); border: 1px solid #58635b; border-radius: 8px;
-      padding: 10px 14px; min-width: 92px; font-size: 12px; font-weight: 800; text-align: center;
-      pointer-events: auto;
+      background: rgba(52,69,58,0.96); color: var(--text); border: 1px solid #58635b; border-radius: 8px;
+      padding: 9px 12px; min-width: 104px; min-height: 46px; font-size: 13px; font-weight: 900; text-align: center;
+      pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.05);
     }
     .action-btn:active:not(:disabled) { background: var(--btn-active); transform: scale(0.97); }
-    .action-btn.active { background: var(--btn-active); border-color: var(--accent); }
+    .action-btn.active { background: var(--btn-active); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(216,170,114,0.18), 0 4px 12px rgba(0,0,0,0.26); }
     .action-btn:disabled { opacity: 0.4; filter: grayscale(1); }
-    .action-btn small { display: block; margin-top: 2px; font-size: 10px; color: var(--muted); }
+    .action-btn small { display: block; margin-top: 2px; font-size: 9px; color: var(--muted); font-weight: 850; }
+    #actionTabs .action-btn { min-width: 118px; }
     .limit-info { color: var(--cyan); }
     .squad-bar {
-      position: absolute; left: 10px; top: 82px; z-index: 35; pointer-events: auto;
+      position: absolute; left: 10px; top: calc(env(safe-area-inset-top, 0px) + 118px); z-index: 35; pointer-events: auto;
       display: flex; flex-direction: column; gap: 6px;
     }
     .squad-slot {
@@ -157,13 +213,77 @@
     .squad-slot small { display: block; margin-top: 4px; color: var(--cyan); font-size: 10px; }
     .squad-slot.empty { opacity: 0.45; }
     .squad-slot.join-target { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(216,170,114,0.22); }
-
+    .side-settings-btn {
+      position: absolute; left: 9px; top: calc(env(safe-area-inset-top, 0px) + 64px);
+      z-index: 38; pointer-events: auto; width: 42px; height: 42px;
+      border-radius: 8px; border: 1px solid rgba(126,214,255,0.48);
+      background: rgba(18, 26, 22, 0.9); color: #eaf7ff; font-size: 11px; font-weight: 950;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.32);
+    }
+    .settings-panel {
+      position: absolute; left: 9px; top: calc(env(safe-area-inset-top, 0px) + 112px);
+      z-index: 39; pointer-events: auto; width: min(230px, 82vw); padding: 8px;
+      border-radius: 8px; border: 1px solid rgba(126,214,255,0.36);
+      background: rgba(14, 20, 17, 0.94); box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+    }
+    .settings-title {
+      color: var(--cyan); font-size: 11px; font-weight: 950; text-transform: uppercase;
+      margin: 2px 4px 7px;
+    }
+    .settings-panel .action-btn {
+      width: 100%; min-height: 40px; margin-top: 6px; padding: 8px 10px; text-align: left;
+    }
     #msgBox {
-      position: absolute; top: 74px; left: 50%; transform: translateX(-50%);
+      position: absolute; top: calc(env(safe-area-inset-top, 0px) + 64px); left: 50%; transform: translateX(-50%);
       max-width: min(88vw, 520px);
-      background: rgba(0,0,0,0.76); color: #fff; border: 1px solid #424242; border-radius: 24px;
-      padding: 12px 18px; font-size: 13px; text-align: center; z-index: 40; opacity: 0; transition: opacity 0.2s;
+      background: rgba(0,0,0,0.76); color: #fff; border: 1px solid #424242; border-radius: 8px;
+      padding: 9px 14px; font-size: 12px; text-align: center; z-index: 40; opacity: 0; transition: opacity 0.2s;
       pointer-events: none;
+    }
+    #uiLayer.hud-min .res-item small,
+    #uiLayer.hud-min .impl-title small,
+    #uiLayer.hud-min #selectionInfo { display: none; }
+    #uiLayer.hud-min .res-item {
+      min-width: 58px; grid-template-columns: 22px minmax(0, 1fr); grid-template-rows: 1fr;
+      min-height: 32px; padding: 4px 6px;
+    }
+    #uiLayer.hud-min .res-icon { width: 22px; height: 22px; font-size: 10px; }
+    #uiLayer.hud-min .res-item span { font-size: 14px; }
+    #uiLayer.hud-min .impl-card { width: 92px; grid-template-columns: 22px auto; min-height: 32px; padding: 4px 6px; }
+    #uiLayer.hud-min .impl-icon { width: 22px; height: 22px; font-size: 10px; }
+    #uiLayer.hud-min .impl-title { display: none; }
+    #uiLayer.hud-min #valImplementation { font-size: 15px; min-width: 34px; }
+    #uiLayer.hud-min .impl-track { grid-column: 1 / 3; height: 3px; }
+    @media (min-width: 720px) {
+      .hud-top { justify-content: center; }
+      .res-item { min-width: 118px; }
+      #selectionInfo { min-width: 170px; }
+      .impl-card { width: 260px; }
+      .hud-bottom { width: min(820px, 100%); }
+      .action-group { justify-content: center; flex-wrap: wrap; }
+    }
+    @media (orientation: landscape) and (max-height: 520px) {
+      .hud-top { width: auto; max-width: calc(100% - 74px); border-right: 1px solid rgba(61,74,64,0.72); border-bottom-right-radius: 8px; }
+      .hud-bottom { width: auto; max-width: calc(100% - 120px); }
+      .action-btn { min-height: 40px; padding: 7px 10px; }
+      #actionTabs .action-btn { min-width: 108px; }
+      .side-settings-btn { top: calc(env(safe-area-inset-top, 0px) + 58px); }
+      .settings-panel { top: calc(env(safe-area-inset-top, 0px) + 104px); }
+    }
+    @media (max-width: 430px) {
+      .hud-top { gap: 5px; padding-left: 6px; padding-right: 6px; }
+      .res-item { min-width: 66px; grid-template-columns: 22px minmax(0, 1fr); padding: 4px 5px; }
+      .res-icon { width: 22px; height: 22px; font-size: 10px; }
+      .res-item span { font-size: 14px; }
+      .res-item small { font-size: 7px; }
+      .impl-card { width: 92px; grid-template-columns: 22px auto; min-height: 34px; padding: 4px 6px; }
+      .impl-icon { width: 22px; height: 22px; font-size: 10px; }
+      .impl-title { display: none; }
+      #valImplementation { font-size: 15px; min-width: 34px; }
+      .impl-track { grid-column: 1 / 3; height: 3px; }
+      #selectionInfo { min-width: 112px; max-width: 220px; font-size: 10px; }
+      .action-btn { min-width: 96px; }
+      #actionTabs .action-btn { min-width: 110px; }
     }
   </style>
 </head>
@@ -198,6 +318,20 @@
       </div>
 
       <div class="setup-section">
+        <div class="setup-label">Recursos iniciais</div>
+        <input id="startResourceSlider" class="setup-slider" type="range" min="0" max="4" step="1" value="1" oninput="UI.setLobbyStartResources(this.value)" />
+        <div id="startResourceLabel" class="setup-subtitle" style="margin:8px 0 0">Padrao: 260M / 180P / 90G</div>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-row" style="justify-content:space-between">
+          <div class="setup-label" style="margin-bottom:0">Modo observador</div>
+          <button id="observerToggle" class="setup-mini-btn" onclick="UI.toggleLobbyObserver()">Desligado</button>
+        </div>
+        <div id="observerInfo" class="setup-subtitle" style="margin:8px 0 0">Jogue normalmente escolhendo a sua Prefeitura inicial.</div>
+      </div>
+
+      <div class="setup-section">
         <div class="setup-row" style="justify-content:space-between">
           <div class="setup-label" style="margin-bottom:0">Times</div>
           <button id="teamToggle" class="setup-mini-btn" onclick="UI.toggleLobbyTeams()">Desligado</button>
@@ -228,13 +362,13 @@
       </div>
 
       <div id="setupWarning" class="setup-warning"></div>
-      <button class="menu-btn" onclick="Game.startFromLobby()">Iniciar partida</button>
+      <button id="startMatchBtn" class="menu-btn" onclick="Game.startFromLobby()">Iniciar partida</button>
     </div>
   </div>
 
   <div id="endMenu" class="overlay hidden">
     <div id="endTitle" class="title">Vitória</div>
-    <div id="endSubtitle" class="subtitle">A prefeitura inimiga caiu.</div>
+    <div id="endSubtitle" class="subtitle">Os assentamentos inimigos cairam.</div>
     <button class="menu-btn" onclick="UI.toBotMenu()">Jogar novamente</button>
   </div>
 
@@ -242,14 +376,27 @@
 
   <div id="uiLayer" class="hidden">
     <div class="hud hud-top">
-      <div class="res-item"><div class="res-icon" style="background:#8b5a2b"></div><span id="valWood">0</span></div>
-      <div class="res-item"><div class="res-icon" style="background:#858585"></div><span id="valStone">0</span></div>
-      <div class="res-item"><div class="res-icon" style="background:#f4d03f"></div><span id="valGrain">0</span></div>
-      <div class="res-item"><div class="res-icon" style="background:#7ed6ff"></div><span id="valUnits">0/0</span></div>
+      <div class="res-item"><div class="res-icon" style="background:#b98555">M</div><span id="valWood">0</span><small>Madeira</small></div>
+      <div class="res-item"><div class="res-icon" style="background:#b9bcc0">P</div><span id="valStone">0</span><small>Pedra</small></div>
+      <div class="res-item"><div class="res-icon" style="background:#f1d36b">G</div><span id="valGrain">0</span><small>Grao</small></div>
+      <div id="unitInfo" class="res-item"><div class="res-icon" style="background:#7ed6ff">T</div><span id="valUnits">0/0</span><small>Tropas</small></div>
+      <div id="implementationInfo" class="impl-card hidden">
+        <div class="impl-icon">I</div>
+        <div class="impl-title"><span>Implementacao</span><small>Construcoes e melhorias aceleradas</small></div>
+        <strong id="valImplementation">45s</strong>
+        <div class="impl-track"><div id="implementationBar"></div></div>
+      </div>
       <div id="selectionInfo">Sem seleção</div>
     </div>
 
     <div id="msgBox">Mensagem</div>
+    <button id="settingsToggle" class="side-settings-btn" onclick="UI.toggleSettingsPanel()">HUD</button>
+    <div id="settingsPanel" class="settings-panel hidden">
+      <div class="settings-title">Opcoes</div>
+      <button id="compactHudBtn" class="action-btn" onclick="UI.toggleCompactHud()">HUD compacto<small>Mais mapa livre</small></button>
+      <button class="action-btn" onclick="UI.requestLandscape()">Tela horizontal<small>Fullscreen quando possivel</small></button>
+      <button class="action-btn" onclick="UI.toggleSettingsPanel()">Fechar<small>Voltar ao jogo</small></button>
+    </div>
     <div id="squadBar" class="squad-bar hidden">
       <button id="squadSlot0" class="squad-slot" onclick="Game.selectSquad(0)">1<small>0</small></button>
       <button id="squadSlot1" class="squad-slot" onclick="Game.selectSquad(1)">2<small>0</small></button>
@@ -261,7 +408,7 @@
       <div id="actions">
         <div id="actionTabs">
         <button id="openBuild" class="action-btn" onclick="UI.showActionMode('build')">Construir<small>Estruturas</small></button>
-        <button id="openTrain" class="action-btn" onclick="UI.showActionMode('train')">Recrutar<small>Tropas</small></button>
+        <button id="openTrain" class="action-btn" onclick="UI.showActionMode('train')">Treinar<small>Tropas</small></button>
       </div>
       <button id="upgradeBuilding" class="action-btn hidden" onclick="Game.upgradeSelectedBuilding()">Melhorar<small>Estrutura</small></button>
       <div id="squadActions" class="action-group hidden">
@@ -269,16 +416,29 @@
         <button id="joinSquad" class="action-btn" onclick="Game.startJoinSquad()">Juntar<small>Ao esquadrao</small></button>
       </div>
       <div id="buildActions" class="action-group hidden">
-        <button class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small>10M <span id="lim-2" class="limit-info">(0/2)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small>10M <span id="lim-3" class="limit-info">(0/2)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small>10M 5P <span id="lim-4" class="limit-info">(0/1)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small>20M 20P <span id="lim-5" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_HALL)">Prefeitura<small><span id="cost-1">360M 300P 140G 180s</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small><span id="cost-2">90M 45P 70s</span> <span id="lim-2" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small><span id="cost-3">90M 45P 70s</span> <span id="lim-3" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small><span id="cost-4">120M 60P 20G 80s</span> <span id="lim-4" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small><span id="cost-5">180M 140P 45G 100s</span> <span id="lim-5" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_WORKSHOP)">Oficina<small><span id="cost-6">320M 260P 100G 140s</span> <span id="lim-6" class="limit-info">(0/0)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_TOWER)">Torre<small><span id="cost-7">45M 180P 55G 90s</span> <span id="lim-7" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_WALL)">Muro<small><span id="cost-8">70M 260P 90G 75s</span> <span id="lim-8" class="limit-info">(0/0)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_STABLE)">Criadouro<small><span id="cost-9">150M 90P 80G 95s</span> <span id="lim-9" class="limit-info">(0/1)</span></small></button>
+        <button id="rotateBuild" class="action-btn hidden" onclick="UI.rotateBuild()">Girar<small>Muro 2x6</small></button>
         <button id="cancelBuild" class="action-btn hidden" onclick="UI.cancelBuild()" style="border-color:#b96a6a;color:#ffd0d0">Cancelar<small>Construcao</small></button>
       </div>
         <div id="trainActions" class="action-group hidden">
-          <div id="trainInfo" class="action-info">Selecione um quartel para ver a fila.</div>
-          <button id="spawnUnit" class="action-btn hidden" onclick="Game.requestUnit(U_SOLDIER)">Soldado<small>10G</small></button>
-          <button id="spawnArcher" class="action-btn hidden" onclick="Game.requestUnit(U_ARCHER)">Arqueiro<small>14G</small></button>
+          <div id="trainInfo" class="action-info">Selecione uma estrutura militar para ver a fila.</div>
+          <button id="spawnUnit" class="action-btn hidden" onclick="Game.requestUnit(U_SOLDIER)">Soldado<small>14G</small></button>
+          <button id="spawnArcher" class="action-btn hidden" onclick="Game.requestUnit(U_ARCHER)">Arqueiro<small>22G</small></button>
+          <button id="spawnMage" class="action-btn hidden" onclick="Game.requestUnit(U_MAGE)">Mago<small>55G</small></button>
+          <button id="spawnCavalry" class="action-btn hidden" onclick="Game.requestUnit(U_CAVALRY)">Cavalaria<small>55G</small></button>
+          <button id="spawnChariot" class="action-btn hidden" onclick="Game.requestUnit(U_CHARIOT)">Biga<small>70G</small></button>
+          <button id="spawnElephant" class="action-btn hidden" onclick="Game.requestUnit(U_ELEPHANT)">Elefante<small>180G</small></button>
+          <button id="spawnRam" class="action-btn hidden" onclick="Game.requestUnit(U_RAM)">Ariete<small>70G</small></button>
+          <button id="spawnBallista" class="action-btn hidden" onclick="Game.requestUnit(U_BALLISTA)">Besta<small>95G</small></button>
+          <button id="spawnCatapult" class="action-btn hidden" onclick="Game.requestUnit(U_CATAPULT)">Catapulta<small>130G</small></button>
           <button id="setRally" class="action-btn hidden" onclick="UI.startRallyPoint()">Ponto<small>Reuniao</small></button>
         </div>
       </div>
@@ -294,14 +454,14 @@
 // - Combate automático com auto-defesa
 // - Simulação fixa independente do FPS
 // - Seleção por gesto no mobile
-// - Bot respeitando economia, limites e quartel
+// - Bot respeitando economia, limites e estruturas militares
 // ============================================================
 
 const TILE = 32;
 let MAP_SZ = 60;
 let WORLD_SZ = TILE * MAP_SZ;
 const MAX_U = 512;
-const MAX_B = 192;
+const MAX_B = 384;
 const MAX_BOTS = 10;
 const FIXED_STEP = 1 / 30;
 const ECON_INTERVAL = 2.0;
@@ -312,23 +472,35 @@ let HASH_H = Math.ceil(WORLD_SZ / HASH_CELL_SIZE);
 let HASH_COUNT = HASH_W * HASH_H;
 const MAX_SELECTION = 64;
 const MAX_SQUADS = 4;
+const MAX_ATTACK_FX = 96;
 const TAP_SLOP2 = 144;
 const TOUCH_SELECT_HOLD_MS = 180;
 const DOUBLE_TAP_MS = 330;
 const DOUBLE_TAP_DIST2 = 28 * 28;
+const TAP_KIND_GROUND = -1;
+const UNIT_SEPARATION_SCALE = 1.65;
+const UNIT_SEPARATION_PUSH = 0.55;
+const UNIT_SEPARATION_MAX = 7.5;
+const UNIT_REGEN_DELAY = 8.0;
+const UNIT_REGEN_RATE = 1.15;
 const BUILD_CLEARANCE_TILES = 1;
 const CAMERA_MIN_Z = 0.5;
 const CAMERA_MAX_Z = 1.55;
 const RETARGET_INTERVAL = 0.35;
-const TRAIN_TIME = 3.0;
-const MAX_TRAIN_QUEUE = 5;
+const IMPLEMENTATION_DURATION = 90;
+const IMPLEMENTATION_COST_MULT = 0.5;
+const IMPLEMENTATION_TIME_MULT = 0.25;
+const TRAIN_TIME = 3.6;
+const MAX_TRAIN_QUEUE = 64;
 const MAX_BUILD_LEVEL = 3;
 const HALL_UNIT_CAP_STEP = 15;
 const START_MIN_DIST_TILES = 18;
 const FLASH_MAX = 0.22;
+const BUILD_WORK_NONE = 0;
+const BUILD_WORK_CONSTRUCT = 1;
+const BUILD_WORK_UPGRADE = 2;
 const BOT_DIFF_TRAINING = 0;
 const BOT_DIFF_NORMAL = 1;
-const BOT_DIFF_VETERAN = 2;
 const BOT_DIFF_COUNT = 3;
 const MAP_SIZE_TILES = [48, 60, 76];
 const BotDiffCfg = {
@@ -346,6 +518,36 @@ const BotDiffCfg = {
 };
 const BOT_DIFF_LABELS = ['IA treino', 'IA normal', 'IA veterano'];
 const BOT_DIFF_SHORT_LABELS = ['Treino', 'Normal', 'Veterano'];
+const START_RESOURCE_LABELS = ['Baixo', 'Padrao', 'Rico', 'Abundante', 'Sandbox'];
+const START_RESOURCE_W = new Int16Array([180, 260, 420, 650, 1000]);
+const START_RESOURCE_S = new Int16Array([120, 180, 300, 480, 800]);
+const START_RESOURCE_G = new Int16Array([60, 90, 160, 260, 500]);
+const HALL_BUILD_RANGE_TILES = new Uint8Array([0, 10, 14, 18]);
+const HALL_BUILD_TIME = 180;
+const HALL_UPGRADE_W = new Int16Array([0, 0, 260, 620]);
+const HALL_UPGRADE_S = new Int16Array([0, 0, 200, 460]);
+const HALL_UPGRADE_G = new Int16Array([0, 0, 90, 220]);
+const HALL_UPGRADE_TIME = new Float32Array([0, 0, 120, 210]);
+const BARR_UPGRADE_W = new Int16Array([0, 0, 180, 340]);
+const BARR_UPGRADE_S = new Int16Array([0, 0, 140, 260]);
+const BARR_UPGRADE_G = new Int16Array([0, 0, 70, 140]);
+const BARR_UPGRADE_TIME = new Float32Array([0, 0, 110, 180]);
+const ECO_UPGRADE_W = new Int16Array([0, 0, 140, 260]);
+const ECO_UPGRADE_S = new Int16Array([0, 0, 90, 180]);
+const ECO_UPGRADE_G = new Int16Array([0, 0, 45, 100]);
+const ECO_UPGRADE_TIME = new Float32Array([0, 0, 95, 155]);
+const WORKSHOP_UPGRADE_W = new Int16Array([0, 0, 260, 460]);
+const WORKSHOP_UPGRADE_S = new Int16Array([0, 0, 220, 380]);
+const WORKSHOP_UPGRADE_G = new Int16Array([0, 0, 120, 220]);
+const WORKSHOP_UPGRADE_TIME = new Float32Array([0, 0, 150, 240]);
+const DEF_UPGRADE_W = new Int16Array([0, 0, 75, 140]);
+const DEF_UPGRADE_S = new Int16Array([0, 0, 180, 320]);
+const DEF_UPGRADE_G = new Int16Array([0, 0, 70, 130]);
+const DEF_UPGRADE_TIME = new Float32Array([0, 0, 105, 170]);
+const STABLE_UPGRADE_W = new Int16Array([0, 0, 190, 360]);
+const STABLE_UPGRADE_S = new Int16Array([0, 0, 120, 240]);
+const STABLE_UPGRADE_G = new Int16Array([0, 0, 130, 260]);
+const STABLE_UPGRADE_TIME = new Float32Array([0, 0, 120, 195]);
 
 // Tipos de construção
 const B_HALL = 1;
@@ -353,9 +555,29 @@ const B_MINE = 2;
 const B_WOOD = 3;
 const B_FARM = 4;
 const B_BARR = 5;
+const B_WORKSHOP = 6;
+const B_TOWER = 7;
+const B_WALL = 8;
+const B_STABLE = 9;
 
 const U_SOLDIER = 1;
 const U_ARCHER = 2;
+const U_RAM = 3;
+const U_MAGE = 4;
+const U_CAVALRY = 5;
+const U_CHARIOT = 6;
+const U_ELEPHANT = 7;
+const U_BALLISTA = 8;
+const U_CATAPULT = 9;
+
+const HALL_LIMIT_MINE = new Uint8Array([0, 2, 3, 3]);
+const HALL_LIMIT_WOOD = new Uint8Array([0, 2, 3, 3]);
+const HALL_LIMIT_FARM = new Uint8Array([0, 1, 2, 3]);
+const HALL_LIMIT_BARR = new Uint8Array([0, 1, 2, 2]);
+const HALL_LIMIT_WORKSHOP = new Uint8Array([0, 0, 1, 1]);
+const HALL_LIMIT_TOWER = new Uint8Array([0, 2, 2, 3]);
+const HALL_LIMIT_WALL = new Uint8Array([0, 0, 8, 14]);
+const HALL_LIMIT_STABLE = new Uint8Array([0, 1, 1, 1]);
 
 // Estados de unidade
 const STATE_IDLE = 0;
@@ -371,27 +593,36 @@ const ORDER_ATTACK_MOVE = 3;
 
 // Banco fixo de configuração
 const BuildCfg = {
-  1: { name: 'Prefeitura', w: 3, h: 3, costW: 0,  costS: 0,  costG: 0, hp: 1000, income: [1,1,1], vision: 190 },
-  2: { name: 'Mina',       w: 2, h: 2, costW: 10, costS: 0,  costG: 0, hp: 480,  income: [0,2,0], vision: 110 },
-  3: { name: 'Lenha',      w: 2, h: 2, costW: 10, costS: 0,  costG: 0, hp: 480,  income: [2,0,0], vision: 110 },
-  4: { name: 'Fazenda',    w: 3, h: 3, costW: 10, costS: 5,  costG: 0, hp: 520,  income: [0,0,5], vision: 110 },
-  5: { name: 'Quartel',    w: 2, h: 2, costW: 20, costS: 20, costG: 0, hp: 650,  income: [0,0,0], vision: 150 }
+  1: { name: 'Prefeitura',     w: 3, h: 3, costW: 360, costS: 300, costG: 140, hp: 1000, income: [1,1,1], vision: 190, buildTime: HALL_BUILD_TIME },
+  2: { name: 'Mina',           w: 2, h: 2, costW: 90,  costS: 45,  costG: 0,   hp: 480,  income: [0,2,0], vision: 110, buildTime: 70 },
+  3: { name: 'Lenha',          w: 2, h: 2, costW: 90,  costS: 45,  costG: 0,   hp: 480,  income: [2,0,0], vision: 110, buildTime: 70 },
+  4: { name: 'Fazenda',        w: 3, h: 3, costW: 120, costS: 60,  costG: 20,  hp: 520,  income: [0,0,5], vision: 110, buildTime: 80 },
+  5: { name: 'Quartel',        w: 2, h: 2, costW: 180, costS: 140, costG: 45,  hp: 650,  income: [0,0,0], vision: 150, buildTime: 100 },
+  6: { name: 'Oficina de Cerco', w: 3, h: 2, costW: 320, costS: 260, costG: 100, hp: 760, income: [0,0,0], vision: 150, buildTime: 140 },
+  7: { name: 'Torre de Arqueiros', w: 2, h: 2, costW: 45, costS: 180, costG: 55, hp: 720, income: [0,0,0], vision: 210, buildTime: 90, attackRange: 175, damage: 9, cooldown: 0.95 },
+  8: { name: 'Muro',           w: 2, h: 6, costW: 70,  costS: 260, costG: 90,  hp: 1500, income: [0,0,0], vision: 80,  buildTime: 75 },
+  9: { name: 'Criadouro de Animais', w: 3, h: 2, costW: 150, costS: 90, costG: 80, hp: 700, income: [0,0,0], vision: 145, buildTime: 95 }
 };
 
 const UnitCfg = {
-  name: ['', 'Soldado', 'Arqueiro'],
-  hp: new Int16Array([0, 100, 70]),
-  speed: new Float32Array([0, 58, 54]),
-  range: new Float32Array([0, 26, 118]),
-  aggro: new Float32Array([0, 110, 140]),
-  chase: new Float32Array([0, 180, 220]),
-  vision: new Float32Array([0, 150, 165]),
-  cooldown: new Float32Array([0, 0.7, 1.05]),
-  damage: new Int16Array([0, 10, 8]),
-  hitRadius: new Float32Array([0, 8, 7]),
-  grainCost: new Int16Array([0, 10, 14]),
-  trainTime: new Float32Array([0, TRAIN_TIME, 4.2]),
-  barrLevel: new Uint8Array([0, 1, 2])
+  name: ['', 'Soldado', 'Arqueiro', 'Ariete', 'Mago', 'Cavalaria', 'Biga', 'Elefante', 'Besta de Cerco', 'Catapulta'],
+  hp: new Int16Array([0, 100, 70, 240, 88, 155, 130, 420, 160, 190]),
+  speed: new Float32Array([0, 58, 54, 36, 50, 82, 72, 34, 34, 28]),
+  range: new Float32Array([0, 26, 118, 32, 96, 30, 62, 38, 150, 178]),
+  aggro: new Float32Array([0, 110, 140, 105, 125, 130, 135, 115, 170, 190]),
+  chase: new Float32Array([0, 180, 220, 160, 200, 220, 210, 170, 230, 250]),
+  vision: new Float32Array([0, 150, 165, 145, 160, 170, 165, 155, 190, 205]),
+  cooldown: new Float32Array([0, 0.7, 1.05, 1.8, 1.25, 0.8, 1.15, 1.6, 1.8, 2.4]),
+  damage: new Int16Array([0, 10, 8, 34, 6, 14, 18, 36, 26, 42]),
+  hitRadius: new Float32Array([0, 8, 7, 11, 8, 10, 11, 15, 11, 12]),
+  woodCost: new Int16Array([0, 0, 10, 120, 20, 30, 90, 120, 180, 260]),
+  stoneCost: new Int16Array([0, 0, 0, 80, 35, 0, 40, 80, 120, 180]),
+  grainCost: new Int16Array([0, 14, 22, 70, 55, 55, 70, 180, 95, 130]),
+  trainTime: new Float32Array([0, TRAIN_TIME, 5.0, 14.0, 9.0, 8.0, 11.0, 24.0, 18.0, 26.0]),
+  producer: new Uint8Array([0, B_BARR, B_BARR, B_WORKSHOP, B_BARR, B_STABLE, B_STABLE, B_STABLE, B_WORKSHOP, B_WORKSHOP]),
+  buildingLevel: new Uint8Array([0, 1, 2, 1, 3, 1, 2, 3, 2, 3]),
+  popCost: new Uint8Array([0, 1, 1, 2, 3, 2, 2, 5, 3, 4]),
+  splashRadius: new Float32Array([0, 0, 0, 0, 42, 0, 0, 0, 0, 0])
 };
 
 const canvas = document.getElementById('gameCanvas');
@@ -433,6 +664,9 @@ const Units = {
   cooldown: new Float32Array(MAX_U),
   scanTimer: new Float32Array(MAX_U),
   flash: new Float32Array(MAX_U),
+  combatTimer: new Float32Array(MAX_U),
+  regenBank: new Float32Array(MAX_U),
+  healFx: new Float32Array(MAX_U),
   attackRange: new Float32Array(MAX_U),
   aggroRange: new Float32Array(MAX_U),
   chaseRange: new Float32Array(MAX_U),
@@ -463,7 +697,13 @@ const Builds = {
   hasRally: new Uint8Array(MAX_B),
   rallyX: new Float32Array(MAX_B),
   rallyY: new Float32Array(MAX_B),
-  flash: new Float32Array(MAX_B)
+  workState: new Uint8Array(MAX_B),
+  workTime: new Float32Array(MAX_B),
+  workDuration: new Float32Array(MAX_B),
+  workHp: new Float32Array(MAX_B),
+  upgradeTo: new Uint8Array(MAX_B),
+  flash: new Float32Array(MAX_B),
+  cooldown: new Float32Array(MAX_B)
 };
 
 const uFree = [];
@@ -476,9 +716,11 @@ const Factions = [];
 const Lobby = {
   mapIndex: 1,
   botCount: 3,
+  observer: false,
   teamsEnabled: false,
   teamCount: 2,
   difficulty: BOT_DIFF_TRAINING,
+  startResourceIndex: 1,
   teams: new Uint8Array(MAX_BOTS + 1),
   botDifficulty: new Uint8Array(MAX_BOTS + 1)
 };
@@ -491,6 +733,19 @@ const Pings = {
   x: new Float32Array(16),
   y: new Float32Array(16),
   t: new Float32Array(16)
+};
+
+const AttackFx = {
+  cursor: 0,
+  active: new Uint8Array(MAX_ATTACK_FX),
+  kind: new Uint8Array(MAX_ATTACK_FX),
+  faction: new Uint8Array(MAX_ATTACK_FX),
+  x: new Float32Array(MAX_ATTACK_FX),
+  y: new Float32Array(MAX_ATTACK_FX),
+  tx: new Float32Array(MAX_ATTACK_FX),
+  ty: new Float32Array(MAX_ATTACK_FX),
+  t: new Float32Array(MAX_ATTACK_FX),
+  dur: new Float32Array(MAX_ATTACK_FX)
 };
 
 const BotReserveIds = new Int16Array(8);
@@ -512,16 +767,26 @@ const Engine = {
   cam: { x: WORLD_SZ / 2, y: WORLD_SZ / 2, z: 1 },
   selectedBuilding: -1,
   buildType: 0,
+  buildRot: 0,
   rallyBuilding: -1,
   joinSquadMode: false,
+  observer: false,
   placingStart: false,
   pendingBotCount: 0,
+  implementationTime: 0,
   msgTimer: 0,
   econAcc: 0,
   botAcc: 0,
+  selectionRefresh: 0,
   pulse: 0,
   lastTime: 0,
   acc: 0,
+  startWood: 260,
+  startStone: 180,
+  startGrain: 90,
+  uiTopH: 56,
+  uiBottomH: 72,
+  uiMeasureDirty: true,
   mini: { x: 0, y: 0, size: 0 },
   lastTapTime: 0,
   lastTapKind: 0,
@@ -553,6 +818,7 @@ const Engine = {
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  Engine.uiMeasureDirty = true;
   clampCamera();
 }
 window.addEventListener('resize', resize);
@@ -561,6 +827,14 @@ resize();
 function setConfigScroll(enabled) {
   document.documentElement.classList.toggle('config-scroll', !!enabled);
   document.body.classList.toggle('config-scroll', !!enabled);
+}
+
+function updateHudMetrics() {
+  const topHud = document.querySelector('.hud-top');
+  const bottomHud = document.querySelector('.hud-bottom');
+  Engine.uiTopH = topHud && !topHud.classList.contains('hidden') ? topHud.getBoundingClientRect().height : 0;
+  Engine.uiBottomH = bottomHud && !bottomHud.classList.contains('hidden') ? bottomHud.getBoundingClientRect().height : 0;
+  Engine.uiMeasureDirty = false;
 }
 
 function toWorld(sx, sy) {
@@ -589,10 +863,15 @@ function zoomAtScreen(sx, sy, factor) {
 }
 
 function layoutMinimap() {
-  const size = clamp(Math.min(canvas.width * 0.28, canvas.height * 0.22), 96, 148);
+  if (Engine.uiMeasureDirty) updateHudMetrics();
+  const topPad = Engine.uiTopH > 0 ? Engine.uiTopH + 8 : 12;
+  const bottomPad = Engine.uiBottomH > 0 ? Engine.uiBottomH + 10 : 12;
+  const sidePad = canvas.width < 430 ? 8 : 12;
+  const availableH = Math.max(90, canvas.height - topPad - bottomPad - 16);
+  const size = clamp(Math.min(canvas.width * 0.24, availableH * 0.24), 88, canvas.width < 430 ? 118 : 150);
   Engine.mini.size = size;
-  Engine.mini.x = canvas.width - size - 12;
-  Engine.mini.y = 82;
+  Engine.mini.x = canvas.width - size - sidePad;
+  Engine.mini.y = topPad;
 }
 
 function isOnMinimap(sx, sy) {
@@ -625,16 +904,171 @@ function unitLabel(type) { return UnitCfg.name[type] || 'Unidade'; }
 function queueSlotIndex(bId, slot) { return bId * MAX_TRAIN_QUEUE + slot; }
 function queuedUnitType(bId) { return Builds.queueCount[bId] > 0 ? Builds.queueKind[queueSlotIndex(bId, 0)] : 0; }
 function unitTrainTime(type) { return UnitCfg.trainTime[type] || TRAIN_TIME; }
+function unitWoodCost(type) { return UnitCfg.woodCost[type] || 0; }
+function unitStoneCost(type) { return UnitCfg.stoneCost[type] || 0; }
 function unitGrainCost(type) { return UnitCfg.grainCost[type] || 0; }
+function unitProducerType(type) { return UnitCfg.producer[type] || 0; }
+function unitRequiredBuildingLevel(type) { return UnitCfg.buildingLevel[type] || 1; }
+function unitPopCost(type) { return UnitCfg.popCost[type] || 1; }
+function isMilitaryProducerType(type) { return type === B_BARR || type === B_WORKSHOP || type === B_STABLE; }
+function isEconomyBuildingType(type) { return type === B_MINE || type === B_WOOD || type === B_FARM; }
+function isDefenseBuildingType(type) { return type === B_TOWER || type === B_WALL; }
+function isUpgradeableBuildingType(type) { return type === B_HALL || type === B_BARR || type === B_WORKSHOP || type === B_STABLE || isEconomyBuildingType(type) || isDefenseBuildingType(type); }
+function isImplementationActive() { return Engine.implementationTime > 0; }
+function implementationCostScale() { return isImplementationActive() ? IMPLEMENTATION_COST_MULT : 1; }
+function implementationTimeScale() { return isImplementationActive() ? IMPLEMENTATION_TIME_MULT : 1; }
+function scaledCost(v) { return Math.ceil(v * implementationCostScale()); }
+function buildCostW(type) { return scaledCost(BuildCfg[type].costW || 0); }
+function buildCostS(type) { return scaledCost(BuildCfg[type].costS || 0); }
+function buildCostG(type) { return scaledCost(BuildCfg[type].costG || 0); }
+function buildTimeFor(type) { return (BuildCfg[type].buildTime || 0) * implementationTimeScale(); }
+function costTimeText(w, s, g, t) {
+  let txt = `${w}M ${s}P`;
+  if (g > 0) txt += ` ${g}G`;
+  txt += ` ${Math.ceil(t)}s`;
+  return txt;
+}
+function buildCostText(type) { return costTimeText(buildCostW(type), buildCostS(type), buildCostG(type), buildTimeFor(type)); }
+function unitCostText(type) {
+  let txt = '';
+  const w = unitWoodCost(type), s = unitStoneCost(type), g = unitGrainCost(type);
+  if (w > 0) txt += `${w}M `;
+  if (s > 0) txt += `${s}P `;
+  if (g > 0 || txt === '') txt += `${g}G`;
+  return txt.trim();
+}
+function startResourceText(index) {
+  const i = clamp(index | 0, 0, START_RESOURCE_LABELS.length - 1);
+  return `${START_RESOURCE_LABELS[i]}: ${START_RESOURCE_W[i]}M / ${START_RESOURCE_S[i]}P / ${START_RESOURCE_G[i]}G`;
+}
 function buildingMaxHp(type, level) {
   const base = BuildCfg[type].hp;
-  if (type === B_HALL) return base + (level - 1) * 300;
-  if (type === B_BARR) return base + (level - 1) * 180;
-  return base;
+  if (type === B_HALL) return base + (level - 1) * 420;
+  if (type === B_BARR) return base + (level - 1) * 240;
+  if (type === B_WORKSHOP) return base + (level - 1) * 300;
+  if (type === B_STABLE) return base + (level - 1) * 230;
+  if (type === B_WALL) return base + (level - 1) * 240;
+  if (type === B_TOWER) return base + (level - 1) * 220;
+  return base + (level - 1) * 160;
 }
-function upgradeCostW(type, nextLevel) { return type === B_HALL ? nextLevel * 45 : (type === B_BARR ? nextLevel * 35 : 0); }
-function upgradeCostS(type, nextLevel) { return type === B_HALL ? nextLevel * 35 : (type === B_BARR ? nextLevel * 35 : 0); }
-function upgradeCostG(type, nextLevel) { return type === B_HALL ? nextLevel * 10 : (type === B_BARR ? nextLevel * 8 : 0); }
+function upgradeBaseCostW(type, nextLevel) {
+  if (type === B_HALL) return HALL_UPGRADE_W[nextLevel];
+  if (type === B_BARR) return BARR_UPGRADE_W[nextLevel];
+  if (type === B_WORKSHOP) return WORKSHOP_UPGRADE_W[nextLevel];
+  if (type === B_STABLE) return STABLE_UPGRADE_W[nextLevel];
+  if (isDefenseBuildingType(type)) return DEF_UPGRADE_W[nextLevel];
+  if (isEconomyBuildingType(type)) return ECO_UPGRADE_W[nextLevel];
+  return 0;
+}
+function upgradeBaseCostS(type, nextLevel) {
+  if (type === B_HALL) return HALL_UPGRADE_S[nextLevel];
+  if (type === B_BARR) return BARR_UPGRADE_S[nextLevel];
+  if (type === B_WORKSHOP) return WORKSHOP_UPGRADE_S[nextLevel];
+  if (type === B_STABLE) return STABLE_UPGRADE_S[nextLevel];
+  if (isDefenseBuildingType(type)) return DEF_UPGRADE_S[nextLevel];
+  if (isEconomyBuildingType(type)) return ECO_UPGRADE_S[nextLevel];
+  return 0;
+}
+function upgradeBaseCostG(type, nextLevel) {
+  if (type === B_HALL) return HALL_UPGRADE_G[nextLevel];
+  if (type === B_BARR) return BARR_UPGRADE_G[nextLevel];
+  if (type === B_WORKSHOP) return WORKSHOP_UPGRADE_G[nextLevel];
+  if (type === B_STABLE) return STABLE_UPGRADE_G[nextLevel];
+  if (isDefenseBuildingType(type)) return DEF_UPGRADE_G[nextLevel];
+  if (isEconomyBuildingType(type)) return ECO_UPGRADE_G[nextLevel];
+  return 0;
+}
+function upgradeCostW(type, nextLevel) { return scaledCost(upgradeBaseCostW(type, nextLevel)); }
+function upgradeCostS(type, nextLevel) { return scaledCost(upgradeBaseCostS(type, nextLevel)); }
+function upgradeCostG(type, nextLevel) { return scaledCost(upgradeBaseCostG(type, nextLevel)); }
+function upgradeTimeFor(type, nextLevel) {
+  let t = 0;
+  if (type === B_HALL) t = HALL_UPGRADE_TIME[nextLevel];
+  else if (type === B_BARR) t = BARR_UPGRADE_TIME[nextLevel];
+  else if (type === B_WORKSHOP) t = WORKSHOP_UPGRADE_TIME[nextLevel];
+  else if (type === B_STABLE) t = STABLE_UPGRADE_TIME[nextLevel];
+  else if (isDefenseBuildingType(type)) t = DEF_UPGRADE_TIME[nextLevel];
+  else if (isEconomyBuildingType(type)) t = ECO_UPGRADE_TIME[nextLevel];
+  return t * implementationTimeScale();
+}
+function buildingAttackRange(type, level) {
+  const base = BuildCfg[type].attackRange || 0;
+  return base > 0 ? base + Math.max(0, level - 1) * 18 : 0;
+}
+function buildingAttackDamage(type, level) {
+  const base = BuildCfg[type].damage || 0;
+  return base > 0 ? base + Math.max(0, level - 1) * 4 : 0;
+}
+function buildingAttackCooldown(type, level) {
+  const base = BuildCfg[type].cooldown || 0;
+  return base > 0 ? Math.max(0.35, base - Math.max(0, level - 1) * 0.08) : 0;
+}
+function canRotateBuilding(type) { return type === B_WALL; }
+function buildingFootprintW(type, rot) {
+  const cfg = BuildCfg[type];
+  return canRotateBuilding(type) && (rot & 1) ? cfg.h : cfg.w;
+}
+function buildingFootprintH(type, rot) {
+  const cfg = BuildCfg[type];
+  return canRotateBuilding(type) && (rot & 1) ? cfg.w : cfg.h;
+}
+function hallBuildRangeTiles(level) { return HALL_BUILD_RANGE_TILES[clamp(level | 0, 1, MAX_BUILD_LEVEL)]; }
+function buildingWorkTargetLevel(bId) { return Builds.upgradeTo[bId] || Builds.level[bId]; }
+function buildingHpBarMax(bId) { return buildingMaxHp(Builds.type[bId], buildingWorkTargetLevel(bId)); }
+function isBuildingWorking(bId) { return Builds.active[bId] && Builds.workState[bId] !== BUILD_WORK_NONE; }
+function isBuildingFunctional(bId) { return Builds.active[bId] && Builds.workState[bId] === BUILD_WORK_NONE; }
+function isHumanFaction(fId) { return !Engine.observer && fId === 0; }
+function hallLevelForLimits(level) { return clamp(level | 0, 0, MAX_BUILD_LEVEL); }
+function limitForBuildingAtHallLevel(type, hallLevel) {
+  const lvl = hallLevelForLimits(hallLevel);
+  if (type === B_MINE) return HALL_LIMIT_MINE[lvl];
+  if (type === B_WOOD) return HALL_LIMIT_WOOD[lvl];
+  if (type === B_FARM) return HALL_LIMIT_FARM[lvl];
+  if (type === B_BARR) return HALL_LIMIT_BARR[lvl];
+  if (type === B_WORKSHOP) return HALL_LIMIT_WORKSHOP[lvl];
+  if (type === B_TOWER) return HALL_LIMIT_TOWER[lvl];
+  if (type === B_WALL) return HALL_LIMIT_WALL[lvl];
+  if (type === B_STABLE) return HALL_LIMIT_STABLE[lvl];
+  return 0;
+}
+function requiredHallLevelForBuilding(type) {
+  if (type === B_HALL) return 0;
+  for (let level = 1; level <= MAX_BUILD_LEVEL; level++) {
+    if (limitForBuildingAtHallLevel(type, level) > 0) return level;
+  }
+  return MAX_BUILD_LEVEL;
+}
+function factionHallLevel(fId) {
+  let best = 0;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    if (Builds.level[i] > best) best = Builds.level[i];
+  }
+  return best;
+}
+function refreshFactionLimits(fId) {
+  const f = Factions[fId];
+  if (!f) return;
+  const level = factionHallLevel(fId);
+  f.limits[B_MINE] = limitForBuildingAtHallLevel(B_MINE, level);
+  f.limits[B_WOOD] = limitForBuildingAtHallLevel(B_WOOD, level);
+  f.limits[B_FARM] = limitForBuildingAtHallLevel(B_FARM, level);
+  f.limits[B_BARR] = limitForBuildingAtHallLevel(B_BARR, level);
+  f.limits[B_WORKSHOP] = limitForBuildingAtHallLevel(B_WORKSHOP, level);
+  f.limits[B_TOWER] = limitForBuildingAtHallLevel(B_TOWER, level);
+  f.limits[B_WALL] = limitForBuildingAtHallLevel(B_WALL, level);
+  f.limits[B_STABLE] = limitForBuildingAtHallLevel(B_STABLE, level);
+}
+function canUpgradeByTech(bId) {
+  if (!Builds.active[bId] || isBuildingWorking(bId)) return false;
+  const type = Builds.type[bId];
+  if (!isUpgradeableBuildingType(type)) return false;
+  if (Builds.level[bId] >= MAX_BUILD_LEVEL) return false;
+  const next = Builds.level[bId] + 1;
+  if (type !== B_HALL && next > factionHallLevel(Builds.faction[bId])) return false;
+  return true;
+}
 
 function setQueueTimerForNext(bId) {
   const nextType = queuedUnitType(bId);
@@ -684,7 +1118,7 @@ function selectBuilding(id) {
   Sel.count = 0;
   Engine.selectedBuilding = id;
   Engine.joinSquadMode = false;
-  UI.actionMode = Builds.active[id] && Builds.faction[id] === 0 && Builds.type[id] === B_BARR ? 'train' : 'root';
+  UI.actionMode = Builds.active[id] && isHumanFaction(Builds.faction[id]) && isMilitaryProducerType(Builds.type[id]) && Builds.workState[id] === BUILD_WORK_NONE ? 'train' : 'root';
   UI.updateSelectionInfo();
 }
 
@@ -705,6 +1139,36 @@ function addPing(x, y) {
   Pings.t[i] = 0.4;
 }
 
+function lateAttackFxDuration(kind) {
+  if (kind === U_CATAPULT) return 0.58;
+  if (kind === U_BALLISTA) return 0.34;
+  if (kind === U_MAGE) return 0.48;
+  if (kind === U_ELEPHANT) return 0.42;
+  if (kind === U_CHARIOT) return 0.30;
+  return 0;
+}
+
+function addAttackFx(kind, x, y, tx, ty, faction) {
+  const dur = lateAttackFxDuration(kind);
+  if (dur <= 0) return;
+  let id = -1;
+  for (let n = 0; n < MAX_ATTACK_FX; n++) {
+    const probe = (AttackFx.cursor + n) % MAX_ATTACK_FX;
+    if (!AttackFx.active[probe]) { id = probe; break; }
+  }
+  if (id === -1) id = AttackFx.cursor;
+  AttackFx.cursor = (id + 1) % MAX_ATTACK_FX;
+  AttackFx.active[id] = 1;
+  AttackFx.kind[id] = kind;
+  AttackFx.faction[id] = faction;
+  AttackFx.x[id] = x;
+  AttackFx.y[id] = y;
+  AttackFx.tx[id] = tx;
+  AttackFx.ty[id] = ty;
+  AttackFx.t[id] = 0;
+  AttackFx.dur[id] = dur;
+}
+
 function createFaction(isAI, teamId, difficulty) {
   const id = Factions.length;
   const aiDiff = clamp((difficulty === undefined ? BOT_DIFF_TRAINING : difficulty) | 0, 0, BOT_DIFF_COUNT - 1);
@@ -713,11 +1177,11 @@ function createFaction(isAI, teamId, difficulty) {
     isAI,
     team: teamId || (id + 1),
     difficulty: aiDiff,
-    wood: 150,
-    stone: 50,
-    grain: 20,
-    limits: { [B_MINE]: 2, [B_WOOD]: 2, [B_FARM]: 1, [B_BARR]: 1 },
-    current: { [B_MINE]: 0, [B_WOOD]: 0, [B_FARM]: 0, [B_BARR]: 0 },
+    wood: Engine.startWood,
+    stone: Engine.startStone,
+    grain: Engine.startGrain,
+    limits: { [B_MINE]: 0, [B_WOOD]: 0, [B_FARM]: 0, [B_BARR]: 0, [B_WORKSHOP]: 0, [B_TOWER]: 0, [B_WALL]: 0, [B_STABLE]: 0 },
+    current: { [B_MINE]: 0, [B_WOOD]: 0, [B_FARM]: 0, [B_BARR]: 0, [B_WORKSHOP]: 0, [B_TOWER]: 0, [B_WALL]: 0, [B_STABLE]: 0 },
     aiPhase: 0,
     aiAttackCooldown: 0,
     aiTrainCooldown: isAI ? BotDiffCfg.trainDelay[aiDiff] : 0,
@@ -733,31 +1197,51 @@ function areEnemies(a, b) {
 }
 
 function isEnemyToPlayer(fId) {
+  if (Engine.observer) return false;
   return areEnemies(0, fId);
 }
 
 function canAfford(fId, type) {
   const f = Factions[fId];
-  const c = BuildCfg[type];
-  return f.wood >= c.costW && f.stone >= c.costS && f.grain >= c.costG;
+  return f.wood >= buildCostW(type) && f.stone >= buildCostS(type) && f.grain >= buildCostG(type);
 }
 
 function payForBuild(fId, type) {
   const f = Factions[fId];
-  const c = BuildCfg[type];
-  f.wood -= c.costW;
-  f.stone -= c.costS;
-  f.grain -= c.costG;
+  f.wood -= buildCostW(type);
+  f.stone -= buildCostS(type);
+  f.grain -= buildCostG(type);
+}
+
+function refundBuild(fId, type) {
+  const f = Factions[fId];
+  f.wood += buildCostW(type);
+  f.stone += buildCostS(type);
+  f.grain += buildCostG(type);
 }
 
 function canUpgradeBuilding(bId) {
   if (!Builds.active[bId]) return false;
+  if (isBuildingWorking(bId)) return false;
   const type = Builds.type[bId];
-  if (type !== B_HALL && type !== B_BARR) return false;
-  if (Builds.level[bId] >= MAX_BUILD_LEVEL) return false;
+  if (!canUpgradeByTech(bId)) return false;
   const f = Factions[Builds.faction[bId]];
   const next = Builds.level[bId] + 1;
   return f.wood >= upgradeCostW(type, next) && f.stone >= upgradeCostS(type, next) && f.grain >= upgradeCostG(type, next);
+}
+
+function canStartBuildingForFaction(fId, type) {
+  if (type === B_HALL) return findHall(fId) === -1;
+  const f = Factions[fId];
+  if (!f || !BuildCfg[type]) return false;
+  refreshFactionLimits(fId);
+  return f.current[type] < (f.limits[type] || 0);
+}
+
+function startImplementationPeriod() {
+  Engine.implementationTime = IMPLEMENTATION_DURATION;
+  UI.implText = '';
+  UI.updateLimits();
 }
 
 function upgradeBuilding(bId) {
@@ -765,13 +1249,19 @@ function upgradeBuilding(bId) {
   const type = Builds.type[bId];
   const f = Factions[Builds.faction[bId]];
   const next = Builds.level[bId] + 1;
-  const oldMax = buildingMaxHp(type, Builds.level[bId]);
-  const newMax = buildingMaxHp(type, next);
+  const duration = upgradeTimeFor(type, next);
   f.wood -= upgradeCostW(type, next);
   f.stone -= upgradeCostS(type, next);
   f.grain -= upgradeCostG(type, next);
-  Builds.level[bId] = next;
-  Builds.hp[bId] = Math.min(newMax, Builds.hp[bId] + (newMax - oldMax));
+  Builds.workState[bId] = duration > 0 ? BUILD_WORK_UPGRADE : BUILD_WORK_NONE;
+  Builds.workTime[bId] = duration;
+  Builds.workDuration[bId] = duration;
+  Builds.workHp[bId] = Builds.hp[bId];
+  Builds.upgradeTo[bId] = duration > 0 ? next : 0;
+  if (duration <= 0) {
+    Builds.level[bId] = next;
+    if (type === B_HALL) refreshFactionLimits(Builds.faction[bId]);
+  }
   Builds.flash[bId] = FLASH_MAX;
   if (Builds.faction[bId] === 0) {
     UI.updateRes();
@@ -781,15 +1271,55 @@ function upgradeBuilding(bId) {
 }
 
 function canPlaceBuilding(tx, ty, w, h) {
-  return findBlockingBuildingForPlacement(tx, ty, w, h) === -1;
+  return canPlaceBuildingType(0, tx, ty, w, h);
+}
+
+function canPlaceBuildingType(type, tx, ty, w, h) {
+  return findBlockingBuildingForPlacementTyped(type, tx, ty, w, h) === -1 && findBlockingUnitForPlacement(type, tx, ty, w, h) === -1;
+}
+
+function distSqHallToFootprintTiles(hallId, tx, ty, w, h) {
+  const hx = Builds.tx[hallId] + Builds.w[hallId] * 0.5;
+  const hy = Builds.ty[hallId] + Builds.h[hallId] * 0.5;
+  const cx = clamp(hx, tx, tx + w);
+  const cy = clamp(hy, ty, ty + h);
+  const dx = hx - cx;
+  const dy = hy - cy;
+  return dx * dx + dy * dy;
+}
+
+function isWithinBuildRange(fId, type, tx, ty, rot) {
+  if (type === B_HALL) return true;
+  const w = buildingFootprintW(type, rot || 0);
+  const h = buildingFootprintH(type, rot || 0);
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    const range = hallBuildRangeTiles(Builds.level[i]);
+    if (distSqHallToFootprintTiles(i, tx, ty, w, h) <= range * range) return true;
+  }
+  return false;
+}
+
+function canPlaceBuildingForFaction(fId, type, tx, ty, rot) {
+  const w = buildingFootprintW(type, rot || 0);
+  const h = buildingFootprintH(type, rot || 0);
+  return findBlockingBuildingForPlacementTyped(type, tx, ty, w, h) === -1
+    && isWithinBuildRange(fId, type, tx, ty, rot || 0)
+    && findBlockingUnitForPlacement(type, tx, ty, w, h) === -1;
 }
 
 function findBlockingBuildingForPlacement(tx, ty, w, h) {
+  return findBlockingBuildingForPlacementTyped(0, tx, ty, w, h);
+}
+
+function findBlockingBuildingForPlacementTyped(type, tx, ty, w, h) {
   if (tx < 0 || ty < 0 || tx + w > MAP_SZ || ty + h > MAP_SZ) return -2;
-  const x0 = Math.max(0, tx - BUILD_CLEARANCE_TILES);
-  const y0 = Math.max(0, ty - BUILD_CLEARANCE_TILES);
-  const x1 = Math.min(MAP_SZ, tx + w + BUILD_CLEARANCE_TILES);
-  const y1 = Math.min(MAP_SZ, ty + h + BUILD_CLEARANCE_TILES);
+  const clearance = type === B_WALL ? 0 : BUILD_CLEARANCE_TILES;
+  const x0 = Math.max(0, tx - clearance);
+  const y0 = Math.max(0, ty - clearance);
+  const x1 = Math.min(MAP_SZ, tx + w + clearance);
+  const y1 = Math.min(MAP_SZ, ty + h + clearance);
   for (let yy = y0; yy < y1; yy++) {
     const row = yy * MAP_SZ;
     for (let xx = x0; xx < x1; xx++) {
@@ -800,38 +1330,68 @@ function findBlockingBuildingForPlacement(tx, ty, w, h) {
   return -1;
 }
 
-function spawnBuilding(factionId, type, tx, ty) {
+function findBlockingUnitForPlacement(type, tx, ty, w, h) {
+  if (tx < 0 || ty < 0 || tx + w > MAP_SZ || ty + h > MAP_SZ) return -2;
+  const x0 = tx * TILE;
+  const y0 = ty * TILE;
+  const x1 = (tx + w) * TILE;
+  const y1 = (ty + h) * TILE;
+  for (let i = 0; i < MAX_U; i++) {
+    if (!Units.active[i]) continue;
+    const r = (UnitCfg.hitRadius[Units.kind[i]] || 8) + 3;
+    const cx = clamp(Units.x[i], x0, x1);
+    const cy = clamp(Units.y[i], y0, y1);
+    const dx = Units.x[i] - cx;
+    const dy = Units.y[i] - cy;
+    if (dx * dx + dy * dy <= r * r) return i;
+  }
+  return -1;
+}
+
+function spawnBuilding(factionId, type, tx, ty, instantComplete, rot) {
   if (bFree.length === 0) return -1;
   const cfg = BuildCfg[type];
-  if (findBlockingBuildingForPlacement(tx, ty, cfg.w, cfg.h) !== -1) return -1;
+  const w = buildingFootprintW(type, rot || 0);
+  const h = buildingFootprintH(type, rot || 0);
+  if (!canPlaceBuildingType(type, tx, ty, w, h)) return -1;
 
   const id = bFree.pop();
+  const duration = instantComplete ? 0 : buildTimeFor(type);
+  const maxHp = buildingMaxHp(type, 1);
   Builds.active[id] = 1;
   Builds.uid[id] = ++Engine.uidGen;
   Builds.faction[id] = factionId;
   Builds.type[id] = type;
   Builds.tx[id] = tx;
   Builds.ty[id] = ty;
-  Builds.w[id] = cfg.w;
-  Builds.h[id] = cfg.h;
+  Builds.w[id] = w;
+  Builds.h[id] = h;
   Builds.level[id] = 1;
-  Builds.hp[id] = buildingMaxHp(type, 1);
+  Builds.hp[id] = duration > 0 ? 1 : maxHp;
   Builds.queue[id] = 0;
   Builds.queueCount[id] = 0;
   for (let slot = 0; slot < MAX_TRAIN_QUEUE; slot++) Builds.queueKind[queueSlotIndex(id, slot)] = 0;
   Builds.hasRally[id] = 0;
   Builds.rallyX[id] = 0;
   Builds.rallyY[id] = 0;
+  Builds.workState[id] = duration > 0 ? BUILD_WORK_CONSTRUCT : BUILD_WORK_NONE;
+  Builds.workTime[id] = duration;
+  Builds.workDuration[id] = duration;
+  Builds.workHp[id] = Builds.hp[id];
+  Builds.upgradeTo[id] = 0;
   Builds.flash[id] = 0;
+  Builds.cooldown[id] = 0;
 
-  for (let yy = 0; yy < cfg.h; yy++) {
-    for (let xx = 0; xx < cfg.w; xx++) {
+  for (let yy = 0; yy < h; yy++) {
+    for (let xx = 0; xx < w; xx++) {
       mapGrid[(ty + yy) * MAP_SZ + (tx + xx)] = id;
     }
   }
 
   if (type !== B_HALL) {
     Factions[factionId].current[type]++;
+  } else {
+    refreshFactionLimits(factionId);
   }
   return id;
 }
@@ -873,14 +1433,16 @@ function placeBotHall(fId, minDistTiles) {
   }
 
   if (bestTx === -1) return false;
-  spawnBuilding(fId, B_HALL, bestTx, bestTy);
+  spawnBuilding(fId, B_HALL, bestTx, bestTy, true);
   return true;
 }
 
-function placeBotStarts(botCount) {
+function placeBotStarts(botCount, startFId) {
   let placed = 0;
+  const firstFId = startFId === undefined ? 1 : startFId;
   const startDist = Math.min(START_MIN_DIST_TILES, Math.max(8, Math.floor(MAP_SZ / Math.max(2.5, Math.sqrt(botCount + 1) * 1.45))));
-  for (let fId = 1; fId <= botCount; fId++) {
+  for (let i = 0; i < botCount; i++) {
+    const fId = firstFId + i;
     if (placeBotHall(fId, startDist)) { placed++; continue; }
     if (placeBotHall(fId, Math.max(6, startDist - 4))) { placed++; continue; }
     if (placeBotHall(fId, Math.max(5, startDist - 8))) placed++;
@@ -911,13 +1473,19 @@ function destroyBuilding(id) {
   if (Engine.selectedBuilding === id) Engine.selectedBuilding = -1;
   if (Engine.rallyBuilding === id) Engine.rallyBuilding = -1;
   Builds.active[id] = 0;
+  if (type === B_HALL) refreshFactionLimits(fId);
   bFree.push(id);
+  if (fId === 0) {
+    UI.updateLimits();
+    UI.updateSelectionInfo();
+    UI.updateUnitHud();
+  }
 }
 
 function spawnUnit(factionId, x, y, unitType) {
   if (uFree.length === 0) return -1;
-  if (factionId >= 0 && factionId < Factions.length && countUnitsByFaction(factionId) >= getUnitCap(factionId)) return -1;
   if (!unitType) unitType = U_SOLDIER;
+  if (factionId >= 0 && factionId < Factions.length && countUnitPopByFaction(factionId) + unitPopCost(unitType) > getUnitCap(factionId)) return -1;
   const id = uFree.pop();
   Units.active[id] = 1;
   Units.uid[id] = ++Engine.uidGen;
@@ -937,6 +1505,9 @@ function spawnUnit(factionId, x, y, unitType) {
   Units.cooldown[id] = 0;
   Units.scanTimer[id] = (id % 5) * 0.07;
   Units.flash[id] = 0;
+  Units.combatTimer[id] = 0;
+  Units.regenBank[id] = 0;
+  Units.healFx[id] = 0;
   Units.attackRange[id] = UnitCfg.range[unitType];
   Units.aggroRange[id] = UnitCfg.aggro[unitType];
   Units.chaseRange[id] = UnitCfg.chase[unitType];
@@ -1076,6 +1647,31 @@ function issueMoveOrder(x, y) {
     Units.homeY[id] = Units.ty[id];
     Units.state[id] = STATE_MOVE;
     Units.order[id] = ORDER_MOVE;
+    clearWaypoint(id);
+    clearUnitTarget(id);
+  }
+  addPing(x, y);
+}
+
+function issueAttackMoveOrder(x, y) {
+  if (Sel.count === 0) return;
+  Engine.joinSquadMode = false;
+  const cols = Math.min(Sel.count, 6);
+  const spacing = 18;
+  for (let i = 0; i < Sel.count; i++) {
+    const id = Sel.ids[i];
+    if (!Units.active[id]) continue;
+    const col = i % cols;
+    const row = (i / cols) | 0;
+    const ox = (col - (cols - 1) * 0.5) * spacing;
+    const oy = row * spacing;
+    Units.tx[id] = clamp(x + ox, 8, WORLD_SZ - 8);
+    Units.ty[id] = clamp(y + oy, 8, WORLD_SZ - 8);
+    Units.homeX[id] = Units.x[id];
+    Units.homeY[id] = Units.y[id];
+    Units.state[id] = STATE_ATTACK_MOVE;
+    Units.order[id] = ORDER_ATTACK_MOVE;
+    Units.scanTimer[id] = 0;
     clearWaypoint(id);
     clearUnitTarget(id);
   }
@@ -1236,7 +1832,11 @@ function dealDamageToUnit(attackerId, targetId, amount) {
   if (!Units.active[targetId]) return;
   Units.hp[targetId] -= amount;
   Units.flash[targetId] = FLASH_MAX;
-  Units.flash[attackerId] = FLASH_MAX * 0.55;
+  Units.combatTimer[targetId] = UNIT_REGEN_DELAY;
+  if (Units.active[attackerId]) {
+    Units.flash[attackerId] = FLASH_MAX * 0.55;
+    Units.combatTimer[attackerId] = UNIT_REGEN_DELAY;
+  }
   if (Units.hp[targetId] <= 0) {
     killUnit(targetId);
     return;
@@ -1249,11 +1849,73 @@ function dealDamageToUnit(attackerId, targetId, amount) {
   }
 }
 
+function dealBuildingDamageToUnit(attackerBId, targetId, amount) {
+  if (!Builds.active[attackerBId] || !Units.active[targetId]) return;
+  Units.hp[targetId] -= amount;
+  Units.flash[targetId] = FLASH_MAX;
+  Units.combatTimer[targetId] = UNIT_REGEN_DELAY;
+  Builds.flash[attackerBId] = FLASH_MAX * 0.8;
+  if (Units.hp[targetId] <= 0) {
+    killUnit(targetId);
+    return;
+  }
+  if (Units.active[targetId] && areEnemies(Units.faction[targetId], Builds.faction[attackerBId]) && (Units.order[targetId] === ORDER_NONE || Units.order[targetId] === ORDER_ATTACK_MOVE)) {
+    setUnitTargetBuilding(targetId, attackerBId);
+    Units.state[targetId] = STATE_ATTACK;
+    Units.homeX[targetId] = Units.x[targetId];
+    Units.homeY[targetId] = Units.y[targetId];
+  }
+}
+
+function dealSplashDamage(attackerId, cx, cy, radius, amount, primaryId) {
+  if (radius <= 0 || amount <= 0) return;
+  const fId = Units.faction[attackerId];
+  const rr = radius * radius;
+  const minHx = clamp(((cx - radius) / HASH_CELL_SIZE) | 0, 0, HASH_W - 1);
+  const maxHx = clamp(((cx + radius) / HASH_CELL_SIZE) | 0, 0, HASH_W - 1);
+  const minHy = clamp(((cy - radius) / HASH_CELL_SIZE) | 0, 0, HASH_H - 1);
+  const maxHy = clamp(((cy + radius) / HASH_CELL_SIZE) | 0, 0, HASH_H - 1);
+  for (let yy = minHy; yy <= maxHy; yy++) {
+    for (let xx = minHx; xx <= maxHx; xx++) {
+      let n = hashHead[yy * HASH_W + xx];
+      while (n !== -1) {
+        const next = hashNext[n];
+        if (n !== primaryId && Units.active[n] && areEnemies(fId, Units.faction[n])) {
+          const d = distSq(cx, cy, Units.x[n], Units.y[n]);
+          if (d <= rr) {
+            Units.hp[n] -= amount;
+            Units.flash[n] = FLASH_MAX;
+            Units.combatTimer[n] = UNIT_REGEN_DELAY;
+            if (Units.hp[n] <= 0) killUnit(n);
+          }
+        }
+        n = next;
+      }
+    }
+  }
+}
+
 function dealDamageToBuilding(targetId, amount) {
   if (!Builds.active[targetId]) return;
   Builds.hp[targetId] -= amount;
+  if (Builds.workState[targetId] !== BUILD_WORK_NONE && Builds.workHp[targetId] > Builds.hp[targetId]) Builds.workHp[targetId] = Builds.hp[targetId];
   Builds.flash[targetId] = FLASH_MAX;
   if (Builds.hp[targetId] <= 0) destroyBuilding(targetId);
+}
+
+function updateUnitRegen(id, dt) {
+  const kind = Units.kind[id] || U_SOLDIER;
+  const maxHp = UnitCfg.hp[kind] || 1;
+  if (Units.combatTimer[id] > 0 || Units.state[id] === STATE_ATTACK || Units.state[id] === STATE_CHASE || Units.hp[id] >= maxHp) {
+    Units.regenBank[id] = 0;
+    return;
+  }
+  Units.regenBank[id] += UNIT_REGEN_RATE * dt;
+  const heal = Units.regenBank[id] | 0;
+  if (heal <= 0) return;
+  Units.regenBank[id] -= heal;
+  Units.hp[id] = Math.min(maxHp, Units.hp[id] + heal);
+  Units.healFx[id] = 0.35;
 }
 
 function blockedBuildingAt(x, y) {
@@ -1273,8 +1935,12 @@ function hasClearStepToward(sx, sy, tx, ty) {
   const d2 = dx * dx + dy * dy;
   if (d2 < 1) return true;
   const d = Math.sqrt(d2);
-  const step = Math.min(24, d);
-  return blockedBuildingAt(sx + (dx / d) * step, sy + (dy / d) * step) === -1;
+  const samples = Math.min(6, Math.max(1, Math.ceil(d / 24)));
+  for (let i = 1; i <= samples; i++) {
+    const t = i / samples;
+    if (blockedBuildingAt(sx + dx * t, sy + dy * t) !== -1) return false;
+  }
+  return true;
 }
 
 function trySetDetour(id, blockerId, finalX, finalY) {
@@ -1381,7 +2047,7 @@ function setUnitMoveOrder(id, x, y) {
   clearUnitTarget(id);
 }
 
-function chooseBarracksLoiterPoint(bId, uId, out) {
+function chooseProducerLoiterPoint(bId, uId, out) {
   const cx = (Builds.tx[bId] + Builds.w[bId] * 0.5) * TILE;
   const cy = (Builds.ty[bId] + Builds.h[bId] * 0.5) * TILE;
   const seed = Units.uid[uId] + bId * 17;
@@ -1400,13 +2066,13 @@ function chooseBarracksLoiterPoint(bId, uId, out) {
   }
 }
 
-function sendFreshUnitFromBarracks(uId, bId) {
+function sendFreshUnitFromProducer(uId, bId) {
   if (Builds.hasRally[bId]) {
     setUnitMoveOrder(uId, Builds.rallyX[bId], Builds.rallyY[bId]);
     return;
   }
   if (Builds.faction[bId] !== 0) {
-    chooseBarracksLoiterPoint(bId, uId, TargetPoint);
+    chooseProducerLoiterPoint(bId, uId, TargetPoint);
     setUnitMoveOrder(uId, TargetPoint[0], TargetPoint[1]);
   }
 }
@@ -1446,26 +2112,25 @@ function moveUnitStep(id, dt, targetX, targetY) {
     Units.y[id] = clamp(ny, 8, WORLD_SZ - 8);
     Units.blockedTime[id] = 0;
   } else {
+    Units.blockedTime[id] += dt;
+    if (blocker >= 0 && !Units.hasWaypoint[id] && Units.blockedTime[id] > 0.05 && trySetDetour(id, blocker, targetX, targetY)) return false;
     const blockX = blockedBuildingAt(nx, Units.y[id]);
     const blockY = blockedBuildingAt(Units.x[id], ny);
     if (blockX === -1) {
       Units.x[id] = clamp(nx, 8, WORLD_SZ - 8);
-      Units.blockedTime[id] += dt;
-      if (blocker >= 0 && Units.blockedTime[id] > 0.22) {
+      if (blocker >= 0 && Units.blockedTime[id] > 0.12) {
         if (trySetDetour(id, blocker, targetX, targetY)) return false;
         Units.blockedTime[id] = 0;
       }
     } else if (blockY === -1) {
       Units.y[id] = clamp(ny, 8, WORLD_SZ - 8);
-      Units.blockedTime[id] += dt;
-      if (blocker >= 0 && Units.blockedTime[id] > 0.22) {
+      if (blocker >= 0 && Units.blockedTime[id] > 0.12) {
         if (trySetDetour(id, blocker, targetX, targetY)) return false;
         Units.blockedTime[id] = 0;
       }
     } else {
-      Units.blockedTime[id] += dt;
       if (blocker < 0) blocker = blockX >= 0 ? blockX : blockY;
-      if (Units.blockedTime[id] > 0.08 || !Units.hasWaypoint[id]) {
+      if (Units.blockedTime[id] > 0.05 || !Units.hasWaypoint[id]) {
         if (!trySetDetour(id, blocker, targetX, targetY)) Units.blockedTime[id] = 0;
       }
     }
@@ -1481,12 +2146,15 @@ function updateUnits(dt) {
     if (Units.cooldown[i] < 0) Units.cooldown[i] = 0;
     if (Units.scanTimer[i] > 0) Units.scanTimer[i] -= dt;
     if (Units.flash[i] > 0) Units.flash[i] -= dt;
+    if (Units.combatTimer[i] > 0) Units.combatTimer[i] -= dt;
+    if (Units.healFx[i] > 0) Units.healFx[i] -= dt;
 
     // Ordem manual de movimento tem prioridade; auto-ataque só assume tropas ociosas ou em ataque-movimento.
     if ((Units.state[i] === STATE_IDLE || Units.state[i] === STATE_ATTACK_MOVE) && Units.scanTimer[i] <= 0) {
       Units.scanTimer[i] = RETARGET_INTERVAL + (i % 3) * 0.03;
       acquireVisibleTarget(i);
     }
+    updateUnitRegen(i, dt);
 
     if (Units.state[i] === STATE_MOVE) {
       const arrived = moveUnitStep(i, dt, Units.tx[i], Units.ty[i]);
@@ -1531,8 +2199,17 @@ function updateUnits(dt) {
       if (d2 <= attackR2) {
         Units.state[i] = STATE_ATTACK;
         if (Units.cooldown[i] <= 0) {
-          if (Units.targetType[i] === 1) dealDamageToUnit(i, Units.targetId[i], Units.damage[i]);
-          else if (Units.targetType[i] === 2) dealDamageToBuilding(Units.targetId[i], Units.damage[i]);
+          addAttackFx(Units.kind[i], Units.x[i], Units.y[i], tx, ty, Units.faction[i]);
+          if (Units.targetType[i] === 1) {
+            const targetId = Units.targetId[i];
+            const sx = Units.active[targetId] ? Units.x[targetId] : tx;
+            const sy = Units.active[targetId] ? Units.y[targetId] : ty;
+            dealDamageToUnit(i, targetId, Units.damage[i]);
+            dealSplashDamage(i, sx, sy, UnitCfg.splashRadius[Units.kind[i]] || 0, Units.damage[i], targetId);
+          } else if (Units.targetType[i] === 2) {
+            Units.combatTimer[i] = UNIT_REGEN_DELAY;
+            dealDamageToBuilding(Units.targetId[i], Units.damage[i]);
+          }
           Units.cooldown[i] = UnitCfg.cooldown[Units.kind[i]];
         }
       } else {
@@ -1544,9 +2221,141 @@ function updateUnits(dt) {
   }
 }
 
+function applyUnitSeparation(dt) {
+  const strength = Math.min(1, dt * 30) * UNIT_SEPARATION_PUSH;
+  for (let i = 0; i < MAX_U; i++) {
+    if (!Units.active[i]) continue;
+    const ux = Units.x[i];
+    const uy = Units.y[i];
+    const base = hashIndex(ux, uy);
+    const hx = base % HASH_W;
+    const hy = (base / HASH_W) | 0;
+    let pushX = 0;
+    let pushY = 0;
+    let closeCount = 0;
+
+    for (let yy = hy - 1; yy <= hy + 1; yy++) {
+      if (yy < 0 || yy >= HASH_H) continue;
+      for (let xx = hx - 1; xx <= hx + 1; xx++) {
+        if (xx < 0 || xx >= HASH_W) continue;
+        let n = hashHead[yy * HASH_W + xx];
+        while (n !== -1) {
+          if (n !== i && Units.active[n]) {
+            const minDist = (UnitCfg.hitRadius[Units.kind[i]] + UnitCfg.hitRadius[Units.kind[n]]) * UNIT_SEPARATION_SCALE;
+            const minD2 = minDist * minDist;
+            let dx = ux - Units.x[n];
+            let dy = uy - Units.y[n];
+            let d2 = dx * dx + dy * dy;
+            if (d2 > 0.01 && d2 < minD2) {
+              const d = Math.sqrt(d2);
+              const force = (minDist - d) / minDist;
+              pushX += (dx / d) * force;
+              pushY += (dy / d) * force;
+              closeCount++;
+            } else if (d2 <= 0.01) {
+              const angle = (Units.uid[i] * 2.399963) + (n * 0.37);
+              pushX += Math.cos(angle);
+              pushY += Math.sin(angle);
+              closeCount++;
+            }
+          }
+          n = hashNext[n];
+        }
+      }
+    }
+
+    if (closeCount === 0) continue;
+    let pushD2 = pushX * pushX + pushY * pushY;
+    if (pushD2 <= 0.0001) continue;
+    let pushD = Math.sqrt(pushD2);
+    let step = Math.min(UNIT_SEPARATION_MAX, pushD * 10 * strength);
+    let nx = ux + (pushX / pushD) * step;
+    let ny = uy + (pushY / pushD) * step;
+
+    if (isStandable(nx, ny)) {
+      Units.x[i] = nx;
+      Units.y[i] = ny;
+    } else {
+      const onlyX = ux + (pushX / pushD) * step;
+      const onlyY = uy + (pushY / pushD) * step;
+      if (isStandable(onlyX, uy)) Units.x[i] = onlyX;
+      else if (isStandable(ux, onlyY)) Units.y[i] = onlyY;
+    }
+  }
+}
+
 function updateBuildingFeedback(dt) {
   for (let i = 0; i < MAX_B; i++) {
     if (Builds.active[i] && Builds.flash[i] > 0) Builds.flash[i] -= dt;
+  }
+}
+
+function updateBuildingCombat(dt) {
+  for (let b = 0; b < MAX_B; b++) {
+    if (!isBuildingFunctional(b)) continue;
+    const type = Builds.type[b];
+    const range = buildingAttackRange(type, Builds.level[b]);
+    if (range <= 0) continue;
+    if (Builds.cooldown[b] > 0) {
+      Builds.cooldown[b] -= dt;
+      continue;
+    }
+    const cx = (Builds.tx[b] + Builds.w[b] * 0.5) * TILE;
+    const cy = (Builds.ty[b] + Builds.h[b] * 0.5) * TILE;
+    const rr = range * range;
+    let best = -1;
+    let bestD = rr + 1;
+    for (let u = 0; u < MAX_U; u++) {
+      if (!Units.active[u] || !areEnemies(Builds.faction[b], Units.faction[u])) continue;
+      const d = distSq(cx, cy, Units.x[u], Units.y[u]);
+      if (d < bestD && d <= rr) { bestD = d; best = u; }
+    }
+    if (best !== -1) {
+      dealBuildingDamageToUnit(b, best, buildingAttackDamage(type, Builds.level[b]));
+      Builds.cooldown[b] = buildingAttackCooldown(type, Builds.level[b]);
+    } else {
+      Builds.cooldown[b] = 0.25;
+    }
+  }
+}
+
+function updateConstruction(dt) {
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.workState[i] === BUILD_WORK_NONE) continue;
+    const type = Builds.type[i];
+    const targetLevel = buildingWorkTargetLevel(i);
+    const targetHp = buildingMaxHp(type, targetLevel);
+    const duration = Math.max(0.1, Builds.workDuration[i]);
+    let hpGain;
+    if (Builds.workState[i] === BUILD_WORK_UPGRADE) {
+      const oldHp = buildingMaxHp(type, Builds.level[i]);
+      hpGain = Math.max(1, targetHp - oldHp) * dt / duration;
+    } else {
+      hpGain = targetHp * dt / duration;
+    }
+    if (Builds.hp[i] < (Builds.workHp[i] | 0)) Builds.workHp[i] = Builds.hp[i];
+    Builds.workHp[i] = Math.min(targetHp, Builds.workHp[i] + hpGain);
+    Builds.hp[i] = Math.max(1, Builds.workHp[i] | 0);
+    Builds.workTime[i] -= dt;
+    if (Builds.workTime[i] > 0) continue;
+
+    if (Builds.workState[i] === BUILD_WORK_UPGRADE && Builds.upgradeTo[i] > Builds.level[i]) {
+      Builds.level[i] = Builds.upgradeTo[i];
+    }
+    Builds.hp[i] = targetHp;
+    Builds.workHp[i] = targetHp;
+    Builds.workState[i] = BUILD_WORK_NONE;
+    Builds.workTime[i] = 0;
+    Builds.workDuration[i] = 0;
+    Builds.upgradeTo[i] = 0;
+    Builds.flash[i] = FLASH_MAX;
+    if (Builds.type[i] === B_HALL) refreshFactionLimits(Builds.faction[i]);
+    if (Builds.faction[i] === 0) {
+      UI.updateRes();
+      UI.updateLimits();
+      UI.updateSelectionInfo();
+      UI.updateUnitHud();
+    }
   }
 }
 
@@ -1556,28 +2365,37 @@ function updateEconomy(dt) {
   Engine.econAcc -= ECON_INTERVAL;
 
   for (let i = 0; i < MAX_B; i++) {
-    if (!Builds.active[i]) continue;
+    if (!isBuildingFunctional(i)) continue;
     const f = Factions[Builds.faction[i]];
     const inc = BuildCfg[Builds.type[i]].income;
-    f.wood += inc[0];
-    f.stone += inc[1];
-    f.grain += inc[2];
+    const level = Builds.level[i] || 1;
+    f.wood += inc[0] * level;
+    f.stone += inc[1] * level;
+    f.grain += inc[2] * level;
   }
   UI.updateRes();
 }
 
-function queueUnitFromBarracks(bId, unitType) {
-  if (!Builds.active[bId] || Builds.type[bId] !== B_BARR) return false;
+function queueUnitFromProducer(bId, unitType) {
+  if (!Builds.active[bId] || !isMilitaryProducerType(Builds.type[bId])) return false;
+  if (Builds.workState[bId] !== BUILD_WORK_NONE) return false;
   if (!unitType) unitType = U_SOLDIER;
-  if (Builds.level[bId] < UnitCfg.barrLevel[unitType]) return false;
+  if (Builds.type[bId] !== unitProducerType(unitType)) return false;
+  if (Builds.level[bId] < unitRequiredBuildingLevel(unitType)) return false;
   const f = Factions[Builds.faction[bId]];
   if (Builds.queueCount[bId] >= MAX_TRAIN_QUEUE) return false;
-  if (!canQueueUnit(Builds.faction[bId])) return false;
-  const cost = unitGrainCost(unitType);
-  if (f.grain < cost) return false;
-  f.grain -= cost;
+  if (!canQueueUnit(Builds.faction[bId], unitType)) return false;
+  const costW = unitWoodCost(unitType);
+  const costS = unitStoneCost(unitType);
+  const costG = unitGrainCost(unitType);
+  if (f.wood < costW || f.stone < costS || f.grain < costG) return false;
+  f.wood -= costW;
+  f.stone -= costS;
+  f.grain -= costG;
   if (!pushUnitQueue(bId, unitType)) {
-    f.grain += cost;
+    f.wood += costW;
+    f.stone += costS;
+    f.grain += costG;
     return false;
   }
   if (Builds.faction[bId] === 0) UI.updateRes();
@@ -1586,23 +2404,23 @@ function queueUnitFromBarracks(bId, unitType) {
 
 function updateProduction(dt) {
   for (let i = 0; i < MAX_B; i++) {
-    if (!Builds.active[i] || Builds.type[i] !== B_BARR || Builds.queueCount[i] === 0) continue;
+    if (!Builds.active[i] || !isMilitaryProducerType(Builds.type[i]) || Builds.queueCount[i] === 0) continue;
+    if (Builds.workState[i] !== BUILD_WORK_NONE) continue;
     Builds.queue[i] -= dt;
     if (Builds.queue[i] <= 0) {
       const fId = Builds.faction[i];
       const unitType = queuedUnitType(i) || U_SOLDIER;
-      const refund = unitGrainCost(unitType);
-      if (!canTrainUnit(fId)) {
-        Factions[fId].grain += refund;
-        popUnitQueue(i);
-        if (fId === 0) {
-          UI.updateRes();
-          UI.msg('Limite de unidades atingido.', true);
-        }
+      const refundW = unitWoodCost(unitType);
+      const refundS = unitStoneCost(unitType);
+      const refundG = unitGrainCost(unitType);
+      if (!canTrainUnit(fId, unitType)) {
+        Builds.queue[i] = 0.5;
         continue;
       }
       if (!findSpawnPointAroundBuilding(i, SpawnPoint)) {
-        Factions[fId].grain += refund;
+        Factions[fId].wood += refundW;
+        Factions[fId].stone += refundS;
+        Factions[fId].grain += refundG;
         if (fId === 0) {
           UI.updateRes();
           UI.msg('Sem espaço livre para a unidade.', true);
@@ -1612,7 +2430,9 @@ function updateProduction(dt) {
       }
       const u = spawnUnit(fId, SpawnPoint[0], SpawnPoint[1], unitType);
       if (u === -1) {
-        Factions[fId].grain += refund;
+        Factions[fId].wood += refundW;
+        Factions[fId].stone += refundS;
+        Factions[fId].grain += refundG;
         if (fId === 0) {
           UI.updateRes();
           UI.msg('Não foi possível criar a unidade.', true);
@@ -1622,7 +2442,7 @@ function updateProduction(dt) {
       }
       Units.homeX[u] = Units.x[u];
       Units.homeY[u] = Units.y[u];
-      sendFreshUnitFromBarracks(u, i);
+      sendFreshUnitFromProducer(u, i);
       popUnitQueue(i);
       if (fId === 0) UI.updateUnitHud();
     }
@@ -1644,18 +2464,39 @@ function updatePings(dt) {
   }
 }
 
+function updateAttackFx(dt) {
+  for (let i = 0; i < MAX_ATTACK_FX; i++) {
+    if (!AttackFx.active[i]) continue;
+    AttackFx.t[i] += dt;
+    if (AttackFx.t[i] >= AttackFx.dur[i]) AttackFx.active[i] = 0;
+  }
+}
+
 function countUnitsByFaction(fId) {
   let c = 0;
   for (let i = 0; i < MAX_U; i++) if (Units.active[i] && Units.faction[i] === fId) c++;
   return c;
 }
 
-function countQueuedUnitsByFaction(fId) {
+function countUnitPopByFaction(fId) {
+  let c = 0;
+  for (let i = 0; i < MAX_U; i++) if (Units.active[i] && Units.faction[i] === fId) c += unitPopCost(Units.kind[i]);
+  return c;
+}
+
+function countQueuedPopByFaction(fId) {
   let c = 0;
   for (let i = 0; i < MAX_B; i++) {
-    if (Builds.active[i] && Builds.faction[i] === fId && Builds.type[i] === B_BARR) c += Builds.queueCount[i];
+    if (!Builds.active[i] || Builds.faction[i] !== fId || !isMilitaryProducerType(Builds.type[i])) continue;
+    const q = Builds.queueCount[i];
+    for (let slot = 0; slot < q; slot++) c += unitPopCost(Builds.queueKind[queueSlotIndex(i, slot)]);
   }
   return c;
+}
+
+function canQueueUnit(fId, unitType) {
+  const pop = unitPopCost(unitType || U_SOLDIER);
+  return uFree.length > 0 && countUnitPopByFaction(fId) + countQueuedPopByFaction(fId) + pop <= getUnitCap(fId);
 }
 
 function getUnitCap(fId) {
@@ -1667,12 +2508,8 @@ function getUnitCap(fId) {
   return 0;
 }
 
-function canTrainUnit(fId) {
-  return uFree.length > 0 && countUnitsByFaction(fId) < getUnitCap(fId);
-}
-
-function canQueueUnit(fId) {
-  return uFree.length > 0 && countUnitsByFaction(fId) + countQueuedUnitsByFaction(fId) < getUnitCap(fId);
+function canTrainUnit(fId, unitType) {
+  return uFree.length > 0 && countUnitPopByFaction(fId) + unitPopCost(unitType || U_SOLDIER) <= getUnitCap(fId);
 }
 
 function findBuildingOfType(fId, type) {
@@ -1680,8 +2517,42 @@ function findBuildingOfType(fId, type) {
   return -1;
 }
 
+function findProducerForFaction(fId, unitType) {
+  const producerType = unitProducerType(unitType);
+  const reqLevel = unitRequiredBuildingLevel(unitType);
+  let best = -1;
+  let bestQueue = 999;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== producerType) continue;
+    if (Builds.workState[i] !== BUILD_WORK_NONE || Builds.level[i] < reqLevel) continue;
+    const q = Builds.queueCount[i];
+    if (q < bestQueue) { bestQueue = q; best = i; }
+  }
+  return best;
+}
+
+function findUpgradeableBuildingOfType(fId, type) {
+  let best = -1;
+  let bestLevel = 99;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== type) continue;
+    if (!canUpgradeBuilding(i)) continue;
+    if (Builds.level[i] < bestLevel) { bestLevel = Builds.level[i]; best = i; }
+  }
+  return best;
+}
+
 function findHall(fId) {
   return findBuildingOfType(fId, B_HALL);
+}
+
+function findAnyBuildingOfFaction(fId) {
+  for (let i = 0; i < MAX_B; i++) if (Builds.active[i] && Builds.faction[i] === fId) return i;
+  return -1;
+}
+
+function factionHasAnyBuilding(fId) {
+  return findAnyBuildingOfFaction(fId) !== -1;
 }
 
 function findVisibleEnemyForFaction(fId) {
@@ -1694,7 +2565,7 @@ function findVisibleEnemyForFaction(fId) {
   let bestId = -1;
   let bestD = 1e30;
   for (let b = 0; b < MAX_B; b++) {
-    if (!Builds.active[b] || Builds.faction[b] !== fId) continue;
+    if (!isBuildingFunctional(b) || Builds.faction[b] !== fId) continue;
     const cx = (Builds.tx[b] + Builds.w[b] * 0.5) * TILE;
     const cy = (Builds.ty[b] + Builds.h[b] * 0.5) * TILE;
     const vr = BuildCfg[Builds.type[b]].vision || 0;
@@ -1721,15 +2592,20 @@ function findVisibleEnemyForFaction(fId) {
 function tryBuildForFaction(fId, type, nearTx, nearTy, radius) {
   const cfg = BuildCfg[type];
   const f = Factions[fId];
-  if (type !== B_HALL && f.current[type] >= f.limits[type]) return false;
+  if (!canStartBuildingForFaction(fId, type)) return false;
   if (bFree.length === 0) return false;
   if (!canAfford(fId, type)) return false;
-  for (let r = 1; r <= radius; r++) {
+  const hall = findHall(fId);
+  const maxRadius = hall === -1 ? radius : Math.min(radius, hallBuildRangeTiles(Builds.level[hall]));
+  const innerRadius = Math.max(1, Math.floor(maxRadius * 0.65));
+
+  for (let r = 1; r <= maxRadius; r++) {
     for (let dy = -r; dy <= r; dy++) {
       for (let dx = -r; dx <= r; dx++) {
         const tx = nearTx + dx;
         const ty = nearTy + dy;
-        if (canPlaceBuilding(tx, ty, cfg.w, cfg.h)) {
+        if (r > innerRadius && Math.abs(dx) < innerRadius && Math.abs(dy) < innerRadius) continue;
+        if (canPlaceBuildingForFaction(fId, type, tx, ty)) {
           payForBuild(fId, type);
           const b = spawnBuilding(fId, type, tx, ty);
           if (b !== -1) {
@@ -1739,6 +2615,7 @@ function tryBuildForFaction(fId, type, nearTx, nearTy, radius) {
             }
             return true;
           }
+          refundBuild(fId, type);
         }
       }
     }
@@ -1860,7 +2737,8 @@ function updateBots(dt) {
   if (Engine.botAcc < BOT_INTERVAL) return;
   Engine.botAcc -= BOT_INTERVAL;
 
-  for (let fId = 1; fId < Factions.length; fId++) {
+  const firstAI = Engine.observer ? 0 : 1;
+  for (let fId = firstAI; fId < Factions.length; fId++) {
     const f = Factions[fId];
     if (!f.isAI) continue;
     const diff = clamp(f.difficulty | 0, 0, BOT_DIFF_COUNT - 1);
@@ -1869,12 +2747,24 @@ function updateBots(dt) {
     if (f.aiBuildCooldown > 0) f.aiBuildCooldown -= BOT_INTERVAL;
 
     const hall = findHall(fId);
-    if (hall === -1) continue;
+    const buildRadius = BotDiffCfg.buildRadius[diff];
+    if (hall === -1) {
+      const anchor = findAnyBuildingOfFaction(fId);
+      if (anchor !== -1 && f.aiBuildCooldown <= 0) {
+        const rebuilt = tryBuildForFaction(fId, B_HALL, Builds.tx[anchor], Builds.ty[anchor], buildRadius);
+        f.aiBuildCooldown = rebuilt ? BotDiffCfg.buildDelay[diff] : BotDiffCfg.failedBuildDelay[diff];
+      }
+      continue;
+    }
     const baseTx = Builds.tx[hall];
     const baseTy = Builds.ty[hall];
-    const buildRadius = BotDiffCfg.buildRadius[diff];
     const army = countUnitsByFaction(fId);
+    const armyPop = countUnitPopByFaction(fId);
+    const queuedPop = countQueuedPopByFaction(fId);
     const barr = findBuildingOfType(fId, B_BARR);
+    const workshop = findBuildingOfType(fId, B_WORKSHOP);
+    const stable = findBuildingOfType(fId, B_STABLE);
+    refreshFactionLimits(fId);
 
     if (f.aiBuildCooldown <= 0) {
       let built = false;
@@ -1882,18 +2772,70 @@ function updateBots(dt) {
       if (!built && f.current[B_WOOD] < f.limits[B_WOOD]) built = tryBuildForFaction(fId, B_WOOD, baseTx - 4, baseTy + 1, buildRadius);
       if (!built && f.current[B_FARM] < f.limits[B_FARM]) built = tryBuildForFaction(fId, B_FARM, baseTx, baseTy + 6, buildRadius + 2);
       if (!built && f.current[B_BARR] < f.limits[B_BARR]) built = tryBuildForFaction(fId, B_BARR, baseTx + 5, baseTy - 4, buildRadius);
-      if (!built && Builds.level[hall] < 2 && army >= BotDiffCfg.hallUpgradeArmy[diff] && canUpgradeBuilding(hall)) built = upgradeBuilding(hall);
-      if (!built && barr !== -1 && Builds.level[barr] < 2 && army >= BotDiffCfg.barrUpgradeArmy[diff] && canUpgradeBuilding(barr)) built = upgradeBuilding(barr);
+      if (!built && f.current[B_STABLE] < f.limits[B_STABLE] && army >= 2) built = tryBuildForFaction(fId, B_STABLE, baseTx - 6, baseTy - 2, buildRadius);
+      if (!built && f.current[B_TOWER] < f.limits[B_TOWER] && army >= 3) built = tryBuildForFaction(fId, B_TOWER, baseTx + 1, baseTy - 6, Math.min(buildRadius, 8));
+      if (!built && f.current[B_WORKSHOP] < f.limits[B_WORKSHOP] && armyPop >= 8) built = tryBuildForFaction(fId, B_WORKSHOP, baseTx - 6, baseTy - 5, buildRadius);
+      if (!built && Builds.level[hall] < MAX_BUILD_LEVEL && armyPop >= BotDiffCfg.hallUpgradeArmy[diff] + Builds.level[hall] && canUpgradeBuilding(hall)) built = upgradeBuilding(hall);
+      if (!built && barr !== -1 && armyPop >= BotDiffCfg.barrUpgradeArmy[diff]) {
+        const upBarr = findUpgradeableBuildingOfType(fId, B_BARR);
+        if (upBarr !== -1) built = upgradeBuilding(upBarr);
+      }
+      if (!built && stable !== -1 && armyPop >= 5) {
+        const upStable = findUpgradeableBuildingOfType(fId, B_STABLE);
+        if (upStable !== -1) built = upgradeBuilding(upStable);
+      }
+      if (!built && workshop !== -1 && armyPop >= 10) {
+        const upWorkshop = findUpgradeableBuildingOfType(fId, B_WORKSHOP);
+        if (upWorkshop !== -1) built = upgradeBuilding(upWorkshop);
+      }
+      if (!built && f.current[B_TOWER] > 0 && armyPop >= 6) {
+        const upTower = findUpgradeableBuildingOfType(fId, B_TOWER);
+        if (upTower !== -1) built = upgradeBuilding(upTower);
+      }
+      if (!built) {
+        const econType = (f.aiPhase % 3 === 0) ? B_FARM : (f.aiPhase % 3 === 1 ? B_MINE : B_WOOD);
+        const econ = findUpgradeableBuildingOfType(fId, econType);
+        if (econ !== -1) built = upgradeBuilding(econ);
+      }
       f.aiBuildCooldown = built ? BotDiffCfg.buildDelay[diff] : BotDiffCfg.failedBuildDelay[diff];
     }
-    if (barr !== -1 && f.aiTrainCooldown <= 0 && army + countQueuedUnitsByFaction(fId) < BotDiffCfg.armySoftCap[diff]) {
+    const desiredPop = BotDiffCfg.armySoftCap[diff] + Math.max(0, Builds.level[hall] - 1) * (diff === BOT_DIFF_TRAINING ? 6 : (diff === BOT_DIFF_NORMAL ? 10 : 14));
+    if (f.aiTrainCooldown <= 0 && armyPop + queuedPop < desiredPop) {
       const archerMix = diff === BOT_DIFF_TRAINING ? 3 : (diff === BOT_DIFF_NORMAL ? 2 : 1);
-      const unitType = Builds.level[barr] >= UnitCfg.barrLevel[U_ARCHER] && army >= 3 && ((army + fId + f.aiPhase) % (archerMix + 1) === 0) ? U_ARCHER : U_SOLDIER;
-      if (queueUnitFromBarracks(barr, unitType)) f.aiTrainCooldown = BotDiffCfg.trainDelay[diff];
-      else f.aiTrainCooldown = BotDiffCfg.failedTrainDelay[diff];
+      const siegeMix = diff === BOT_DIFF_TRAINING ? 11 : (diff === BOT_DIFF_NORMAL ? 8 : 6);
+      const beastMix = diff === BOT_DIFF_TRAINING ? 9 : (diff === BOT_DIFF_NORMAL ? 6 : 4);
+      const mageMix = diff === BOT_DIFF_TRAINING ? 8 : (diff === BOT_DIFF_NORMAL ? 5 : 3);
+      const pulse = armyPop + army + fId + f.aiPhase;
+      let unitType = U_SOLDIER;
+      if (workshop !== -1 && armyPop >= 8 && (pulse % siegeMix === 0)) {
+        if (Builds.level[workshop] >= unitRequiredBuildingLevel(U_CATAPULT) && armyPop >= 18) unitType = U_CATAPULT;
+        else if (Builds.level[workshop] >= unitRequiredBuildingLevel(U_BALLISTA) && armyPop >= 12) unitType = U_BALLISTA;
+        else unitType = U_RAM;
+      } else if (stable !== -1 && armyPop >= 5 && (pulse % beastMix === 0)) {
+        if (Builds.level[stable] >= unitRequiredBuildingLevel(U_ELEPHANT) && armyPop >= 18) unitType = U_ELEPHANT;
+        else if (Builds.level[stable] >= unitRequiredBuildingLevel(U_CHARIOT) && armyPop >= 10) unitType = U_CHARIOT;
+        else unitType = U_CAVALRY;
+      } else if (barr !== -1 && Builds.level[barr] >= unitRequiredBuildingLevel(U_MAGE) && armyPop >= 9 && (pulse % mageMix === 0)) {
+        unitType = U_MAGE;
+      } else if (barr !== -1 && Builds.level[barr] >= unitRequiredBuildingLevel(U_ARCHER) && army >= 3 && (pulse % (archerMix + 1) === 0)) {
+        unitType = U_ARCHER;
+      }
+      let producer = findProducerForFaction(fId, unitType);
+      let queued = producer !== -1 && queueUnitFromProducer(producer, unitType);
+      if (!queued && unitType !== U_ARCHER && barr !== -1 && Builds.level[barr] >= unitRequiredBuildingLevel(U_ARCHER)) {
+        unitType = U_ARCHER;
+        producer = findProducerForFaction(fId, unitType);
+        queued = producer !== -1 && queueUnitFromProducer(producer, unitType);
+      }
+      if (!queued && unitType !== U_SOLDIER) {
+        unitType = U_SOLDIER;
+        producer = findProducerForFaction(fId, unitType);
+        queued = producer !== -1 && queueUnitFromProducer(producer, unitType);
+      }
+      f.aiTrainCooldown = queued ? BotDiffCfg.trainDelay[diff] : BotDiffCfg.failedTrainDelay[diff];
     }
 
-    if (army >= BotDiffCfg.attackMinArmy[diff] && f.aiAttackCooldown <= 0) {
+    if ((army >= BotDiffCfg.attackMinArmy[diff] || armyPop >= BotDiffCfg.attackMinArmy[diff] + 4) && f.aiAttackCooldown <= 0) {
       const reserve = BotDiffCfg.defenseReserve[diff];
       if (findVisibleEnemyForFaction(fId)) orderFactionAttackVisible(fId, Temp[0], Temp[1], reserve);
       else {
@@ -1908,25 +2850,45 @@ function updateBots(dt) {
 function checkGameOver() {
   if (!Engine.running || Factions.length === 0) return;
   if (Engine.placingStart) return;
-  const playerTeam = Factions[0].team;
-  let alliedHallAlive = false;
-  let enemyHallAlive = false;
-  for (let fId = 0; fId < Factions.length; fId++) {
-    if (findHall(fId) === -1) continue;
-    if (Factions[fId].team === playerTeam) alliedHallAlive = true;
-    else enemyHallAlive = true;
+  if (Engine.observer) {
+    if (Factions.length <= 1) return;
+    let seenMask = 0;
+    let aliveTeams = 0;
+    for (let fId = 0; fId < Factions.length; fId++) {
+      if (!factionHasAnyBuilding(fId)) continue;
+      const team = Factions[fId].team;
+      const bit = 1 << clamp(team, 0, 30);
+      if (seenMask & bit) continue;
+      seenMask |= bit;
+      aliveTeams++;
+      if (aliveTeams > 1) return;
+    }
+    if (aliveTeams <= 1) Game.end(true);
+    return;
   }
-  if (!alliedHallAlive) {
+  const playerTeam = Factions[0].team;
+  let alliedBuildingsAlive = false;
+  let enemyBuildingsAlive = false;
+  for (let fId = 0; fId < Factions.length; fId++) {
+    if (!factionHasAnyBuilding(fId)) continue;
+    if (Factions[fId].team === playerTeam) alliedBuildingsAlive = true;
+    else enemyBuildingsAlive = true;
+  }
+  if (!alliedBuildingsAlive) {
     Game.end(false);
     return;
   }
-  if (!enemyHallAlive) Game.end(true);
+  if (!enemyBuildingsAlive) Game.end(true);
 }
 
 function buildingFill(type, enemy) {
   if (enemy) {
     if (type === B_HALL) return '#7b4835';
     if (type === B_BARR) return '#723e4a';
+    if (type === B_WORKSHOP) return '#664142';
+    if (type === B_TOWER) return '#5e4650';
+    if (type === B_WALL) return '#5a5153';
+    if (type === B_STABLE) return '#684b36';
     if (type === B_MINE) return '#5f4b52';
     if (type === B_WOOD) return '#6b4b30';
     if (type === B_FARM) return '#6c6430';
@@ -1934,6 +2896,10 @@ function buildingFill(type, enemy) {
   }
   if (type === B_HALL) return '#6d623e';
   if (type === B_BARR) return '#4b5068';
+  if (type === B_WORKSHOP) return '#505048';
+  if (type === B_TOWER) return '#5b5d63';
+  if (type === B_WALL) return '#60676b';
+  if (type === B_STABLE) return '#5b4f36';
   if (type === B_MINE) return '#4c4f55';
   if (type === B_WOOD) return '#5e4a2d';
   if (type === B_FARM) return '#6c7136';
@@ -1946,6 +2912,10 @@ function buildingAccent(type, enemy) {
   if (type === B_WOOD) return '#d39b55';
   if (type === B_FARM) return '#e5d160';
   if (type === B_BARR) return '#a6b4da';
+  if (type === B_WORKSHOP) return '#d6c18a';
+  if (type === B_TOWER) return '#bfc6d1';
+  if (type === B_WALL) return '#c9ced0';
+  if (type === B_STABLE) return '#d8aa72';
   return '#d8aa72';
 }
 
@@ -1998,6 +2968,47 @@ function drawBuildingDetails(id, x, y, w, h) {
     ctx.moveTo(x + w * 0.68, y + h * 0.34);
     ctx.lineTo(x + w * 0.32, y + h * 0.66);
     ctx.stroke();
+  } else if (type === B_WORKSHOP) {
+    ctx.strokeStyle = accent;
+    ctx.strokeRect(x + w * 0.18, y + h * 0.22, w * 0.64, h * 0.52);
+    ctx.beginPath();
+    ctx.arc(x + w * 0.35, y + h * 0.48, Math.min(w, h) * 0.13, 0, Math.PI * 2);
+    ctx.arc(x + w * 0.65, y + h * 0.48, Math.min(w, h) * 0.13, 0, Math.PI * 2);
+    ctx.moveTo(x + w * 0.26, y + h * 0.7);
+    ctx.lineTo(x + w * 0.74, y + h * 0.28);
+    ctx.stroke();
+  } else if (type === B_TOWER) {
+    ctx.strokeStyle = accent;
+    ctx.strokeRect(x + w * 0.28, y + h * 0.2, w * 0.44, h * 0.66);
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.22, y + h * 0.2);
+    ctx.lineTo(x + w * 0.5, y + h * 0.04);
+    ctx.lineTo(x + w * 0.78, y + h * 0.2);
+    ctx.stroke();
+    ctx.fillRect(x + w * 0.43, y + h * 0.46, w * 0.14, h * 0.18);
+  } else if (type === B_WALL) {
+    ctx.strokeStyle = accent;
+    ctx.strokeRect(x + 4, y + 4, w - 8, h - 8);
+    ctx.fillStyle = enemy ? 'rgba(40,28,30,0.45)' : 'rgba(210,220,220,0.18)';
+    ctx.fillRect(x + 6, y + 6, w - 12, h - 12);
+    ctx.beginPath();
+    for (let xx = TILE; xx < w; xx += TILE) {
+      ctx.moveTo(x + xx, y + 6);
+      ctx.lineTo(x + xx, y + h - 6);
+    }
+    for (let yy = TILE; yy < h; yy += TILE) {
+      ctx.moveTo(x + 6, y + yy);
+      ctx.lineTo(x + w - 6, y + yy);
+    }
+    ctx.stroke();
+  } else if (type === B_STABLE) {
+    ctx.strokeStyle = accent;
+    ctx.strokeRect(x + w * 0.16, y + h * 0.24, w * 0.68, h * 0.52);
+    ctx.beginPath();
+    ctx.arc(x + w * 0.36, y + h * 0.52, Math.min(w, h) * 0.1, 0, Math.PI * 2);
+    ctx.moveTo(x + w * 0.48, y + h * 0.52);
+    ctx.lineTo(x + w * 0.72, y + h * 0.38);
+    ctx.stroke();
   }
 }
 
@@ -2037,6 +3048,259 @@ function drawMinimap() {
   ctx.restore();
 }
 
+function isRangedUnitType(type) {
+  return (UnitCfg.range[type] || 0) >= 58;
+}
+
+function isSelectedUnit(id) {
+  for (let k = 0; k < Sel.count; k++) if (Sel.ids[k] === id) return true;
+  return false;
+}
+
+function drawRangeRing(cx, cy, radius, stroke, fill) {
+  ctx.fillStyle = fill;
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.6 / Engine.cam.z;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+}
+
+function drawSelectedAttackRanges() {
+  if (Engine.selectedBuilding !== -1 && Builds.active[Engine.selectedBuilding]) {
+    const b = Engine.selectedBuilding;
+    const radius = buildingAttackRange(Builds.type[b], Builds.level[b]);
+    if (radius > 0) {
+      const cx = (Builds.tx[b] + Builds.w[b] * 0.5) * TILE;
+      const cy = (Builds.ty[b] + Builds.h[b] * 0.5) * TILE;
+      drawRangeRing(cx, cy, radius, 'rgba(255,196,88,0.72)', 'rgba(255,196,88,0.055)');
+    }
+  }
+  for (let k = 0; k < Sel.count; k++) {
+    const id = Sel.ids[k];
+    if (!Units.active[id]) continue;
+    const type = Units.kind[id] || U_SOLDIER;
+    if (!isRangedUnitType(type)) continue;
+    drawRangeRing(Units.x[id], Units.y[id], Units.attackRange[id], 'rgba(126,214,255,0.58)', 'rgba(126,214,255,0.045)');
+  }
+}
+
+function drawRegularPolygon(cx, cy, radius, sides, rotation) {
+  ctx.beginPath();
+  for (let p = 0; p < sides; p++) {
+    const a = rotation + p * Math.PI * 2 / sides;
+    const x = cx + Math.cos(a) * radius;
+    const y = cy + Math.sin(a) * radius;
+    if (p === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
+function drawStarPolygon(cx, cy, outer, inner, points, rotation) {
+  ctx.beginPath();
+  const total = points * 2;
+  for (let p = 0; p < total; p++) {
+    const a = rotation + p * Math.PI / points;
+    const r = (p & 1) ? inner : outer;
+    const x = cx + Math.cos(a) * r;
+    const y = cy + Math.sin(a) * r;
+    if (p === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+}
+
+function strokeUnitShape() {
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth = 1 / Engine.cam.z;
+  ctx.stroke();
+}
+
+function drawUnitShape(id, uType, hitRadius) {
+  const x = Units.x[id];
+  const y = Units.y[id];
+  const main = factionColor(Units.faction[id]);
+  ctx.fillStyle = main;
+
+  if (uType === U_SOLDIER) {
+    drawRegularPolygon(x, y, hitRadius + 1, 6, Math.PI / 6);
+    ctx.fill(); strokeUnitShape();
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.fillRect(x - 2.2, y - hitRadius * 0.7, 4.4, hitRadius * 1.4);
+  } else if (uType === U_ARCHER) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - hitRadius - 3);
+    ctx.lineTo(x + hitRadius + 2, y + hitRadius);
+    ctx.lineTo(x, y + hitRadius * 0.45);
+    ctx.lineTo(x - hitRadius - 2, y + hitRadius);
+    ctx.closePath();
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(255,240,190,0.82)';
+    ctx.lineWidth = 1.4 / Engine.cam.z;
+    ctx.beginPath(); ctx.arc(x, y + 1, hitRadius + 4, Math.PI * 1.18, Math.PI * 1.82); ctx.stroke();
+  } else if (uType === U_MAGE) {
+    drawStarPolygon(x, y, hitRadius + 5, hitRadius * 0.48, 5, -Math.PI / 2);
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(126,214,255,0.92)';
+    ctx.lineWidth = 1.5 / Engine.cam.z;
+    ctx.beginPath(); ctx.arc(x, y, hitRadius + 2, 0, Math.PI * 2); ctx.stroke();
+  } else if (uType === U_RAM) {
+    ctx.beginPath();
+    ctx.moveTo(x - hitRadius, y - hitRadius * 0.75);
+    ctx.lineTo(x + hitRadius * 0.72, y - hitRadius * 0.75);
+    ctx.lineTo(x + hitRadius + 5, y);
+    ctx.lineTo(x + hitRadius * 0.72, y + hitRadius * 0.75);
+    ctx.lineTo(x - hitRadius, y + hitRadius * 0.75);
+    ctx.closePath();
+    ctx.fill(); strokeUnitShape();
+    ctx.fillStyle = 'rgba(28,20,14,0.9)';
+    ctx.fillRect(x - hitRadius * 0.72, y - 2, hitRadius * 1.25, 4);
+  } else if (uType === U_CAVALRY) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - hitRadius - 4);
+    ctx.lineTo(x + hitRadius + 5, y);
+    ctx.lineTo(x, y + hitRadius + 2);
+    ctx.lineTo(x - hitRadius * 0.95, y);
+    ctx.closePath();
+    ctx.fill(); strokeUnitShape();
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    drawRegularPolygon(x + hitRadius * 0.38, y - hitRadius * 0.08, hitRadius * 0.38, 3, Math.PI / 2);
+    ctx.fill();
+  } else if (uType === U_CHARIOT) {
+    ctx.beginPath();
+    ctx.moveTo(x - hitRadius - 2, y - hitRadius * 0.55);
+    ctx.lineTo(x + hitRadius + 3, y - hitRadius * 0.25);
+    ctx.lineTo(x + hitRadius + 3, y + hitRadius * 0.55);
+    ctx.lineTo(x - hitRadius - 2, y + hitRadius * 0.55);
+    ctx.closePath();
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(255,238,180,0.82)';
+    ctx.lineWidth = 1.5 / Engine.cam.z;
+    ctx.beginPath(); ctx.moveTo(x - hitRadius * 0.35, y); ctx.lineTo(x + hitRadius + 8, y - hitRadius * 0.75); ctx.stroke();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(x - hitRadius * 0.55, y + hitRadius * 0.78, 3.4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + hitRadius * 0.58, y + hitRadius * 0.78, 3.4, 0, Math.PI * 2); ctx.fill();
+  } else if (uType === U_ELEPHANT) {
+    drawRegularPolygon(x, y, hitRadius + 2, 8, Math.PI / 8);
+    ctx.fill(); strokeUnitShape();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(x - hitRadius * 0.38, y - hitRadius * 1.02, hitRadius * 0.76, hitRadius * 0.42);
+    ctx.fillStyle = main;
+    ctx.fillRect(x + hitRadius * 0.78, y - 3, hitRadius * 0.55, 6);
+    ctx.strokeRect(x + hitRadius * 0.78, y - 3, hitRadius * 0.55, 6);
+  } else if (uType === U_BALLISTA) {
+    drawRegularPolygon(x, y, hitRadius + 1, 4, Math.PI / 4);
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(255,238,190,0.9)';
+    ctx.lineWidth = 1.7 / Engine.cam.z;
+    ctx.beginPath();
+    ctx.moveTo(x - hitRadius - 5, y - hitRadius * 0.55);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x + hitRadius + 8, y);
+    ctx.moveTo(x - hitRadius - 5, y + hitRadius * 0.55);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(x - hitRadius * 0.55, y + hitRadius * 0.78, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + hitRadius * 0.55, y + hitRadius * 0.78, 3, 0, Math.PI * 2); ctx.fill();
+  } else if (uType === U_CATAPULT) {
+    drawStarPolygon(x, y, hitRadius + 4, hitRadius * 0.78, 8, Math.PI / 8);
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(255,220,160,0.9)';
+    ctx.lineWidth = 1.8 / Engine.cam.z;
+    ctx.beginPath(); ctx.moveTo(x - hitRadius * 0.45, y + hitRadius * 0.25); ctx.lineTo(x + hitRadius * 0.8, y - hitRadius - 5); ctx.stroke();
+    ctx.fillStyle = '#1b1b1b';
+    ctx.beginPath(); ctx.arc(x + hitRadius * 0.95, y - hitRadius - 6, 3.5, 0, Math.PI * 2); ctx.fill();
+  } else {
+    drawRegularPolygon(x, y, hitRadius, 5, -Math.PI / 2);
+    ctx.fill(); strokeUnitShape();
+  }
+}
+
+function drawAttackEffects() {
+  for (let i = 0; i < MAX_ATTACK_FX; i++) {
+    if (!AttackFx.active[i]) continue;
+    const kind = AttackFx.kind[i];
+    const p = clamp(AttackFx.t[i] / AttackFx.dur[i], 0, 1);
+    const inv = 1 - p;
+    const sx = AttackFx.x[i], sy = AttackFx.y[i];
+    const tx = AttackFx.tx[i], ty = AttackFx.ty[i];
+    const dx = tx - sx, dy = ty - sy;
+    const color = factionColor(AttackFx.faction[i]);
+
+    if (kind === U_MAGE) {
+      const px = sx + dx * p;
+      const py = sy + dy * p;
+      ctx.strokeStyle = `rgba(126,214,255,${0.9 * inv})`;
+      ctx.lineWidth = 2 / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(px, py); ctx.stroke();
+      ctx.fillStyle = 'rgba(126,214,255,0.82)';
+      drawStarPolygon(px, py, 6 + 5 * p, 2.5 + 2 * p, 5, Engine.pulse * 1.7);
+      ctx.fill();
+      ctx.strokeStyle = `rgba(190,244,255,${0.65 * inv})`;
+      ctx.beginPath(); ctx.arc(tx, ty, 8 + 40 * p, 0, Math.PI * 2); ctx.stroke();
+    } else if (kind === U_BALLISTA) {
+      const px = sx + dx * Math.min(1, p * 1.35);
+      const py = sy + dy * Math.min(1, p * 1.35);
+      ctx.strokeStyle = `rgba(255,238,190,${0.95 * inv + 0.15})`;
+      ctx.lineWidth = 3 / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(px, py); ctx.stroke();
+      ctx.strokeStyle = `rgba(40,28,18,${0.85 * inv})`;
+      ctx.lineWidth = 1.2 / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(px - dx * 0.035, py - dy * 0.035); ctx.lineTo(px, py); ctx.stroke();
+      ctx.fillStyle = `rgba(255,210,120,${0.55 * inv})`;
+      ctx.beginPath(); ctx.arc(tx, ty, 5 + 16 * p, 0, Math.PI * 2); ctx.fill();
+    } else if (kind === U_CATAPULT) {
+      const px = sx + dx * p;
+      const py = sy + dy * p - Math.sin(p * Math.PI) * 42;
+      ctx.strokeStyle = `rgba(65,48,36,${0.42 * inv})`;
+      ctx.lineWidth = 2 / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo((sx + tx) * 0.5, (sy + ty) * 0.5 - 58, tx, ty); ctx.stroke();
+      ctx.fillStyle = 'rgba(30,26,22,0.92)';
+      ctx.beginPath(); ctx.arc(px, py, 5.5 + 2.5 * p, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = `rgba(255,176,76,${0.55 * Math.max(0, p - 0.55) * 2.2})`;
+      ctx.beginPath(); ctx.arc(tx, ty, 10 + 34 * p, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = `rgba(255,221,150,${0.85 * Math.max(0, p - 0.45)})`;
+      ctx.lineWidth = 2.4 / Engine.cam.z;
+      ctx.beginPath(); ctx.arc(tx, ty, 10 + 30 * p, 0, Math.PI * 2); ctx.stroke();
+    } else if (kind === U_CHARIOT) {
+      const len = Math.sqrt(dx * dx + dy * dy) || 1;
+      const nx = -dy / len, ny = dx / len;
+      ctx.fillStyle = `rgba(255,204,98,${0.35 * inv})`;
+      ctx.beginPath();
+      ctx.moveTo(sx + nx * 8, sy + ny * 8);
+      ctx.lineTo(tx + nx * 15, ty + ny * 15);
+      ctx.lineTo(tx - nx * 15, ty - ny * 15);
+      ctx.lineTo(sx - nx * 8, sy - ny * 8);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = `rgba(255,238,180,${0.88 * inv})`;
+      ctx.lineWidth = 2 / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(tx, ty); ctx.stroke();
+      ctx.strokeStyle = `rgba(208,162,86,${0.55 * inv})`;
+      ctx.beginPath(); ctx.arc(sx, sy, 10 + 24 * p, 0, Math.PI * 2); ctx.stroke();
+    } else if (kind === U_ELEPHANT) {
+      ctx.strokeStyle = `rgba(255,236,184,${0.78 * inv})`;
+      ctx.lineWidth = 3 / Engine.cam.z;
+      ctx.beginPath(); ctx.arc(sx, sy, 14 + 32 * p, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = `rgba(120,96,70,${0.6 * inv})`;
+      ctx.lineWidth = 2 / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(tx - 18 * inv, ty - 7); ctx.lineTo(tx + 18 * inv, ty + 7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(tx - 10, ty + 16 * inv); ctx.lineTo(tx + 12, ty - 14 * inv); ctx.stroke();
+      ctx.fillStyle = `rgba(255,221,150,${0.25 * inv})`;
+      ctx.beginPath(); ctx.arc(tx, ty, 12 + 22 * p, 0, Math.PI * 2); ctx.fill();
+    }
+
+    if (kind === U_BALLISTA || kind === U_CATAPULT || kind === U_CHARIOT || kind === U_ELEPHANT) {
+      ctx.strokeStyle = `${color}88`;
+      ctx.lineWidth = 1 / Engine.cam.z;
+      ctx.beginPath(); ctx.arc(sx, sy, 4 + 10 * inv, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+}
+
 function render() {
   ctx.fillStyle = '#17201b';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -2064,6 +3328,21 @@ function render() {
     ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(WORLD_SZ, i); ctx.stroke();
   }
 
+  if (Engine.selectedBuilding !== -1 && Builds.active[Engine.selectedBuilding] && Builds.type[Engine.selectedBuilding] === B_HALL && Builds.workState[Engine.selectedBuilding] !== BUILD_WORK_CONSTRUCT) {
+    const hId = Engine.selectedBuilding;
+    const hx = (Builds.tx[hId] + Builds.w[hId] * 0.5) * TILE;
+    const hy = (Builds.ty[hId] + Builds.h[hId] * 0.5) * TILE;
+    const radius = hallBuildRangeTiles(Builds.level[hId]) * TILE;
+    ctx.fillStyle = 'rgba(126,214,255,0.055)';
+    ctx.strokeStyle = 'rgba(126,214,255,0.58)';
+    ctx.lineWidth = 2 / Engine.cam.z;
+    ctx.beginPath();
+    ctx.arc(hx, hy, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  drawSelectedAttackRanges();
+
   // Prédios
   for (let i = 0; i < MAX_B; i++) {
     if (!Builds.active[i]) continue;
@@ -2079,6 +3358,18 @@ function render() {
     ctx.strokeRect(x, y, w, h);
     drawBuildingDetails(i, x, y, w, h);
 
+    if (Builds.workState[i] !== BUILD_WORK_NONE) {
+      ctx.fillStyle = 'rgba(6,8,7,0.28)';
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = 'rgba(216,170,114,0.86)';
+      ctx.lineWidth = 2 / Engine.cam.z;
+      ctx.strokeRect(x + 2, y + 2, w - 4, h - 4);
+      ctx.fillStyle = 'rgba(255,235,190,0.92)';
+      ctx.font = `${10 / Engine.cam.z}px system-ui`;
+      ctx.textAlign = 'center';
+      ctx.fillText(Builds.workState[i] === BUILD_WORK_UPGRADE ? 'Up' : 'Obra', x + w * 0.5, y + h * 0.5 + 3 / Engine.cam.z);
+    }
+
     if (Builds.flash[i] > 0) {
       const a = Builds.flash[i] / FLASH_MAX;
       ctx.fillStyle = `rgba(255,235,170,${0.32 * a})`;
@@ -2088,12 +3379,12 @@ function render() {
       ctx.strokeRect(x - 2, y - 2, w + 4, h + 4);
     }
 
-    const hpMax = buildingMaxHp(Builds.type[i], Builds.level[i]);
+    const hpMax = buildingHpBarMax(i);
     const barW = w - 8;
     const ratio = Math.max(0, Builds.hp[i] / hpMax);
     ctx.fillStyle = '#111';
     ctx.fillRect(x + 4, y - 7, barW, 4);
-    ctx.fillStyle = '#7fde8a';
+    ctx.fillStyle = Builds.workState[i] === BUILD_WORK_NONE ? '#7fde8a' : '#d8aa72';
     ctx.fillRect(x + 4, y - 7, barW * ratio, 4);
 
     if (Engine.selectedBuilding === i) {
@@ -2102,21 +3393,21 @@ function render() {
       ctx.strokeRect(x - 2, y - 2, w + 4, h + 4);
     }
 
-    if (Builds.type[i] === B_BARR && Builds.queueCount[i] > 0) {
+    if (isMilitaryProducerType(Builds.type[i]) && Builds.queueCount[i] > 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.font = `${12 / Engine.cam.z}px system-ui`;
       ctx.textAlign = 'center';
       ctx.fillText(`Fila ${Builds.queueCount[i]}`, x + w * 0.5, y + h * 0.5 + 4 / Engine.cam.z);
     }
 
-    if ((Builds.type[i] === B_HALL || Builds.type[i] === B_BARR) && Builds.level[i] > 1) {
+    if (isUpgradeableBuildingType(Builds.type[i]) && Builds.level[i] > 1) {
       ctx.fillStyle = 'rgba(255,255,255,0.82)';
       ctx.font = `${10 / Engine.cam.z}px system-ui`;
       ctx.textAlign = 'right';
       ctx.fillText(`Nv ${Builds.level[i]}`, x + w - 5, y + h - 6);
     }
 
-    if (Engine.selectedBuilding === i && Builds.type[i] === B_BARR && Builds.hasRally[i]) {
+    if (Engine.selectedBuilding === i && isMilitaryProducerType(Builds.type[i]) && Builds.hasRally[i]) {
       const cx = x + w * 0.5;
       const cy = y + h * 0.5;
       ctx.strokeStyle = 'rgba(126,214,255,0.72)';
@@ -2134,21 +3425,7 @@ function render() {
     if (!Units.active[i]) continue;
     const uType = Units.kind[i] || U_SOLDIER;
     const hitRadius = UnitCfg.hitRadius[uType];
-    ctx.fillStyle = factionColor(Units.faction[i]);
-    if (uType === U_ARCHER) {
-      ctx.beginPath();
-      ctx.moveTo(Units.x[i], Units.y[i] - hitRadius);
-      ctx.lineTo(Units.x[i] + hitRadius, Units.y[i]);
-      ctx.lineTo(Units.x[i], Units.y[i] + hitRadius);
-      ctx.lineTo(Units.x[i] - hitRadius, Units.y[i]);
-      ctx.closePath();
-      ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], hitRadius, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.strokeStyle = '#111';
-    ctx.lineWidth = 1 / Engine.cam.z;
-    ctx.stroke();
+    drawUnitShape(i, uType, hitRadius);
 
     if (Units.state[i] === STATE_ATTACK || Units.state[i] === STATE_CHASE) {
       const pulse = 0.45 + 0.25 * Math.sin(Engine.pulse * 8 + i);
@@ -2156,8 +3433,9 @@ function render() {
       ctx.lineWidth = 2 / Engine.cam.z;
       ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], 13 + pulse * 2, 0, Math.PI * 2); ctx.stroke();
       if (getTargetPoint(i, TargetPoint)) {
-        ctx.strokeStyle = `rgba(255,92,70,${0.22 + pulse * 0.25})`;
-        ctx.lineWidth = 1 / Engine.cam.z;
+        const ranged = isRangedUnitType(uType);
+        ctx.strokeStyle = ranged ? `rgba(126,214,255,${0.32 + pulse * 0.35})` : `rgba(255,92,70,${0.22 + pulse * 0.25})`;
+        ctx.lineWidth = (ranged ? 1.4 : 1) / Engine.cam.z;
         ctx.beginPath(); ctx.moveTo(Units.x[i], Units.y[i]); ctx.lineTo(TargetPoint[0], TargetPoint[1]); ctx.stroke();
       }
     }
@@ -2167,6 +3445,15 @@ function render() {
       ctx.fillStyle = `rgba(255,245,190,${0.75 * a})`;
       ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], hitRadius + 2, 0, Math.PI * 2); ctx.fill();
     }
+    if (Units.healFx[i] > 0) {
+      const a = Units.healFx[i] / 0.35;
+      ctx.strokeStyle = `rgba(120,223,136,${0.65 * a})`;
+      ctx.lineWidth = 1.6 / Engine.cam.z;
+      ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], hitRadius + 5 - a * 2, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = `rgba(120,223,136,${0.45 * a})`;
+      ctx.fillRect(Units.x[i] - 1, Units.y[i] - hitRadius - 10, 2, 7);
+      ctx.fillRect(Units.x[i] - 3.5, Units.y[i] - hitRadius - 7.5, 7, 2);
+    }
 
     const hpRatio = Math.max(0, Units.hp[i] / UnitCfg.hp[uType]);
     ctx.fillStyle = '#111';
@@ -2174,30 +3461,57 @@ function render() {
     ctx.fillStyle = '#78df88';
     ctx.fillRect(Units.x[i] - 10, Units.y[i] - 16, 20 * hpRatio, 3);
 
-    let selected = false;
-    for (let k = 0; k < Sel.count; k++) if (Sel.ids[k] === i) { selected = true; break; }
-    if (selected) {
+    if (isSelectedUnit(i)) {
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 2 / Engine.cam.z;
-      ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], 11, 0, Math.PI * 2); ctx.stroke();
+      drawRegularPolygon(Units.x[i], Units.y[i], hitRadius + 6, 8, Math.PI / 8);
+      ctx.stroke();
     }
   }
 
   // Preview de construção
+  drawAttackEffects();
+
   if (Engine.buildType !== 0) {
-    const cfg = BuildCfg[Engine.buildType];
+    const bw = buildingFootprintW(Engine.buildType, Engine.buildRot);
+    const bh = buildingFootprintH(Engine.buildType, Engine.buildRot);
+    ctx.strokeStyle = 'rgba(126,214,255,0.26)';
+    ctx.lineWidth = 1.5 / Engine.cam.z;
+    for (let hId = 0; hId < MAX_B; hId++) {
+      if (!Builds.active[hId] || Builds.faction[hId] !== 0 || Builds.type[hId] !== B_HALL) continue;
+      if (Builds.workState[hId] === BUILD_WORK_CONSTRUCT) continue;
+      const hx = (Builds.tx[hId] + Builds.w[hId] * 0.5) * TILE;
+      const hy = (Builds.ty[hId] + Builds.h[hId] * 0.5) * TILE;
+      ctx.beginPath();
+      ctx.arc(hx, hy, hallBuildRangeTiles(Builds.level[hId]) * TILE, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     const gx = (Engine.drag.wx / TILE) | 0;
     const gy = (Engine.drag.wy / TILE) | 0;
-    const ok = canPlaceBuilding(gx, gy, cfg.w, cfg.h) && canAfford(0, Engine.buildType) && Factions[0].current[Engine.buildType] < Factions[0].limits[Engine.buildType];
+    const ok = canPlaceBuildingForFaction(0, Engine.buildType, gx, gy, Engine.buildRot) && canAfford(0, Engine.buildType) && canStartBuildingForFaction(0, Engine.buildType);
     ctx.fillStyle = ok ? 'rgba(0,255,100,0.28)' : 'rgba(255,0,0,0.28)';
-    ctx.fillRect(gx * TILE, gy * TILE, cfg.w * TILE, cfg.h * TILE);
-    const cx0 = Math.max(0, gx - BUILD_CLEARANCE_TILES);
-    const cy0 = Math.max(0, gy - BUILD_CLEARANCE_TILES);
-    const cx1 = Math.min(MAP_SZ, gx + cfg.w + BUILD_CLEARANCE_TILES);
-    const cy1 = Math.min(MAP_SZ, gy + cfg.h + BUILD_CLEARANCE_TILES);
+    ctx.fillRect(gx * TILE, gy * TILE, bw * TILE, bh * TILE);
+    const clearTiles = Engine.buildType === B_WALL ? 0 : BUILD_CLEARANCE_TILES;
+    const cx0 = Math.max(0, gx - clearTiles);
+    const cy0 = Math.max(0, gy - clearTiles);
+    const cx1 = Math.min(MAP_SZ, gx + bw + clearTiles);
+    const cy1 = Math.min(MAP_SZ, gy + bh + clearTiles);
     ctx.strokeStyle = ok ? 'rgba(255,240,190,0.42)' : 'rgba(255,110,110,0.55)';
     ctx.lineWidth = 1 / Engine.cam.z;
     ctx.strokeRect(cx0 * TILE, cy0 * TILE, (cx1 - cx0) * TILE, (cy1 - cy0) * TILE);
+    ctx.strokeStyle = ok ? 'rgba(255,240,190,0.95)' : 'rgba(255,90,90,0.95)';
+    ctx.lineWidth = 2 / Engine.cam.z;
+    ctx.strokeRect(gx * TILE, gy * TILE, bw * TILE, bh * TILE);
+    if (Engine.buildType === B_WALL) {
+      ctx.strokeStyle = 'rgba(255,245,210,0.55)';
+      ctx.lineWidth = 1 / Engine.cam.z;
+      for (let yy = 1; yy < bh; yy++) {
+        ctx.beginPath(); ctx.moveTo(gx * TILE, (gy + yy) * TILE); ctx.lineTo((gx + bw) * TILE, (gy + yy) * TILE); ctx.stroke();
+      }
+      for (let xx = 1; xx < bw; xx++) {
+        ctx.beginPath(); ctx.moveTo((gx + xx) * TILE, gy * TILE); ctx.lineTo((gx + xx) * TILE, (gy + bh) * TILE); ctx.stroke();
+      }
+    }
   }
 
   if (Engine.placingStart) {
@@ -2365,6 +3679,7 @@ function selectUnitsOfType(unitType) {
 }
 
 function finalizeSelectionBox() {
+  if (Engine.observer) return;
   const x0 = Math.min(Engine.drag.boxX0, Engine.drag.boxX1);
   const y0 = Math.min(Engine.drag.boxY0, Engine.drag.boxY1);
   const x1 = Math.max(Engine.drag.boxX0, Engine.drag.boxX1);
@@ -2382,19 +3697,52 @@ function finalizeSelectionBox() {
   UI.updateSelectionInfo();
 }
 
-function issueCommandAt(wx, wy) {
+function isGroundDoubleTap(sx, sy) {
+  if (sx === undefined || sy === undefined) return false;
+  const now = performance.now();
+  const tapDx = sx - Engine.lastTapSx;
+  const tapDy = sy - Engine.lastTapSy;
+  return Engine.lastTapKind === TAP_KIND_GROUND && now - Engine.lastTapTime <= DOUBLE_TAP_MS && tapDx * tapDx + tapDy * tapDy <= DOUBLE_TAP_DIST2;
+}
+
+function rememberGroundTap(sx, sy) {
+  if (sx === undefined || sy === undefined) return;
+  Engine.lastTapTime = performance.now();
+  Engine.lastTapKind = TAP_KIND_GROUND;
+  Engine.lastTapSx = sx;
+  Engine.lastTapSy = sy;
+}
+
+function issueCommandAt(wx, wy, sx, sy) {
+  if (Engine.observer) return;
   if (Sel.count === 0) return;
-  Engine.lastTapTime = 0;
-  Engine.lastTapKind = 0;
   const enemyUnit = pickEnemyUnitAt(wx, wy, 0);
   const enemyBuilding = pickEnemyBuildingAt(wx, wy, 0);
-  if (enemyUnit !== -1) issueAttackOrderUnit(enemyUnit);
-  else if (enemyBuilding !== -1) issueAttackOrderBuilding(enemyBuilding);
-  else issueMoveOrder(wx, wy);
+  if (enemyUnit !== -1) {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
+    issueAttackOrderUnit(enemyUnit);
+  } else if (enemyBuilding !== -1) {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
+    issueAttackOrderBuilding(enemyBuilding);
+  } else if (isGroundDoubleTap(sx, sy)) {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
+    issueAttackMoveOrder(wx, wy);
+    UI.msg('Avancar atacando.', false);
+  } else {
+    issueMoveOrder(wx, wy);
+    rememberGroundTap(sx, sy);
+  }
   UI.updateSelectionInfo();
 }
 
 function handlePrimaryTap(wx, wy, pointerType, sx, sy) {
+  if (Engine.observer) {
+    clearSelection();
+    return;
+  }
   const ownUnit = pickUnitAt(wx, wy, 0);
   const ownBuilding = findOwnBuildingAt(wx, wy, 0);
 
@@ -2419,10 +3767,14 @@ function handlePrimaryTap(wx, wy, pointerType, sx, sy) {
     Engine.lastTapTime = 0;
     Engine.lastTapKind = 0;
     selectBuilding(ownBuilding);
-  } else if (pointerType !== 'mouse' && Sel.count > 0) {
-    Engine.lastTapTime = 0;
-    Engine.lastTapKind = 0;
-    issueCommandAt(wx, wy);
+  } else if (Sel.count > 0) {
+    if (pointerType === 'mouse') {
+      Engine.lastTapTime = 0;
+      Engine.lastTapKind = 0;
+      clearSelection();
+    } else {
+      issueCommandAt(wx, wy, sx, sy);
+    }
   } else {
     Engine.lastTapTime = 0;
     Engine.lastTapKind = 0;
@@ -2477,7 +3829,7 @@ canvas.addEventListener('pointerdown', (e) => {
   toWorld(e.clientX, e.clientY);
   Engine.drag.startWx = Engine.drag.wx = Temp[0];
   Engine.drag.startWy = Engine.drag.wy = Temp[1];
-  Engine.drag.overOwnUnit = pickUnitAt(Engine.drag.wx, Engine.drag.wy, 0);
+  Engine.drag.overOwnUnit = Engine.observer ? -1 : pickUnitAt(Engine.drag.wx, Engine.drag.wy, 0);
   if (Engine.buildType !== 0) return;
 });
 
@@ -2526,7 +3878,9 @@ canvas.addEventListener('pointermove', (e) => {
     const panButton = mouse && (Engine.drag.button === 1 || Engine.drag.button === 2);
     const heldForSelect = !mouse && performance.now() - Engine.drag.downTime >= TOUCH_SELECT_HOLD_MS;
     const touchSelect = !mouse && (Engine.drag.overOwnUnit !== -1 || heldForSelect);
-    if (panButton) {
+    if (Engine.observer) {
+      Engine.drag.mode = 2;
+    } else if (panButton) {
       Engine.drag.mode = 2;
     } else if (mouse || touchSelect) {
       Engine.drag.mode = 3;
@@ -2598,21 +3952,33 @@ canvas.addEventListener('pointerup', (e) => {
       return;
     }
     const type = Engine.buildType;
-    const cfg = BuildCfg[type];
+    const bw = buildingFootprintW(type, Engine.buildRot);
+    const bh = buildingFootprintH(type, Engine.buildRot);
     const gx = (Engine.drag.wx / TILE) | 0;
     const gy = (Engine.drag.wy / TILE) | 0;
-    const f = Factions[0];
-    if (f.current[type] >= f.limits[type]) UI.msg('Limite atingido para esta construção.', true);
-    else if (bFree.length === 0) UI.msg('Limite global de construções atingido.', true);
+    if (!canStartBuildingForFaction(0, type)) {
+      const req = requiredHallLevelForBuilding(type);
+      if (type === B_HALL) UI.msg('Voce ja possui uma prefeitura.', true);
+      else if (factionHallLevel(0) < req) UI.msg(`${buildingLabel(type)} exige Prefeitura Nv ${req}.`, true);
+      else UI.msg('Limite atingido para esta construcao.', true);
+    }
+    else if (bFree.length === 0) UI.msg('Limite global de construcoes atingido.', true);
     else if (!canAfford(0, type)) UI.msg('Recursos insuficientes.', true);
-    else if (!canPlaceBuilding(gx, gy, cfg.w, cfg.h)) UI.msg('Local invalido, ocupado ou perto demais.', true);
+    else if (findBlockingBuildingForPlacementTyped(type, gx, gy, bw, bh) !== -1) UI.msg('Local invalido, ocupado ou perto demais.', true);
+    else if (findBlockingUnitForPlacement(type, gx, gy, bw, bh) >= 0) UI.msg('Nao construa sobre tropas. Elas podem ficar presas.', true);
+    else if (!isWithinBuildRange(0, type, gx, gy, Engine.buildRot)) UI.msg('Fora do alcance da prefeitura.', true);
     else {
       payForBuild(0, type);
-      const b = spawnBuilding(0, type, gx, gy);
+      const b = spawnBuilding(0, type, gx, gy, false, Engine.buildRot);
       if (b !== -1) {
         UI.updateRes();
         UI.updateLimits();
+        UI.msg(`${buildingLabel(type)} em construcao (${Math.ceil(buildTimeFor(type))}s).`, false);
         UI.cancelBuild();
+      } else {
+        refundBuild(0, type);
+        UI.updateRes();
+        UI.msg('Nao foi possivel iniciar a obra.', true);
       }
     }
     resetDrag();
@@ -2627,7 +3993,7 @@ canvas.addEventListener('pointerup', (e) => {
 
   if (tap) {
     const wx = Engine.drag.wx, wy = Engine.drag.wy;
-    if (mouse && button === 2) issueCommandAt(wx, wy);
+    if (mouse && button === 2) issueCommandAt(wx, wy, e.clientX, e.clientY);
     else if (!mouse || button === 0) handlePrimaryTap(wx, wy, Engine.drag.pointerType, e.clientX, e.clientY);
   }
 
@@ -2649,18 +4015,34 @@ canvas.addEventListener('wheel', (e) => {
   e.preventDefault();
   zoomAtScreen(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.001));
 }, { passive: false });
+window.addEventListener('keydown', (e) => {
+  if ((e.key === 'r' || e.key === 'R') && canRotateBuilding(Engine.buildType)) {
+    e.preventDefault();
+    UI.rotateBuild();
+  } else if (e.key === 'Escape' && Engine.buildType !== 0) {
+    e.preventDefault();
+    UI.cancelBuild();
+  }
+});
 
 const UI = {
   resWood: -1,
   resStone: -1,
   resGrain: -1,
   unitText: '',
+  unitStatus: '',
+  implText: '',
+  implPct: '',
+  implEnding: false,
+  implActiveState: false,
   limitCache: {},
   selectionText: '',
   spawnVisible: false,
   spawnText: '',
   archerVisible: false,
   archerText: '',
+  ramVisible: false,
+  ramText: '',
   rallyVisible: false,
   rallyText: '',
   upgradeVisible: false,
@@ -2668,6 +4050,37 @@ const UI = {
   squadActionsVisible: false,
   actionMode: 'root',
   panelMode: '',
+  settingsVisible: false,
+  compactHud: false,
+  applyHudOptions() {
+    const layer = document.getElementById('uiLayer');
+    if (layer) layer.classList.toggle('hud-min', UI.compactHud);
+    const btn = document.getElementById('compactHudBtn');
+    if (btn) btn.innerHTML = UI.compactHud ? 'HUD normal<small>Mais informacao</small>' : 'HUD compacto<small>Mais mapa livre</small>';
+    Engine.uiMeasureDirty = true;
+  },
+  toggleSettingsPanel() {
+    UI.settingsVisible = !UI.settingsVisible;
+    const panel = document.getElementById('settingsPanel');
+    if (panel) panel.classList.toggle('hidden', !UI.settingsVisible);
+    UI.applyHudOptions();
+  },
+  toggleCompactHud() {
+    UI.compactHud = !UI.compactHud;
+    UI.applyHudOptions();
+    UI.msg(UI.compactHud ? 'HUD compacto ativado.' : 'HUD normal ativado.', false);
+  },
+  requestLandscape() {
+    const root = document.documentElement;
+    const fullscreen = document.fullscreenElement ? Promise.resolve() : (root.requestFullscreen ? root.requestFullscreen() : Promise.resolve());
+    fullscreen
+      .then(() => {
+        if (screen.orientation && screen.orientation.lock) return screen.orientation.lock('landscape');
+        return Promise.resolve();
+      })
+      .then(() => UI.msg('Modo horizontal solicitado. Gire o celular se necessario.', false))
+      .catch(() => UI.msg('O navegador bloqueou a rotacao. Use a rotacao do aparelho.', true));
+  },
   lobbyWarning(txt) {
     const el = document.getElementById('setupWarning');
     if (el) el.textContent = txt || '';
@@ -2678,7 +4091,8 @@ const UI = {
     for (let i = 1; i <= MAX_BOTS; i++) {
       if (Lobby.botDifficulty[i] >= BOT_DIFF_COUNT) Lobby.botDifficulty[i] = Lobby.difficulty;
     }
-    const maxTeams = Math.max(1, Lobby.botCount);
+    const maxTeams = Math.max(1, Lobby.observer ? Lobby.botCount - 1 : Lobby.botCount);
+    if (Lobby.teamsEnabled && maxTeams < 2) Lobby.teamsEnabled = false;
     Lobby.teamCount = clamp(Lobby.teamCount | 0, 1, maxTeams);
     if (!Lobby.teamsEnabled) {
       for (let i = 0; i <= MAX_BOTS; i++) Lobby.teams[i] = i + 1;
@@ -2703,19 +4117,37 @@ const UI = {
     const teamSetupSection = document.getElementById('teamSetupSection');
     const teamRowsLabel = document.getElementById('teamRowsLabel');
     const teamModeInfo = document.getElementById('teamModeInfo');
+    const observerToggle = document.getElementById('observerToggle');
+    const observerInfo = document.getElementById('observerInfo');
+    const startMatchBtn = document.getElementById('startMatchBtn');
     if (botLabel) botLabel.textContent = Lobby.botCount;
     if (teamLabel) teamLabel.textContent = Lobby.teamCount;
+    const resSlider = document.getElementById('startResourceSlider');
+    const resLabel = document.getElementById('startResourceLabel');
+    if (resSlider) resSlider.value = Lobby.startResourceIndex;
+    if (resLabel) resLabel.textContent = startResourceText(Lobby.startResourceIndex);
     if (teamToggle) {
       teamToggle.textContent = Lobby.teamsEnabled ? 'Ligado' : 'Desligado';
       teamToggle.classList.toggle('active', Lobby.teamsEnabled);
     }
+    if (observerToggle) {
+      observerToggle.textContent = Lobby.observer ? 'Ligado' : 'Desligado';
+      observerToggle.classList.toggle('active', Lobby.observer);
+    }
+    if (observerInfo) {
+      observerInfo.textContent = Lobby.observer
+        ? 'Partida sem jogador: todos os participantes sao bots.'
+        : 'Jogue normalmente escolhendo a sua Prefeitura inicial.';
+    }
+    if (startMatchBtn) startMatchBtn.textContent = Lobby.observer ? 'Assistir bots' : 'Iniciar partida';
     if (teamControls) teamControls.classList.toggle('hidden', !Lobby.teamsEnabled);
     if (teamDistribute) teamDistribute.classList.toggle('hidden', !Lobby.teamsEnabled);
     if (teamSetupSection) teamSetupSection.classList.remove('hidden');
     if (teamRowsLabel) teamRowsLabel.textContent = Lobby.teamsEnabled ? 'Formacao de times e bots' : 'Dificuldade por bot';
     if (teamModeInfo) {
+      const maxLobbyTeams = Math.max(1, Lobby.observer ? Lobby.botCount - 1 : Lobby.botCount);
       teamModeInfo.textContent = Lobby.teamsEnabled
-        ? `Alianças ativas. Máximo: ${Lobby.botCount} time${Lobby.botCount === 1 ? '' : 's'}.`
+        ? `Aliancas ativas. Maximo: ${maxLobbyTeams} time${maxLobbyTeams === 1 ? '' : 's'}.`
         : 'Todos contra todos: cada participante joga sozinho.';
     }
 
@@ -2723,11 +4155,13 @@ const UI = {
     if (rows) {
       let html = '';
       if (Lobby.teamsEnabled) {
-        html += '<div class="team-row no-team"><div class="team-name">Jogador<small>voce controla</small></div><select class="team-select" onchange="UI.setLobbyTeam(0, this.value)">';
-        for (let team = 1; team <= Lobby.teamCount; team++) {
-          html += `<option value="${team}"${Lobby.teams[0] === team ? ' selected' : ''}>Time ${team}</option>`;
+        if (!Lobby.observer) {
+          html += '<div class="team-row no-team"><div class="team-name">Jogador<small>voce controla</small></div><select class="team-select" onchange="UI.setLobbyTeam(0, this.value)">';
+          for (let team = 1; team <= Lobby.teamCount; team++) {
+            html += `<option value="${team}"${Lobby.teams[0] === team ? ' selected' : ''}>Time ${team}</option>`;
+          }
+          html += '</select></div>';
         }
-        html += '</select></div>';
         for (let i = 1; i <= Lobby.botCount; i++) {
           html += `<div class="team-row"><div class="team-name">Bot ${i}<small>${BOT_DIFF_LABELS[Lobby.botDifficulty[i]]}</small></div><select class="team-select" onchange="UI.setLobbyTeam(${i}, this.value)">`;
           for (let team = 1; team <= Lobby.teamCount; team++) {
@@ -2766,17 +4200,31 @@ const UI = {
     UI.updateLobby();
   },
   adjustLobbyTeams(delta) {
-    const maxTeams = Math.max(1, Lobby.botCount);
+    const maxTeams = Math.max(1, Lobby.observer ? Lobby.botCount - 1 : Lobby.botCount);
     Lobby.teamCount = clamp(Lobby.teamCount + delta, 1, maxTeams);
     UI.normalizeLobby();
     UI.updateLobby();
   },
+  toggleLobbyObserver() {
+    Lobby.observer = !Lobby.observer;
+    UI.normalizeLobby();
+    UI.updateLobby();
+  },
   toggleLobbyTeams() {
+    const maxTeams = Math.max(1, Lobby.observer ? Lobby.botCount - 1 : Lobby.botCount);
+    if (!Lobby.teamsEnabled && maxTeams < 2) {
+      UI.lobbyWarning('Times exigem pelo menos 3 participantes.');
+      return;
+    }
     Lobby.teamsEnabled = !Lobby.teamsEnabled;
     if (Lobby.teamsEnabled) {
-      Lobby.teamCount = clamp(Math.max(2, Lobby.teamCount), 1, Math.max(1, Lobby.botCount));
+      Lobby.teamCount = clamp(Math.max(2, Lobby.teamCount), 1, maxTeams);
       Lobby.teams[0] = 1;
-      for (let i = 1; i <= Lobby.botCount; i++) Lobby.teams[i] = Math.min(2, Lobby.teamCount);
+      if (Lobby.observer) {
+        for (let i = 1; i <= Lobby.botCount; i++) Lobby.teams[i] = 1 + ((i - 1) % Lobby.teamCount);
+      } else {
+        for (let i = 1; i <= Lobby.botCount; i++) Lobby.teams[i] = Math.min(2, Lobby.teamCount);
+      }
     }
     UI.updateLobby();
   },
@@ -2791,12 +4239,20 @@ const UI = {
     Lobby.botDifficulty[botId] = clamp(index | 0, 0, BOT_DIFF_COUNT - 1);
     UI.updateLobby();
   },
+  setLobbyStartResources(index) {
+    Lobby.startResourceIndex = clamp(index | 0, 0, START_RESOURCE_LABELS.length - 1);
+    UI.updateLobby();
+  },
   balanceLobbyTeams() {
     UI.normalizeLobby();
     if (!Lobby.teamsEnabled) return;
-    Lobby.teams[0] = 1;
-    for (let i = 1; i <= Lobby.botCount; i++) {
-      Lobby.teams[i] = Lobby.teamCount === 1 ? 1 : 2 + ((i - 1) % Math.max(1, Lobby.teamCount - 1));
+    if (Lobby.observer) {
+      for (let i = 1; i <= Lobby.botCount; i++) Lobby.teams[i] = 1 + ((i - 1) % Lobby.teamCount);
+    } else {
+      Lobby.teams[0] = 1;
+      for (let i = 1; i <= Lobby.botCount; i++) {
+        Lobby.teams[i] = Lobby.teamCount === 1 ? 1 : 2 + ((i - 1) % Math.max(1, Lobby.teamCount - 1));
+      }
     }
     UI.updateLobby();
   },
@@ -2811,6 +4267,7 @@ const UI = {
     document.getElementById('endMenu').classList.add('hidden');
     document.getElementById('botMenu').classList.remove('hidden');
     Lobby.teamsEnabled = false;
+    Lobby.observer = false;
     UI.updateLobby();
   },
   showEnd(victory) {
@@ -2818,11 +4275,20 @@ const UI = {
     document.getElementById('uiLayer').classList.add('hidden');
     document.getElementById('botMenu').classList.add('hidden');
     document.getElementById('mainMenu').classList.add('hidden');
-    document.getElementById('endTitle').textContent = victory ? 'Vitória' : 'Derrota';
-    document.getElementById('endSubtitle').textContent = victory ? 'As prefeituras inimigas caíram.' : 'Sua prefeitura foi destruída.';
+    if (Engine.observer) {
+      document.getElementById('endTitle').textContent = 'Fim da simulacao';
+      document.getElementById('endSubtitle').textContent = 'Um assentamento dominou o mapa.';
+    } else {
+      document.getElementById('endTitle').textContent = victory ? 'Vitoria' : 'Derrota';
+      document.getElementById('endSubtitle').textContent = victory ? 'Os assentamentos inimigos cairam.' : 'Seu assentamento caiu.';
+    }
     document.getElementById('endMenu').classList.remove('hidden');
   },
   showActionMode(mode) {
+    if (Engine.observer) {
+      UI.msg('Modo observador: comandos desativados.', true);
+      return;
+    }
     if (Engine.placingStart) {
       UI.msg('Escolha a prefeitura inicial primeiro.', true);
       return;
@@ -2832,7 +4298,7 @@ const UI = {
     UI.updateSelectionInfo();
   },
   updateActionPanels() {
-    const mode = Engine.buildType !== 0 ? 'build' : (Engine.placingStart ? 'root' : UI.actionMode);
+    const mode = Engine.observer ? 'observer' : (Engine.buildType !== 0 ? 'build' : (Engine.placingStart ? 'root' : UI.actionMode));
     if (UI.panelMode === mode) return;
     UI.panelMode = mode;
     const buildActions = document.getElementById('buildActions');
@@ -2842,36 +4308,70 @@ const UI = {
     if (!buildActions || !trainActions) return;
     buildActions.classList.toggle('hidden', mode !== 'build');
     trainActions.classList.toggle('hidden', mode !== 'train');
-    if (openBuild) openBuild.classList.toggle('active', mode === 'build');
-    if (openTrain) openTrain.classList.toggle('active', mode === 'train');
+    if (openBuild) {
+      openBuild.classList.toggle('hidden', mode === 'observer');
+      openBuild.classList.toggle('active', mode === 'build');
+    }
+    if (openTrain) {
+      openTrain.classList.toggle('hidden', mode === 'observer');
+      openTrain.classList.toggle('active', mode === 'train');
+    }
+    Engine.uiMeasureDirty = true;
   },
   prepBuild(type) {
+    if (Engine.observer) {
+      UI.msg('Modo observador: construcao desativada.', true);
+      return;
+    }
     if (Engine.placingStart) {
       UI.msg('Escolha a prefeitura inicial primeiro.', true);
       return;
     }
-    const f = Factions[0];
-    if (f.current[type] >= f.limits[type]) {
-      UI.msg('Limite atingido para esta construção.', true);
+    if (!canStartBuildingForFaction(0, type)) {
+      const req = requiredHallLevelForBuilding(type);
+      if (type === B_HALL) UI.msg('Voce ja possui uma prefeitura.', true);
+      else if (factionHallLevel(0) < req) UI.msg(`${buildingLabel(type)} exige Prefeitura Nv ${req}.`, true);
+      else UI.msg('Limite atingido para esta construcao.', true);
       return;
     }
     Engine.buildType = type;
+    Engine.buildRot = 0;
     Engine.rallyBuilding = -1;
     UI.actionMode = 'build';
     document.getElementById('cancelBuild').classList.remove('hidden');
+    const rotate = document.getElementById('rotateBuild');
+    if (rotate) rotate.classList.toggle('hidden', !canRotateBuilding(type));
     UI.updateActionPanels();
+    UI.updateSelectionInfo();
+  },
+  rotateBuild() {
+    if (!canRotateBuilding(Engine.buildType)) return;
+    Engine.buildRot = (Engine.buildRot + 1) & 1;
+    const rotate = document.getElementById('rotateBuild');
+    if (rotate) rotate.innerHTML = Engine.buildRot ? 'Girar<small>Muro 6x2</small>' : 'Girar<small>Muro 2x6</small>';
     UI.updateSelectionInfo();
   },
   cancelBuild() {
     Engine.buildType = 0;
+    Engine.buildRot = 0;
     document.getElementById('cancelBuild').classList.add('hidden');
+    const rotate = document.getElementById('rotateBuild');
+    if (rotate) {
+      rotate.classList.add('hidden');
+      rotate.innerHTML = 'Girar<small>Muro 2x6</small>';
+    }
     UI.updateActionPanels();
     UI.updateSelectionInfo();
   },
   startRallyPoint() {
+    if (Engine.observer) return;
     const bId = Engine.selectedBuilding;
-    if (bId === -1 || !Builds.active[bId] || Builds.type[bId] !== B_BARR || Builds.faction[bId] !== 0) {
-      UI.msg('Selecione um quartel seu.', true);
+    if (bId === -1 || !Builds.active[bId] || !isMilitaryProducerType(Builds.type[bId]) || Builds.faction[bId] !== 0) {
+      UI.msg('Selecione uma estrutura militar sua.', true);
+      return;
+    }
+    if (Builds.workState[bId] !== BUILD_WORK_NONE) {
+      UI.msg(`${buildingLabel(Builds.type[bId])} indisponivel durante a obra.`, true);
       return;
     }
     Engine.buildType = 0;
@@ -2907,70 +4407,86 @@ const UI = {
   updateUnitHud() {
     const el = document.getElementById('valUnits');
     if (!el || Factions.length === 0) return;
-    const active = countUnitsByFaction(0);
-    const queued = countQueuedUnitsByFaction(0);
+    const active = countUnitPopByFaction(0);
+    const queued = countQueuedPopByFaction(0);
     const cap = getUnitCap(0);
-    const txt = queued > 0 ? `${active}+${queued}/${cap}` : `${active}/${cap}`;
+    const txt = queued > 0 ? `${active}/${cap}+${queued}` : `${active}/${cap}`;
     if (UI.unitText !== txt) {
       el.textContent = txt;
       UI.unitText = txt;
     }
+    let status = '';
+    if (cap > 0 && active >= cap) status = 'danger';
+    else if (cap > 0 && active >= cap * 0.8) status = 'warn';
+    if (UI.unitStatus !== status) {
+      const box = document.getElementById('unitInfo');
+      if (box) {
+        box.classList.toggle('warn', status === 'warn');
+        box.classList.toggle('danger', status === 'danger');
+      }
+      UI.unitStatus = status;
+    }
   },
   updateLimits() {
     const f = Factions[0];
-    for (const type of [B_MINE, B_WOOD, B_FARM, B_BARR]) {
+    if (!f) return;
+    refreshFactionLimits(0);
+    for (const type of [B_HALL, B_MINE, B_WOOD, B_FARM, B_BARR, B_WORKSHOP, B_TOWER, B_WALL, B_STABLE]) {
+      const costEl = document.getElementById('cost-' + type);
+      if (costEl) costEl.textContent = buildCostText(type);
+    }
+    for (const type of [B_MINE, B_WOOD, B_FARM, B_BARR, B_WORKSHOP, B_TOWER, B_WALL, B_STABLE]) {
       const txt = `(${f.current[type]}/${f.limits[type]})`;
       if (UI.limitCache[type] === txt) continue;
       const el = document.getElementById('lim-' + type);
       if (el) el.textContent = txt;
       UI.limitCache[type] = txt;
     }
-  },
-  updateSelectionInfo() {
-    const label = document.getElementById('selectionInfo');
-    const spawn = document.getElementById('spawnUnit');
-    const trainInfo = document.getElementById('trainInfo');
-    let text = 'Sem seleção';
-    let showSpawn = false;
-    let spawnHtml = 'Soldado<small>10G</small>';
-    let trainText = 'Selecione um quartel para ver a fila.';
-    if (Engine.placingStart) {
-      text = 'Escolha sua prefeitura inicial';
-    } else if (Engine.buildType !== 0) {
-      text = 'Posicione: ' + buildingLabel(Engine.buildType);
-    } else if (Engine.selectedBuilding !== -1) {
-      const bId = Engine.selectedBuilding;
-      text = buildingLabel(Builds.type[bId]);
-      if (Builds.type[bId] === B_BARR) {
-        const q = Builds.queueCount[bId];
-        const t = Math.ceil(Builds.queue[bId]);
-        text = q > 0 ? `Quartel - Fila ${q}/${MAX_TRAIN_QUEUE} (${t}s)` : `Quartel - Fila 0/${MAX_TRAIN_QUEUE}`;
-        trainText = q > 0 ? `Fila do quartel: ${q}/${MAX_TRAIN_QUEUE}. Proximo soldado em ${t}s.` : `Fila do quartel: 0/${MAX_TRAIN_QUEUE}.`;
-        spawnHtml = q >= MAX_TRAIN_QUEUE ? 'Soldado<small>Fila cheia</small>' : (!canQueueUnit(0) ? 'Soldado<small>Limite</small>' : `Soldado<small>10G Fila ${q}/${MAX_TRAIN_QUEUE}</small>`);
-        showSpawn = true;
+    const implBox = document.getElementById('implementationInfo');
+    const implVal = document.getElementById('valImplementation');
+    const implBar = document.getElementById('implementationBar');
+    const implActive = Engine.implementationTime > 0;
+    const layer = document.getElementById('uiLayer');
+    if (layer) layer.classList.toggle('impl-active', implActive);
+    if (UI.implActiveState !== implActive) {
+      UI.implActiveState = implActive;
+      Engine.uiMeasureDirty = true;
+    }
+    if (implBox) {
+      implBox.classList.toggle('hidden', !implActive);
+      const ending = implActive && Engine.implementationTime <= 10;
+      if (UI.implEnding !== ending) {
+        implBox.classList.toggle('ending', ending);
+        UI.implEnding = ending;
       }
-    } else if (Sel.count > 0) {
-      text = Sel.count === 1 ? '1 unidade selecionada' : `${Sel.count} unidades selecionadas`;
     }
-    if (UI.selectionText !== text) {
-      label.textContent = text;
-      UI.selectionText = text;
+    if (implVal) {
+      const txt = implActive ? `${Math.ceil(Engine.implementationTime)}s` : '';
+      if (UI.implText !== txt) {
+        implVal.textContent = txt;
+        UI.implText = txt;
+      }
     }
-    if (UI.spawnVisible !== showSpawn) {
-      spawn.classList.toggle('hidden', !showSpawn);
-      UI.spawnVisible = showSpawn;
+    if (implBar) {
+      const pct = implActive ? clamp(Engine.implementationTime / IMPLEMENTATION_DURATION, 0, 1) : 0;
+      const pctText = `${Math.round(pct * 100)}%`;
+      if (UI.implPct !== pctText) {
+        implBar.style.width = pctText;
+        UI.implPct = pctText;
+      }
     }
-    if (UI.spawnText !== spawnHtml) {
-      spawn.innerHTML = spawnHtml;
-      UI.spawnText = spawnHtml;
-    }
-    if (trainInfo && trainInfo.textContent !== trainText) trainInfo.textContent = trainText;
-    UI.updateActionPanels();
   },
   updateSelectionInfo() {
     const label = document.getElementById('selectionInfo');
     const spawn = document.getElementById('spawnUnit');
     const archer = document.getElementById('spawnArcher');
+    const ram = document.getElementById('spawnRam');
+    const mage = document.getElementById('spawnMage');
+    const cavalry = document.getElementById('spawnCavalry');
+    const chariot = document.getElementById('spawnChariot');
+    const elephant = document.getElementById('spawnElephant');
+    const ballista = document.getElementById('spawnBallista');
+    const catapult = document.getElementById('spawnCatapult');
     const rally = document.getElementById('setRally');
     const upgrade = document.getElementById('upgradeBuilding');
     const squadActions = document.getElementById('squadActions');
@@ -2979,53 +4495,78 @@ const UI = {
     let text = 'Sem selecao';
     let showSpawn = false;
     let showArcher = false;
+    let showRam = false;
     let showRally = false;
     let showUpgrade = false;
     let showSquadActions = false;
-    let spawnHtml = `Soldado<small>${unitGrainCost(U_SOLDIER)}G</small>`;
-    let archerHtml = `Arqueiro<small>${unitGrainCost(U_ARCHER)}G</small>`;
+    let spawnHtml = `Soldado<small>${unitCostText(U_SOLDIER)} Hab ${unitPopCost(U_SOLDIER)}</small>`;
+    let archerHtml = `Arqueiro<small>${unitCostText(U_ARCHER)} Hab ${unitPopCost(U_ARCHER)}</small>`;
+    let ramHtml = `Ariete<small>${unitCostText(U_RAM)} Hab ${unitPopCost(U_RAM)}</small>`;
     let rallyHtml = 'Ponto<small>Reuniao</small>';
     let upgradeHtml = 'Melhorar<small>Estrutura</small>';
-    let trainText = 'Selecione um quartel para ver a fila.';
+    let trainText = 'Selecione uma estrutura militar para ver a fila.';
+    let layoutChanged = false;
 
-    if (Engine.placingStart) {
+    if (Engine.observer) {
+      text = 'Modo observador';
+      trainText = 'Comandos desativados. Use camera, zoom e minimapa.';
+    } else if (Engine.placingStart) {
       text = 'Escolha sua prefeitura inicial';
     } else if (Engine.rallyBuilding !== -1) {
       text = 'Definindo ponto de reuniao';
     } else if (Engine.buildType !== 0) {
       text = 'Posicione: ' + buildingLabel(Engine.buildType);
+      if (canRotateBuilding(Engine.buildType)) text += Engine.buildRot ? ' 6x2' : ' 2x6';
     } else if (Engine.selectedBuilding !== -1) {
       const bId = Engine.selectedBuilding;
       const bType = Builds.type[bId];
+      const working = Builds.workState[bId] !== BUILD_WORK_NONE;
       text = buildingLabel(bType);
 
-      if (bType === B_HALL || bType === B_BARR) {
+      if (working) {
+        const t = Math.max(0, Math.ceil(Builds.workTime[bId]));
+        if (Builds.workState[bId] === BUILD_WORK_UPGRADE) {
+          text = `${buildingLabel(bType)} Nv ${Builds.level[bId]} -> Nv ${buildingWorkTargetLevel(bId)} (${t}s)`;
+        } else {
+          text = `${buildingLabel(bType)} em obra (${t}s)`;
+        }
+        if (isMilitaryProducerType(bType)) trainText = `${buildingLabel(bType)} indisponivel durante a obra.`;
+      } else if (isUpgradeableBuildingType(bType)) {
         text = `${buildingLabel(bType)} Nv ${Builds.level[bId]}`;
-        if (bType === B_HALL) text += ` - limite ${getUnitCap(Builds.faction[bId])}`;
-        if (Builds.faction[bId] === 0 && Builds.level[bId] < MAX_BUILD_LEVEL) {
+        if (bType === B_HALL) text += ` - limite ${getUnitCap(Builds.faction[bId])} - alcance ${hallBuildRangeTiles(Builds.level[bId])}`;
+        if (buildingAttackRange(bType, Builds.level[bId]) > 0) text += ` - ATQ ${buildingAttackDamage(bType, Builds.level[bId])} RNG ${Math.round(buildingAttackRange(bType, Builds.level[bId]))}`;
+        if (Builds.faction[bId] === 0 && canUpgradeByTech(bId)) {
           const next = Builds.level[bId] + 1;
           showUpgrade = true;
-          upgradeHtml = `Melhorar<small>${upgradeCostW(bType, next)}M ${upgradeCostS(bType, next)}P ${upgradeCostG(bType, next)}G</small>`;
+          upgradeHtml = `Melhorar<small>${upgradeCostW(bType, next)}M ${upgradeCostS(bType, next)}P ${upgradeCostG(bType, next)}G ${Math.ceil(upgradeTimeFor(bType, next))}s</small>`;
         }
       }
 
-      if (bType === B_BARR) {
+      if (!working && isMilitaryProducerType(bType)) {
         const q = Builds.queueCount[bId];
         const t = Math.ceil(Builds.queue[bId]);
         const firstType = queuedUnitType(bId);
-        text = q > 0 ? `Quartel Nv ${Builds.level[bId]} - Fila ${q}/${MAX_TRAIN_QUEUE} (${t}s)` : `Quartel Nv ${Builds.level[bId]} - Fila 0/${MAX_TRAIN_QUEUE}`;
-        trainText = q > 0 ? `Fila: ${q}/${MAX_TRAIN_QUEUE}. Treinando ${unitLabel(firstType)} em ${t}s.` : `Fila do quartel: 0/${MAX_TRAIN_QUEUE}.`;
+        text = q > 0 ? `${buildingLabel(bType)} Nv ${Builds.level[bId]} - Fila ${q} (${t}s)` : `${buildingLabel(bType)} Nv ${Builds.level[bId]} - Fila vazia`;
+        trainText = q > 0 ? `Fila: ${q}. Treinando ${unitLabel(firstType)} em ${t}s.` : `Fila vazia em ${buildingLabel(bType)}.`;
         trainText += Builds.hasRally[bId] ? ' Ponto de reuniao definido.' : ' Sem ponto de reuniao.';
-        if (Builds.level[bId] < UnitCfg.barrLevel[U_ARCHER]) trainText += ' Arqueiro exige quartel nv2.';
-        spawnHtml = q >= MAX_TRAIN_QUEUE ? 'Soldado<small>Fila cheia</small>' : (!canQueueUnit(0) ? 'Soldado<small>Limite</small>' : `Soldado<small>${unitGrainCost(U_SOLDIER)}G Fila ${q}/${MAX_TRAIN_QUEUE}</small>`);
-        archerHtml = q >= MAX_TRAIN_QUEUE ? 'Arqueiro<small>Fila cheia</small>' : (!canQueueUnit(0) ? 'Arqueiro<small>Limite</small>' : `Arqueiro<small>${unitGrainCost(U_ARCHER)}G Nv2</small>`);
+        if (bType === B_BARR && Builds.level[bId] < unitRequiredBuildingLevel(U_ARCHER)) trainText += ' Arqueiro exige quartel nv2.';
+        spawnHtml = q >= MAX_TRAIN_QUEUE ? 'Soldado<small>Fila tecnica cheia</small>' : `Soldado<small>${unitCostText(U_SOLDIER)} Hab ${unitPopCost(U_SOLDIER)}</small>`;
+        archerHtml = q >= MAX_TRAIN_QUEUE ? 'Arqueiro<small>Fila tecnica cheia</small>' : `Arqueiro<small>${unitCostText(U_ARCHER)} Hab ${unitPopCost(U_ARCHER)} Nv2</small>`;
+        ramHtml = q >= MAX_TRAIN_QUEUE ? 'Ariete<small>Fila tecnica cheia</small>' : `Ariete<small>${unitCostText(U_RAM)} Hab ${unitPopCost(U_RAM)}</small>`;
         rallyHtml = Builds.hasRally[bId] ? 'Ponto<small>Alterar</small>' : 'Ponto<small>Reuniao</small>';
-        showSpawn = Builds.faction[bId] === 0;
-        showArcher = Builds.faction[bId] === 0 && Builds.level[bId] >= UnitCfg.barrLevel[U_ARCHER];
+        showSpawn = Builds.faction[bId] === 0 && bType === B_BARR;
+        showArcher = Builds.faction[bId] === 0 && bType === B_BARR && Builds.level[bId] >= unitRequiredBuildingLevel(U_ARCHER);
+        showRam = Builds.faction[bId] === 0 && bType === B_WORKSHOP;
         showRally = Builds.faction[bId] === 0;
       }
     } else if (Sel.count > 0) {
-      text = Sel.count === 1 ? '1 unidade selecionada' : `${Sel.count} unidades selecionadas`;
+      if (Sel.count === 1 && Units.active[Sel.ids[0]]) {
+        const u = Sel.ids[0];
+        const kind = Units.kind[u] || U_SOLDIER;
+        text = `${unitLabel(kind)} HP ${Units.hp[u]}/${UnitCfg.hp[kind]} ATQ ${Units.damage[u]} RNG ${Math.round(Units.attackRange[u])} VEL ${Math.round(Units.speed[u])}`;
+      } else {
+        text = `${Sel.count} unidades selecionadas`;
+      }
       showSquadActions = true;
     }
 
@@ -3036,6 +4577,7 @@ const UI = {
     if (UI.spawnVisible !== showSpawn) {
       spawn.classList.toggle('hidden', !showSpawn);
       UI.spawnVisible = showSpawn;
+      layoutChanged = true;
     }
     if (UI.spawnText !== spawnHtml) {
       spawn.innerHTML = spawnHtml;
@@ -3044,14 +4586,54 @@ const UI = {
     if (archer && UI.archerVisible !== showArcher) {
       archer.classList.toggle('hidden', !showArcher);
       UI.archerVisible = showArcher;
+      layoutChanged = true;
     }
     if (archer && UI.archerText !== archerHtml) {
       archer.innerHTML = archerHtml;
       UI.archerText = archerHtml;
     }
+    if (ram && UI.ramVisible !== showRam) {
+      ram.classList.toggle('hidden', !showRam);
+      UI.ramVisible = showRam;
+      layoutChanged = true;
+    }
+    if (ram && UI.ramText !== ramHtml) {
+      ram.innerHTML = ramHtml;
+      UI.ramText = ramHtml;
+    }
+    const syncTrainButton = (el, unitType) => {
+      if (!el) return;
+      let show = false;
+      let q = 0;
+      if (!Engine.observer && Engine.selectedBuilding !== -1 && Builds.active[Engine.selectedBuilding]) {
+        const bId = Engine.selectedBuilding;
+        q = Builds.queueCount[bId];
+        show = Builds.faction[bId] === 0
+          && Builds.workState[bId] === BUILD_WORK_NONE
+          && Builds.type[bId] === unitProducerType(unitType)
+          && Builds.level[bId] >= unitRequiredBuildingLevel(unitType);
+      }
+      const wasHidden = el.classList.contains('hidden');
+      el.classList.toggle('hidden', !show);
+      if (wasHidden === show) layoutChanged = true;
+      const html = q >= MAX_TRAIN_QUEUE
+        ? `${unitLabel(unitType)}<small>Fila tecnica cheia</small>`
+        : `${unitLabel(unitType)}<small>${unitCostText(unitType)} Hab ${unitPopCost(unitType)}</small>`;
+      if (el.dataset.html !== html) {
+        el.innerHTML = html;
+        el.dataset.html = html;
+      }
+    };
+    syncTrainButton(mage, U_MAGE);
+    syncTrainButton(cavalry, U_CAVALRY);
+    syncTrainButton(chariot, U_CHARIOT);
+    syncTrainButton(elephant, U_ELEPHANT);
+    syncTrainButton(ballista, U_BALLISTA);
+    syncTrainButton(catapult, U_CATAPULT);
     if (rally && UI.rallyVisible !== showRally) {
       rally.classList.toggle('hidden', !showRally);
       UI.rallyVisible = showRally;
+      layoutChanged = true;
     }
     if (rally && UI.rallyText !== rallyHtml) {
       rally.innerHTML = rallyHtml;
@@ -3060,6 +4642,7 @@ const UI = {
     if (upgrade && UI.upgradeVisible !== showUpgrade) {
       upgrade.classList.toggle('hidden', !showUpgrade);
       UI.upgradeVisible = showUpgrade;
+      layoutChanged = true;
     }
     if (upgrade && UI.upgradeText !== upgradeHtml) {
       upgrade.innerHTML = upgradeHtml;
@@ -3068,6 +4651,7 @@ const UI = {
     if (squadActions && UI.squadActionsVisible !== showSquadActions) {
       squadActions.classList.toggle('hidden', !showSquadActions);
       UI.squadActionsVisible = showSquadActions;
+      layoutChanged = true;
     }
     if (joinSquad) {
       const anySquad = hasAnySquad();
@@ -3076,6 +4660,7 @@ const UI = {
       joinSquad.innerHTML = Engine.joinSquadMode ? 'Escolha<small>Quadrado</small>' : (anySquad ? 'Juntar<small>Ao esquadrao</small>' : 'Juntar<small>Sem esquadrao</small>');
     }
     if (trainInfo && trainInfo.textContent !== trainText) trainInfo.textContent = trainText;
+    if (layoutChanged) Engine.uiMeasureDirty = true;
     UI.updateSquadPanel();
     UI.updateActionPanels();
   },
@@ -3103,6 +4688,8 @@ const Game = {
     hashHead.fill(-1);
     for (let i = 0; i < MAX_U; i++) Units.active[i] = 0;
     for (let i = 0; i < MAX_B; i++) Builds.active[i] = 0;
+    AttackFx.active.fill(0);
+    AttackFx.cursor = 0;
     uFree.length = 0; bFree.length = 0;
     for (let i = MAX_U - 1; i >= 0; i--) uFree.push(i);
     for (let i = MAX_B - 1; i >= 0; i--) bFree.push(i);
@@ -3110,32 +4697,54 @@ const Game = {
     Sel.count = 0;
     Engine.selectedBuilding = -1;
     Engine.buildType = 0;
+    Engine.buildRot = 0;
     Engine.rallyBuilding = -1;
     Engine.joinSquadMode = false;
+    Engine.observer = false;
     Engine.placingStart = false;
     Engine.pendingBotCount = 0;
+    Engine.implementationTime = 0;
     Engine.msgTimer = 0;
     UI.actionMode = 'root';
     UI.panelMode = '';
     UI.selectionText = '';
     UI.unitText = '';
+    UI.unitStatus = '';
+    UI.implText = '';
+    UI.implPct = '';
+    UI.implEnding = false;
+    UI.implActiveState = false;
     UI.spawnVisible = false;
     UI.spawnText = '';
     UI.archerVisible = false;
     UI.archerText = '';
+    UI.ramVisible = false;
+    UI.ramText = '';
     UI.rallyVisible = false;
     UI.rallyText = '';
     UI.upgradeVisible = false;
     UI.upgradeText = '';
     UI.squadActionsVisible = false;
+    UI.settingsVisible = false;
     Squads.count.fill(0);
     Squads.ids.fill(-1);
     const cancelBtn = document.getElementById('cancelBuild');
     if (cancelBtn) cancelBtn.classList.add('hidden');
+    const rotateBtn = document.getElementById('rotateBuild');
+    if (rotateBtn) {
+      rotateBtn.classList.add('hidden');
+      rotateBtn.innerHTML = 'Girar<small>Muro 2x6</small>';
+    }
     const spawnBtn = document.getElementById('spawnUnit');
     if (spawnBtn) spawnBtn.classList.add('hidden');
     const archerBtn = document.getElementById('spawnArcher');
     if (archerBtn) archerBtn.classList.add('hidden');
+    const ramBtn = document.getElementById('spawnRam');
+    if (ramBtn) ramBtn.classList.add('hidden');
+    for (const id of ['spawnMage', 'spawnCavalry', 'spawnChariot', 'spawnElephant', 'spawnBallista', 'spawnCatapult']) {
+      const btn = document.getElementById(id);
+      if (btn) btn.classList.add('hidden');
+    }
     const rallyBtn = document.getElementById('setRally');
     if (rallyBtn) rallyBtn.classList.add('hidden');
     const upgradeBtn = document.getElementById('upgradeBuilding');
@@ -3144,8 +4753,12 @@ const Game = {
     if (squadActions) squadActions.classList.add('hidden');
     const squadBar = document.getElementById('squadBar');
     if (squadBar) squadBar.classList.add('hidden');
+    const settingsPanel = document.getElementById('settingsPanel');
+    if (settingsPanel) settingsPanel.classList.add('hidden');
+    UI.applyHudOptions();
     Engine.econAcc = 0;
     Engine.botAcc = 0;
+    Engine.selectionRefresh = 0;
     Engine.uidGen = 1;
     Engine.cam.x = WORLD_SZ / 2;
     Engine.cam.y = WORLD_SZ / 2;
@@ -3160,48 +4773,87 @@ const Game = {
     const difficultyPlan = new Uint8Array(MAX_BOTS + 1);
     for (let i = 1; i <= Lobby.botCount; i++) difficultyPlan[i] = Lobby.botDifficulty[i];
     if (Lobby.teamsEnabled) {
-      const playerTeam = Lobby.teams[0];
       let hasEnemy = false;
-      for (let i = 0; i <= Lobby.botCount; i++) teamPlan[i] = Lobby.teams[i];
-      for (let i = 1; i <= Lobby.botCount; i++) {
-        if (teamPlan[i] !== playerTeam) { hasEnemy = true; break; }
+      if (Lobby.observer) {
+        let firstTeam = 0;
+        for (let i = 1; i <= Lobby.botCount; i++) {
+          teamPlan[i] = Lobby.teams[i];
+          if (firstTeam === 0) firstTeam = teamPlan[i];
+          else if (teamPlan[i] !== firstTeam) hasEnemy = true;
+        }
+      } else {
+        const playerTeam = Lobby.teams[0];
+        for (let i = 0; i <= Lobby.botCount; i++) teamPlan[i] = Lobby.teams[i];
+        for (let i = 1; i <= Lobby.botCount; i++) {
+          if (teamPlan[i] !== playerTeam) { hasEnemy = true; break; }
+        }
       }
       if (!hasEnemy) {
-        UI.lobbyWarning('Coloque pelo menos um bot em outro time.');
+        UI.lobbyWarning(Lobby.observer ? 'Coloque bots em pelo menos dois times ou desligue times.' : 'Coloque pelo menos um bot em outro time.');
         return;
       }
     } else {
-      for (let i = 0; i <= Lobby.botCount; i++) teamPlan[i] = i + 1;
+      if (Lobby.observer) for (let i = 1; i <= Lobby.botCount; i++) teamPlan[i] = i;
+      else for (let i = 0; i <= Lobby.botCount; i++) teamPlan[i] = i + 1;
     }
     Game.start(Lobby.botCount, {
       mapSize: MAP_SIZE_TILES[Lobby.mapIndex],
       teams: teamPlan,
       difficulty: Lobby.difficulty,
-      difficulties: difficultyPlan
+      difficulties: difficultyPlan,
+      startResourceIndex: Lobby.startResourceIndex,
+      observer: Lobby.observer
     });
   },
   start(botCount, options) {
     const cfg = options || {};
     configureMap(cfg.mapSize || MAP_SIZE_TILES[1]);
     Game.reset();
+    const resIndex = clamp((cfg.startResourceIndex === undefined ? Lobby.startResourceIndex : cfg.startResourceIndex) | 0, 0, START_RESOURCE_LABELS.length - 1);
+    Engine.startWood = START_RESOURCE_W[resIndex];
+    Engine.startStone = START_RESOURCE_S[resIndex];
+    Engine.startGrain = START_RESOURCE_G[resIndex];
     setConfigScroll(false);
     document.getElementById('botMenu').classList.add('hidden');
     document.getElementById('endMenu').classList.add('hidden');
     document.getElementById('uiLayer').classList.remove('hidden');
 
-    createFaction(false, cfg.teams ? cfg.teams[0] : 1, BOT_DIFF_TRAINING); // player = 0
-    for (let i = 0; i < botCount; i++) {
-      const botDiff = cfg.difficulties ? cfg.difficulties[i + 1] : (cfg.difficulty === undefined ? BOT_DIFF_TRAINING : cfg.difficulty);
-      createFaction(true, cfg.teams ? cfg.teams[i + 1] : 2, botDiff);
+    Engine.observer = !!cfg.observer;
+    if (Engine.observer) {
+      for (let i = 0; i < botCount; i++) {
+        const botIndex = i + 1;
+        const botDiff = cfg.difficulties ? cfg.difficulties[botIndex] : (cfg.difficulty === undefined ? BOT_DIFF_TRAINING : cfg.difficulty);
+        createFaction(true, cfg.teams ? cfg.teams[botIndex] : botIndex, botDiff);
+      }
+      const placedBots = placeBotStarts(botCount, 0);
+      Engine.placingStart = false;
+      Engine.pendingBotCount = 0;
+      startImplementationPeriod();
+      const hall = findHall(0);
+      if (hall !== -1) {
+        Engine.cam.x = (Builds.tx[hall] + Builds.w[hall] * 0.5) * TILE;
+        Engine.cam.y = (Builds.ty[hall] + Builds.h[hall] * 0.5) * TILE;
+        clampCamera();
+      }
+      UI.updateRes();
+      UI.updateLimits();
+      UI.updateSelectionInfo();
+      UI.msg(placedBots === botCount ? 'Modo observador iniciado. Assistindo aos bots.' : `${placedBots}/${botCount} bots posicionados no modo observador.`, placedBots !== botCount);
+    } else {
+      createFaction(false, cfg.teams ? cfg.teams[0] : 1, BOT_DIFF_TRAINING); // player = 0
+      for (let i = 0; i < botCount; i++) {
+        const botDiff = cfg.difficulties ? cfg.difficulties[i + 1] : (cfg.difficulty === undefined ? BOT_DIFF_TRAINING : cfg.difficulty);
+        createFaction(true, cfg.teams ? cfg.teams[i + 1] : 2, botDiff);
+      }
+
+      Engine.placingStart = true;
+      Engine.pendingBotCount = botCount;
+
+      UI.updateRes();
+      UI.updateLimits();
+      UI.updateSelectionInfo();
+      UI.msg('Escolha onde construir sua prefeitura.', false);
     }
-
-    Engine.placingStart = true;
-    Engine.pendingBotCount = botCount;
-
-    UI.updateRes();
-    UI.updateLimits();
-    UI.updateSelectionInfo();
-    UI.msg('Escolha onde construir sua prefeitura.', false);
 
     Engine.running = true;
     Engine.lastTime = performance.now();
@@ -3219,16 +4871,17 @@ const Game = {
       return;
     }
 
-    const hall = spawnBuilding(0, B_HALL, tx, ty);
+    const hall = spawnBuilding(0, B_HALL, tx, ty, true);
     if (hall === -1) {
       UI.msg('Nao foi possivel posicionar a prefeitura.', true);
       return;
     }
 
     const requestedBots = Engine.pendingBotCount;
-    const placedBots = placeBotStarts(requestedBots);
+    const placedBots = placeBotStarts(requestedBots, 1);
     Engine.placingStart = false;
     Engine.pendingBotCount = 0;
+    startImplementationPeriod();
     Engine.cam.x = (Builds.tx[hall] + Builds.w[hall] * 0.5) * TILE;
     Engine.cam.y = (Builds.ty[hall] + Builds.h[hall] * 0.5) * TILE;
     clampCamera();
@@ -3246,7 +4899,8 @@ const Game = {
     UI.showEnd(victory);
   },
   setRallyPoint(bId, wx, wy) {
-    if (!Builds.active[bId] || Builds.type[bId] !== B_BARR || Builds.faction[bId] !== 0) return;
+    if (!Builds.active[bId] || !isMilitaryProducerType(Builds.type[bId]) || Builds.faction[bId] !== 0) return;
+    if (Builds.workState[bId] !== BUILD_WORK_NONE) return;
     const x = clamp(wx, 8, WORLD_SZ - 8);
     const y = clamp(wy, 8, WORLD_SZ - 8);
     if (!isStandable(x, y)) {
@@ -3314,12 +4968,14 @@ const Game = {
     UI.msg(`Esquadrao ${slot + 1} selecionado.`, false);
   },
   upgradeSelectedBuilding() {
+    if (Engine.observer) return;
     const bId = Engine.selectedBuilding;
     if (bId === -1 || !Builds.active[bId] || Builds.faction[bId] !== 0) {
       UI.msg('Selecione uma estrutura sua.', true);
       return;
     }
-    if (Builds.type[bId] !== B_HALL && Builds.type[bId] !== B_BARR) {
+    const type = Builds.type[bId];
+    if (!isUpgradeableBuildingType(type)) {
       UI.msg('Esta estrutura nao pode ser melhorada.', true);
       return;
     }
@@ -3327,36 +4983,57 @@ const Game = {
       UI.msg('Nivel maximo atingido.', true);
       return;
     }
+    if (Builds.workState[bId] !== BUILD_WORK_NONE) {
+      UI.msg('Estrutura indisponivel durante a obra.', true);
+      return;
+    }
+    const next = Builds.level[bId] + 1;
+    if (type !== B_HALL && next > factionHallLevel(Builds.faction[bId])) {
+      UI.msg(`${buildingLabel(type)} Nv ${next} exige Prefeitura Nv ${next}.`, true);
+      return;
+    }
     if (!canUpgradeBuilding(bId)) {
       UI.msg('Recursos insuficientes para melhorar.', true);
       return;
     }
     upgradeBuilding(bId);
-    UI.msg(`${buildingLabel(Builds.type[bId])} no nivel ${Builds.level[bId]}.`, false);
+    UI.actionMode = 'root';
+    UI.updateActionPanels();
+    const t = Math.ceil(Builds.workTime[bId]);
+    UI.msg(`${buildingLabel(Builds.type[bId])} melhorando (${t}s).`, false);
   },
   requestUnit(unitType) {
+    if (Engine.observer) return;
     if (!unitType) unitType = U_SOLDIER;
-    if (Engine.selectedBuilding === -1 || !Builds.active[Engine.selectedBuilding] || Builds.type[Engine.selectedBuilding] !== B_BARR) {
-      UI.msg('Selecione um quartel.', true);
+    const producerType = unitProducerType(unitType);
+    if (!producerType) return;
+    const bId = Engine.selectedBuilding;
+    if (bId === -1 || !Builds.active[bId] || Builds.type[bId] !== producerType) {
+      UI.msg(`${unitLabel(unitType)} exige ${buildingLabel(producerType)}.`, true);
       return;
     }
-    if (Builds.level[Engine.selectedBuilding] < UnitCfg.barrLevel[unitType]) {
-      UI.msg(`${unitLabel(unitType)} exige quartel nivel ${UnitCfg.barrLevel[unitType]}.`, true);
+    if (Builds.workState[bId] !== BUILD_WORK_NONE) {
+      UI.msg(`${buildingLabel(Builds.type[bId])} indisponivel durante a obra.`, true);
       return;
     }
-    if (!canQueueUnit(0)) {
-      UI.msg('Limite de unidades atingido.', true);
+    const reqLevel = unitRequiredBuildingLevel(unitType);
+    if (Builds.level[bId] < reqLevel) {
+      UI.msg(`${unitLabel(unitType)} exige ${buildingLabel(producerType)} nivel ${reqLevel}.`, true);
       return;
     }
-    if (Builds.queueCount[Engine.selectedBuilding] >= MAX_TRAIN_QUEUE) {
-      UI.msg('Fila do quartel cheia.', true);
+    if (Builds.queueCount[bId] >= MAX_TRAIN_QUEUE) {
+      UI.msg('Fila tecnica cheia. Gaste a fila antes de adicionar mais.', true);
       return;
     }
-    if (Factions[0].grain < unitGrainCost(unitType)) {
-      UI.msg(`Grao insuficiente para treinar ${unitLabel(unitType)}.`, true);
+    if (!canQueueUnit(0, unitType)) {
+      UI.msg(`Limite de tropas insuficiente para ${unitLabel(unitType)}.`, true);
       return;
     }
-    if (!queueUnitFromBarracks(Engine.selectedBuilding, unitType)) {
+    if (Factions[0].wood < unitWoodCost(unitType) || Factions[0].stone < unitStoneCost(unitType) || Factions[0].grain < unitGrainCost(unitType)) {
+      UI.msg(`Recursos insuficientes para treinar ${unitLabel(unitType)}.`, true);
+      return;
+    }
+    if (!queueUnitFromProducer(bId, unitType)) {
       UI.msg('Nao foi possivel adicionar a unidade na fila.', true);
       return;
     }
@@ -3368,14 +5045,27 @@ const Game = {
 function update(dt) {
   Engine.pulse += dt;
   if (Engine.pulse > Math.PI * 2) Engine.pulse -= Math.PI * 2;
+  if (Engine.implementationTime > 0) Engine.implementationTime = Math.max(0, Engine.implementationTime - dt);
   rebuildHash();
   updateUnits(dt);
+  rebuildHash();
+  applyUnitSeparation(dt);
   updateBuildingFeedback(dt);
+  updateBuildingCombat(dt);
+  updateConstruction(dt);
   updateProduction(dt);
   updatePings(dt);
+  updateAttackFx(dt);
   updateEconomy(dt);
   updateBots(dt);
   checkGameOver();
+  if (Sel.count === 1) {
+    Engine.selectionRefresh -= dt;
+    if (Engine.selectionRefresh <= 0) {
+      Engine.selectionRefresh = 0.35;
+      UI.updateSelectionInfo();
+    }
+  }
 
   if (Engine.msgTimer > 0) {
     Engine.msgTimer -= dt;
