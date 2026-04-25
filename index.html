@@ -305,7 +305,23 @@
           <button id="mapChoice0" class="setup-choice" onclick="UI.setLobbyMap(0)">Pequeno<small>rapido</small></button>
           <button id="mapChoice1" class="setup-choice active" onclick="UI.setLobbyMap(1)">Medio<small>padrao</small></button>
           <button id="mapChoice2" class="setup-choice" onclick="UI.setLobbyMap(2)">Grande<small>macro</small></button>
+          <button id="mapChoice3" class="setup-choice" onclick="UI.setLobbyMap(3)">Enorme<small>expansao</small></button>
+          <button id="mapChoice4" class="setup-choice" onclick="UI.setLobbyMap(4)">Continente<small>massivo</small></button>
+          <button id="mapChoice5" class="setup-choice" onclick="UI.setLobbyMap(5)">Imperio<small>144x144</small></button>
+          <button id="mapChoice6" class="setup-choice" onclick="UI.setLobbyMap(6)">Mundo<small>168x168</small></button>
+          <button id="mapChoice7" class="setup-choice" onclick="UI.setLobbyMap(7)">Colossal<small>192x192</small></button>
         </div>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-label">Agua procedural (em desenvolvimento)</div>
+        <div class="setup-row">
+          <button id="waterNoneToggle" class="setup-choice active" onclick="UI.setLobbyWaterNone()">Sem agua<small>classico</small></button>
+          <button id="waterOceanToggle" class="setup-choice" onclick="UI.toggleLobbyWater(WATER_OCEANS)" disabled>Oceanos<small>pausado</small></button>
+          <button id="waterRiverToggle" class="setup-choice" onclick="UI.toggleLobbyWater(WATER_RIVERS)" disabled>Rios<small>pausado</small></button>
+          <button id="waterLakeToggle" class="setup-choice" onclick="UI.toggleLobbyWater(WATER_LAKES)" disabled>Lagos<small>pausado</small></button>
+        </div>
+        <div id="waterInfo" class="setup-subtitle" style="margin:8px 0 0">Em desenvolvimento: agua desabilitada para proteger o pathfinding.</div>
       </div>
 
       <div class="setup-section">
@@ -321,6 +337,14 @@
         <div class="setup-label">Recursos iniciais</div>
         <input id="startResourceSlider" class="setup-slider" type="range" min="0" max="4" step="1" value="1" oninput="UI.setLobbyStartResources(this.value)" />
         <div id="startResourceLabel" class="setup-subtitle" style="margin:8px 0 0">Padrao: 260M / 180P / 90G</div>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-row" style="justify-content:space-between">
+          <div class="setup-label" style="margin-bottom:0">Areas de conquista</div>
+          <button id="captureZonesToggle" class="setup-mini-btn active" onclick="UI.toggleLobbyCaptureZones()">Ligado</button>
+        </div>
+        <div id="captureZonesInfo" class="setup-subtitle" style="margin:8px 0 0">Pontos neutros no mapa geram bonus para quem controlar.</div>
       </div>
 
       <div class="setup-section">
@@ -395,6 +419,7 @@
       <div class="settings-title">Opcoes</div>
       <button id="compactHudBtn" class="action-btn" onclick="UI.toggleCompactHud()">HUD compacto<small>Mais mapa livre</small></button>
       <button class="action-btn" onclick="UI.requestLandscape()">Tela horizontal<small>Fullscreen quando possivel</small></button>
+      <button class="action-btn" onclick="Game.abandonToMainMenu()" style="border-color:#b96a6a;color:#ffd0d0">Menu inicial<small>Abandonar partida</small></button>
       <button class="action-btn" onclick="UI.toggleSettingsPanel()">Fechar<small>Voltar ao jogo</small></button>
     </div>
     <div id="squadBar" class="squad-bar hidden">
@@ -415,16 +440,23 @@
         <button id="createSquad" class="action-btn" onclick="Game.createSquadFromSelection()">Criar<small>Esquadrao</small></button>
         <button id="joinSquad" class="action-btn" onclick="Game.startJoinSquad()">Juntar<small>Ao esquadrao</small></button>
       </div>
+      <div id="engineerActions" class="action-group hidden">
+        <button id="engineerHallBuild" class="action-btn" onclick="UI.prepBuild(B_HALL)">Colonia<small>504M 420P 196G</small></button>
+        <button id="engineerOutpostBuild" class="action-btn" onclick="UI.prepBuild(B_OUTPOST)">Outpost<small>70M 45P 20G</small></button>
+        <button id="engineerTrapBuild" class="action-btn" onclick="UI.prepBuild(B_TRAP)">Armadilha<small>35M 25P 35G</small></button>
+      </div>
       <div id="buildActions" class="action-group hidden">
-        <button class="action-btn" onclick="UI.prepBuild(B_HALL)">Prefeitura<small><span id="cost-1">360M 300P 140G 180s</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small><span id="cost-2">90M 45P 70s</span> <span id="lim-2" class="limit-info">(0/2)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small><span id="cost-3">90M 45P 70s</span> <span id="lim-3" class="limit-info">(0/2)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small><span id="cost-4">120M 60P 20G 80s</span> <span id="lim-4" class="limit-info">(0/1)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small><span id="cost-5">180M 140P 45G 100s</span> <span id="lim-5" class="limit-info">(0/1)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_WORKSHOP)">Oficina<small><span id="cost-6">320M 260P 100G 140s</span> <span id="lim-6" class="limit-info">(0/0)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_TOWER)">Torre<small><span id="cost-7">45M 180P 55G 90s</span> <span id="lim-7" class="limit-info">(0/2)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_WALL)">Muro<small><span id="cost-8">70M 260P 90G 75s</span> <span id="lim-8" class="limit-info">(0/0)</span></small></button>
-        <button class="action-btn" onclick="UI.prepBuild(B_STABLE)">Criadouro<small><span id="cost-9">150M 90P 80G 95s</span> <span id="lim-9" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_HALL)">Prefeitura<small><span id="cost-1">252M 210P 98G 180s</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_MINE)">Mina<small><span id="cost-2">63M 32P 70s</span> <span id="lim-2" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_WOOD)">Lenha<small><span id="cost-3">63M 32P 70s</span> <span id="lim-3" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_FARM)">Fazenda<small><span id="cost-4">84M 42P 14G 80s</span> <span id="lim-4" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_BARR)">Quartel<small><span id="cost-5">126M 98P 32G 100s</span> <span id="lim-5" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_WORKSHOP)">Oficina<small><span id="cost-6">224M 182P 70G 140s</span> <span id="lim-6" class="limit-info">(0/0)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_TOWER)">Torre<small><span id="cost-7">32M 126P 39G 90s</span> <span id="lim-7" class="limit-info">(0/2)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_WALL)">Muro<small><span id="cost-8">49M 182P 63G 75s</span> <span id="lim-8" class="limit-info">(0/0)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_STABLE)">Criadouro<small><span id="cost-9">105M 63P 56G 95s</span> <span id="lim-9" class="limit-info">(0/1)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_DOCK)">Porto<small><span id="cost-10">126M 84P 35G 110s</span> <span id="lim-10" class="limit-info">(0/0)</span></small></button>
+        <button class="action-btn" onclick="UI.prepBuild(B_ACADEMY)">Academia<small><span id="cost-11">168M 126P 70G 120s</span> <span id="lim-11" class="limit-info">(0/0)</span></small></button>
         <button id="rotateBuild" class="action-btn hidden" onclick="UI.rotateBuild()">Girar<small>Muro 2x6</small></button>
         <button id="cancelBuild" class="action-btn hidden" onclick="UI.cancelBuild()" style="border-color:#b96a6a;color:#ffd0d0">Cancelar<small>Construcao</small></button>
       </div>
@@ -439,6 +471,12 @@
           <button id="spawnRam" class="action-btn hidden" onclick="Game.requestUnit(U_RAM)">Ariete<small>70G</small></button>
           <button id="spawnBallista" class="action-btn hidden" onclick="Game.requestUnit(U_BALLISTA)">Besta<small>95G</small></button>
           <button id="spawnCatapult" class="action-btn hidden" onclick="Game.requestUnit(U_CATAPULT)">Catapulta<small>130G</small></button>
+          <button id="spawnBoat" class="action-btn hidden" onclick="Game.requestUnit(U_BOAT)">Barco<small>45G</small></button>
+          <button id="spawnGale" class="action-btn hidden" onclick="Game.requestUnit(U_GALE)">Gale<small>90G</small></button>
+          <button id="spawnSiegeShip" class="action-btn hidden" onclick="Game.requestUnit(U_SIEGE_SHIP)">Barco Cerco<small>150G</small></button>
+          <button id="spawnMedic" class="action-btn hidden" onclick="Game.requestUnit(U_MEDIC)">Medico<small>60G</small></button>
+          <button id="spawnDiplomat" class="action-btn hidden" onclick="Game.requestUnit(U_DIPLOMAT)">Diplomata<small>80G</small></button>
+          <button id="spawnEngineer" class="action-btn hidden" onclick="Game.requestUnit(U_ENGINEER)">Engenheiro<small>40G</small></button>
           <button id="setRally" class="action-btn hidden" onclick="UI.startRallyPoint()">Ponto<small>Reuniao</small></button>
         </div>
       </div>
@@ -461,7 +499,7 @@ const TILE = 32;
 let MAP_SZ = 60;
 let WORLD_SZ = TILE * MAP_SZ;
 const MAX_U = 512;
-const MAX_B = 384;
+const MAX_B = 512;
 const MAX_BOTS = 10;
 const FIXED_STEP = 1 / 30;
 const ECON_INTERVAL = 2.0;
@@ -483,13 +521,23 @@ const UNIT_SEPARATION_PUSH = 0.55;
 const UNIT_SEPARATION_MAX = 7.5;
 const UNIT_REGEN_DELAY = 8.0;
 const UNIT_REGEN_RATE = 1.15;
+const ENGINEER_BUILD_RANGE_TILES = 9;
+const COLONY_HALL_COST_MULT = 2;
 const BUILD_CLEARANCE_TILES = 1;
-const CAMERA_MIN_Z = 0.5;
+const CAMERA_MIN_Z = 0.20;
 const CAMERA_MAX_Z = 1.55;
+const MAX_CAPTURE_ZONES = 8;
+const CAPTURE_RADIUS = 86;
+const CAPTURE_TIME = 8.0;
+const CAPTURE_RESOURCE_BONUS = 0.10;
+const CAPTURE_BUILD_TIME_BONUS = 0.10;
+const CAPTURE_BUILD_TIME_MIN = 0.45;
 const RETARGET_INTERVAL = 0.35;
 const IMPLEMENTATION_DURATION = 90;
-const IMPLEMENTATION_COST_MULT = 0.5;
-const IMPLEMENTATION_TIME_MULT = 0.25;
+const IMPLEMENTATION_TIME_MULT = 1 / 3;
+const UI_REFRESH_INTERVAL = 0.25;
+const IMPLEMENTATION_UI_INTERVAL = 0.25;
+const RENDER_CULL_PAD = 80;
 const TRAIN_TIME = 3.6;
 const MAX_TRAIN_QUEUE = 64;
 const MAX_BUILD_LEVEL = 3;
@@ -502,7 +550,16 @@ const BUILD_WORK_UPGRADE = 2;
 const BOT_DIFF_TRAINING = 0;
 const BOT_DIFF_NORMAL = 1;
 const BOT_DIFF_COUNT = 3;
-const MAP_SIZE_TILES = [48, 60, 76];
+const MAP_SIZE_TILES = [48, 60, 76, 96, 120, 144, 168, 192];
+const BOT_MIN_SCOUT_ARMY = 10;
+const BOT_MIN_DEFENSE_FRACTION = 0.10;
+const TERRAIN_LAND = 0;
+const TERRAIN_WATER = 1;
+const MOVE_LAND = 1;
+const MOVE_WATER = 2;
+const WATER_OCEANS = 1;
+const WATER_RIVERS = 2;
+const WATER_LAKES = 4;
 const BotDiffCfg = {
   buildDelay: new Float32Array([5.0, 2.7, 0.9]),
   failedBuildDelay: new Float32Array([2.0, 1.2, 0.65]),
@@ -548,6 +605,14 @@ const STABLE_UPGRADE_W = new Int16Array([0, 0, 190, 360]);
 const STABLE_UPGRADE_S = new Int16Array([0, 0, 120, 240]);
 const STABLE_UPGRADE_G = new Int16Array([0, 0, 130, 260]);
 const STABLE_UPGRADE_TIME = new Float32Array([0, 0, 120, 195]);
+const DOCK_UPGRADE_W = new Int16Array([0, 0, 210, 390]);
+const DOCK_UPGRADE_S = new Int16Array([0, 0, 145, 290]);
+const DOCK_UPGRADE_G = new Int16Array([0, 0, 90, 190]);
+const DOCK_UPGRADE_TIME = new Float32Array([0, 0, 125, 205]);
+const ACADEMY_UPGRADE_W = new Int16Array([0, 0, 220, 420]);
+const ACADEMY_UPGRADE_S = new Int16Array([0, 0, 170, 330]);
+const ACADEMY_UPGRADE_G = new Int16Array([0, 0, 95, 210]);
+const ACADEMY_UPGRADE_TIME = new Float32Array([0, 0, 130, 215]);
 
 // Tipos de construção
 const B_HALL = 1;
@@ -559,6 +624,10 @@ const B_WORKSHOP = 6;
 const B_TOWER = 7;
 const B_WALL = 8;
 const B_STABLE = 9;
+const B_DOCK = 10;
+const B_ACADEMY = 11;
+const B_OUTPOST = 12;
+const B_TRAP = 13;
 
 const U_SOLDIER = 1;
 const U_ARCHER = 2;
@@ -569,6 +638,12 @@ const U_CHARIOT = 6;
 const U_ELEPHANT = 7;
 const U_BALLISTA = 8;
 const U_CATAPULT = 9;
+const U_BOAT = 10;
+const U_GALE = 11;
+const U_SIEGE_SHIP = 12;
+const U_ENGINEER = 13;
+const U_MEDIC = 14;
+const U_DIPLOMAT = 15;
 
 const HALL_LIMIT_MINE = new Uint8Array([0, 2, 3, 3]);
 const HALL_LIMIT_WOOD = new Uint8Array([0, 2, 3, 3]);
@@ -578,6 +653,10 @@ const HALL_LIMIT_WORKSHOP = new Uint8Array([0, 0, 1, 1]);
 const HALL_LIMIT_TOWER = new Uint8Array([0, 2, 2, 3]);
 const HALL_LIMIT_WALL = new Uint8Array([0, 0, 8, 14]);
 const HALL_LIMIT_STABLE = new Uint8Array([0, 1, 1, 1]);
+const HALL_LIMIT_DOCK = new Uint8Array([0, 1, 1, 2]);
+const HALL_LIMIT_ACADEMY = new Uint8Array([0, 0, 1, 2]);
+const BUILD_UI_TYPES = [B_HALL, B_MINE, B_WOOD, B_FARM, B_BARR, B_WORKSHOP, B_TOWER, B_WALL, B_STABLE, B_DOCK, B_ACADEMY];
+const LIMITED_BUILD_TYPES = [B_MINE, B_WOOD, B_FARM, B_BARR, B_WORKSHOP, B_TOWER, B_WALL, B_STABLE, B_DOCK, B_ACADEMY];
 
 // Estados de unidade
 const STATE_IDLE = 0;
@@ -593,36 +672,42 @@ const ORDER_ATTACK_MOVE = 3;
 
 // Banco fixo de configuração
 const BuildCfg = {
-  1: { name: 'Prefeitura',     w: 3, h: 3, costW: 360, costS: 300, costG: 140, hp: 1000, income: [1,1,1], vision: 190, buildTime: HALL_BUILD_TIME },
-  2: { name: 'Mina',           w: 2, h: 2, costW: 90,  costS: 45,  costG: 0,   hp: 480,  income: [0,2,0], vision: 110, buildTime: 70 },
-  3: { name: 'Lenha',          w: 2, h: 2, costW: 90,  costS: 45,  costG: 0,   hp: 480,  income: [2,0,0], vision: 110, buildTime: 70 },
-  4: { name: 'Fazenda',        w: 3, h: 3, costW: 120, costS: 60,  costG: 20,  hp: 520,  income: [0,0,5], vision: 110, buildTime: 80 },
-  5: { name: 'Quartel',        w: 2, h: 2, costW: 180, costS: 140, costG: 45,  hp: 650,  income: [0,0,0], vision: 150, buildTime: 100 },
-  6: { name: 'Oficina de Cerco', w: 3, h: 2, costW: 320, costS: 260, costG: 100, hp: 760, income: [0,0,0], vision: 150, buildTime: 140 },
-  7: { name: 'Torre de Arqueiros', w: 2, h: 2, costW: 45, costS: 180, costG: 55, hp: 720, income: [0,0,0], vision: 210, buildTime: 90, attackRange: 175, damage: 9, cooldown: 0.95 },
-  8: { name: 'Muro',           w: 2, h: 6, costW: 70,  costS: 260, costG: 90,  hp: 1500, income: [0,0,0], vision: 80,  buildTime: 75 },
-  9: { name: 'Criadouro de Animais', w: 3, h: 2, costW: 150, costS: 90, costG: 80, hp: 700, income: [0,0,0], vision: 145, buildTime: 95 }
+  1: { name: 'Prefeitura',     w: 3, h: 3, costW: 252, costS: 210, costG: 98, hp: 1000, income: [1,1,1], vision: 190, buildTime: HALL_BUILD_TIME },
+  2: { name: 'Mina',           w: 2, h: 2, costW: 63,  costS: 32,  costG: 0,  hp: 480,  income: [0,2,0], vision: 110, buildTime: 70 },
+  3: { name: 'Lenha',          w: 2, h: 2, costW: 63,  costS: 32,  costG: 0,  hp: 480,  income: [2,0,0], vision: 110, buildTime: 70 },
+  4: { name: 'Fazenda',        w: 3, h: 3, costW: 84,  costS: 42,  costG: 14, hp: 520,  income: [0,0,5], vision: 110, buildTime: 80 },
+  5: { name: 'Quartel',        w: 2, h: 2, costW: 126, costS: 98,  costG: 32, hp: 650,  income: [0,0,0], vision: 150, buildTime: 100 },
+  6: { name: 'Oficina de Cerco', w: 3, h: 2, costW: 224, costS: 182, costG: 70, hp: 760, income: [0,0,0], vision: 150, buildTime: 140 },
+  7: { name: 'Torre de Arqueiros', w: 2, h: 2, costW: 32, costS: 126, costG: 39, hp: 720, income: [0,0,0], vision: 210, buildTime: 90, attackRange: 175, damage: 9, cooldown: 0.95 },
+  8: { name: 'Muro',           w: 2, h: 6, costW: 49,  costS: 182, costG: 63, hp: 1500, income: [0,0,0], vision: 80,  buildTime: 75 },
+  9: { name: 'Criadouro de Animais', w: 3, h: 2, costW: 105, costS: 63, costG: 56, hp: 700, income: [0,0,0], vision: 145, buildTime: 95 },
+  10: { name: 'Porto',          w: 3, h: 2, costW: 126, costS: 84,  costG: 35, hp: 620, income: [0,0,0], vision: 160, buildTime: 110 },
+  11: { name: 'Academia',       w: 3, h: 2, costW: 168, costS: 126, costG: 70, hp: 680, income: [0,0,0], vision: 155, buildTime: 120 },
+  12: { name: 'Posto Avancado', w: 1, h: 1, costW: 70,  costS: 45,  costG: 20, hp: 260, income: [0,0,0], vision: 245, buildTime: 45, attackRange: 135, damage: 5, cooldown: 1.15 },
+  13: { name: 'Armadilha',      w: 1, h: 1, costW: 35,  costS: 25,  costG: 35, hp: 90,  income: [0,0,0], vision: 55,  buildTime: 25, attackRange: 42,  damage: 65, cooldown: 8.0 }
 };
 
 const UnitCfg = {
-  name: ['', 'Soldado', 'Arqueiro', 'Ariete', 'Mago', 'Cavalaria', 'Biga', 'Elefante', 'Besta de Cerco', 'Catapulta'],
-  hp: new Int16Array([0, 100, 70, 240, 88, 155, 130, 420, 160, 190]),
-  speed: new Float32Array([0, 58, 54, 36, 50, 82, 72, 34, 34, 28]),
-  range: new Float32Array([0, 26, 118, 32, 96, 30, 62, 38, 150, 178]),
-  aggro: new Float32Array([0, 110, 140, 105, 125, 130, 135, 115, 170, 190]),
-  chase: new Float32Array([0, 180, 220, 160, 200, 220, 210, 170, 230, 250]),
-  vision: new Float32Array([0, 150, 165, 145, 160, 170, 165, 155, 190, 205]),
-  cooldown: new Float32Array([0, 0.7, 1.05, 1.8, 1.25, 0.8, 1.15, 1.6, 1.8, 2.4]),
-  damage: new Int16Array([0, 10, 8, 34, 6, 14, 18, 36, 26, 42]),
-  hitRadius: new Float32Array([0, 8, 7, 11, 8, 10, 11, 15, 11, 12]),
-  woodCost: new Int16Array([0, 0, 10, 120, 20, 30, 90, 120, 180, 260]),
-  stoneCost: new Int16Array([0, 0, 0, 80, 35, 0, 40, 80, 120, 180]),
-  grainCost: new Int16Array([0, 14, 22, 70, 55, 55, 70, 180, 95, 130]),
-  trainTime: new Float32Array([0, TRAIN_TIME, 5.0, 14.0, 9.0, 8.0, 11.0, 24.0, 18.0, 26.0]),
-  producer: new Uint8Array([0, B_BARR, B_BARR, B_WORKSHOP, B_BARR, B_STABLE, B_STABLE, B_STABLE, B_WORKSHOP, B_WORKSHOP]),
-  buildingLevel: new Uint8Array([0, 1, 2, 1, 3, 1, 2, 3, 2, 3]),
-  popCost: new Uint8Array([0, 1, 1, 2, 3, 2, 2, 5, 3, 4]),
-  splashRadius: new Float32Array([0, 0, 0, 0, 42, 0, 0, 0, 0, 0])
+  name: ['', 'Soldado', 'Arqueiro', 'Ariete', 'Mago', 'Cavalaria', 'Biga', 'Elefante', 'Besta de Cerco', 'Catapulta', 'Barco', 'Gale', 'Barco de Cerco', 'Engenheiro', 'Medico', 'Diplomata'],
+  hp: new Int16Array([0, 100, 70, 240, 88, 155, 130, 420, 160, 190, 150, 230, 260, 85, 78, 65]),
+  speed: new Float32Array([0, 58, 54, 36, 50, 82, 72, 34, 34, 28, 78, 58, 42, 56, 58, 62]),
+  range: new Float32Array([0, 26, 118, 32, 96, 30, 62, 38, 150, 178, 118, 150, 190, 24, 92, 0]),
+  aggro: new Float32Array([0, 110, 140, 105, 125, 130, 135, 115, 170, 190, 150, 180, 210, 80, 135, 0]),
+  chase: new Float32Array([0, 180, 220, 160, 200, 220, 210, 170, 230, 250, 230, 260, 290, 130, 180, 0]),
+  vision: new Float32Array([0, 150, 165, 145, 160, 170, 165, 155, 190, 205, 190, 215, 235, 150, 165, 180]),
+  cooldown: new Float32Array([0, 0.7, 1.05, 1.8, 1.25, 0.8, 1.15, 1.6, 1.8, 2.4, 1.25, 1.6, 2.7, 1.1, 0.9, 1.0]),
+  damage: new Int16Array([0, 10, 8, 34, 6, 14, 18, 36, 26, 42, 12, 24, 48, 4, 12, 0]),
+  hitRadius: new Float32Array([0, 8, 7, 11, 8, 10, 11, 15, 11, 12, 13, 15, 17, 7, 7, 7]),
+  equilibrio: new Float32Array([0, 55, 28, 86, 36, 78, 74, 130, 92, 98, 82, 110, 120, 34, 30, 24]),
+  woodCost: new Int16Array([0, 0, 10, 120, 20, 30, 90, 120, 180, 260, 80, 130, 220, 40, 25, 60]),
+  stoneCost: new Int16Array([0, 0, 0, 80, 35, 0, 40, 80, 120, 180, 20, 60, 140, 25, 15, 25]),
+  grainCost: new Int16Array([0, 14, 22, 70, 55, 55, 70, 180, 95, 130, 45, 90, 150, 40, 60, 80]),
+  trainTime: new Float32Array([0, TRAIN_TIME, 5.0, 14.0, 9.0, 8.0, 11.0, 24.0, 18.0, 26.0, 9.0, 15.0, 25.0, 12.0, 10.0, 16.0]),
+  producer: new Uint8Array([0, B_BARR, B_BARR, B_WORKSHOP, B_BARR, B_STABLE, B_STABLE, B_STABLE, B_WORKSHOP, B_WORKSHOP, B_DOCK, B_DOCK, B_DOCK, B_ACADEMY, B_ACADEMY, B_ACADEMY]),
+  buildingLevel: new Uint8Array([0, 1, 2, 1, 3, 1, 2, 3, 2, 3, 1, 2, 3, 3, 1, 2]),
+  popCost: new Uint8Array([0, 1, 1, 2, 3, 2, 2, 5, 3, 4, 2, 3, 5, 1, 2, 1]),
+  splashRadius: new Float32Array([0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0]),
+  moveMask: new Uint8Array([0, MOVE_LAND, MOVE_LAND, MOVE_LAND, MOVE_LAND, MOVE_LAND, MOVE_LAND, MOVE_LAND, MOVE_LAND, MOVE_LAND, MOVE_WATER, MOVE_WATER, MOVE_WATER, MOVE_LAND, MOVE_LAND, MOVE_LAND])
 };
 
 const canvas = document.getElementById('gameCanvas');
@@ -631,17 +716,23 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const Temp = new Float32Array(2);
 const TargetPoint = new Float32Array(2);
 const SpawnPoint = new Float32Array(2);
+const SearchResult = new Float32Array(2);
 let mapGrid = new Int16Array(MAP_SZ * MAP_SZ).fill(-1);
+let terrainGrid = new Uint8Array(MAP_SZ * MAP_SZ);
+let terrainRandState = 1;
+const terrainMiniCanvas = document.createElement('canvas');
+const terrainMiniCtx = terrainMiniCanvas.getContext('2d');
 let hashHead = new Int16Array(HASH_COUNT).fill(-1);
 const hashNext = new Int16Array(MAX_U).fill(-1);
 
 function configureMap(sizeTiles) {
-  MAP_SZ = clamp(sizeTiles | 0, 36, 96);
+  MAP_SZ = clamp(sizeTiles | 0, 36, 192);
   WORLD_SZ = TILE * MAP_SZ;
   HASH_W = Math.ceil(WORLD_SZ / HASH_CELL_SIZE);
   HASH_H = Math.ceil(WORLD_SZ / HASH_CELL_SIZE);
   HASH_COUNT = HASH_W * HASH_H;
   mapGrid = new Int16Array(MAP_SZ * MAP_SZ).fill(-1);
+  terrainGrid = new Uint8Array(MAP_SZ * MAP_SZ);
   hashHead = new Int16Array(HASH_COUNT).fill(-1);
 }
 
@@ -661,6 +752,10 @@ const Units = {
   targetType: new Uint8Array(MAX_U), // 0 nenhum, 1 unidade, 2 prédio
   targetId: new Int16Array(MAX_U),
   targetUid: new Int32Array(MAX_U),
+  targetLock: new Float32Array(MAX_U),
+  targetLineX: new Float32Array(MAX_U),
+  targetLineY: new Float32Array(MAX_U),
+  targetLineAlpha: new Float32Array(MAX_U),
   cooldown: new Float32Array(MAX_U),
   scanTimer: new Float32Array(MAX_U),
   flash: new Float32Array(MAX_U),
@@ -689,6 +784,7 @@ const Builds = {
   ty: new Int16Array(MAX_B),
   w: new Int8Array(MAX_B),
   h: new Int8Array(MAX_B),
+  parentHall: new Int16Array(MAX_B),
   level: new Uint8Array(MAX_B),
   hp: new Int16Array(MAX_B),
   queue: new Float32Array(MAX_B),
@@ -703,7 +799,8 @@ const Builds = {
   workHp: new Float32Array(MAX_B),
   upgradeTo: new Uint8Array(MAX_B),
   flash: new Float32Array(MAX_B),
-  cooldown: new Float32Array(MAX_B)
+  cooldown: new Float32Array(MAX_B),
+  queryMark: new Int32Array(MAX_B)
 };
 
 const uFree = [];
@@ -721,6 +818,8 @@ const Lobby = {
   teamCount: 2,
   difficulty: BOT_DIFF_TRAINING,
   startResourceIndex: 1,
+  waterMask: 0,
+  captureZones: true,
   teams: new Uint8Array(MAX_BOTS + 1),
   botDifficulty: new Uint8Array(MAX_BOTS + 1)
 };
@@ -735,6 +834,18 @@ const Pings = {
   t: new Float32Array(16)
 };
 
+const CaptureZones = {
+  enabled: false,
+  count: 0,
+  x: new Float32Array(MAX_CAPTURE_ZONES),
+  y: new Float32Array(MAX_CAPTURE_ZONES),
+  owner: new Int16Array(MAX_CAPTURE_ZONES),
+  progress: new Float32Array(MAX_CAPTURE_ZONES),
+  contender: new Int16Array(MAX_CAPTURE_ZONES)
+};
+CaptureZones.owner.fill(-1);
+CaptureZones.contender.fill(-1);
+
 const AttackFx = {
   cursor: 0,
   active: new Uint8Array(MAX_ATTACK_FX),
@@ -748,7 +859,10 @@ const AttackFx = {
   dur: new Float32Array(MAX_ATTACK_FX)
 };
 
-const BotReserveIds = new Int16Array(8);
+const BotReserveIds = new Int16Array(MAX_SELECTION);
+const BotGroupIds = new Int16Array(12);
+const FunctionalHallIds = new Int16Array(MAX_B);
+let FunctionalHallCount = 0;
 
 const Sel = {
   count: 0,
@@ -768,15 +882,22 @@ const Engine = {
   selectedBuilding: -1,
   buildType: 0,
   buildRot: 0,
+  buildBuilderUnit: -1,
+  inspectedUnit: -1,
   rallyBuilding: -1,
   joinSquadMode: false,
   observer: false,
   placingStart: false,
   pendingBotCount: 0,
   implementationTime: 0,
+  hasWater: false,
+  captureZonesEnabled: false,
+  mapSeed: 1,
   msgTimer: 0,
   econAcc: 0,
   botAcc: 0,
+  implRefresh: 0,
+  queryStamp: 1,
   selectionRefresh: 0,
   pulse: 0,
   lastTime: 0,
@@ -894,6 +1015,285 @@ function hashIndex(x, y) {
   if (hy < 0) hy = 0; else if (hy >= HASH_H) hy = HASH_H - 1;
   return hy * HASH_W + hx;
 }
+function terrainIndex(tx, ty) { return ty * MAP_SZ + tx; }
+function seedTerrainRng(seed) {
+  terrainRandState = (seed | 0) || 1;
+}
+function terrainRand() {
+  terrainRandState = (terrainRandState + 0x6D2B79F5) | 0;
+  let t = terrainRandState;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function terrainNoise(tx, ty, salt) {
+  const n = Math.sin((tx * 127.1 + ty * 311.7 + salt * 73.3 + Engine.mapSeed * 0.017)) * 43758.5453;
+  return n - Math.floor(n);
+}
+function isWaterTile(tx, ty) {
+  return tx >= 0 && ty >= 0 && tx < MAP_SZ && ty < MAP_SZ && terrainGrid[terrainIndex(tx, ty)] === TERRAIN_WATER;
+}
+function isTerrainPassableTile(tx, ty, moveMask) {
+  if (tx < 0 || ty < 0 || tx >= MAP_SZ || ty >= MAP_SZ) return false;
+  const terrain = terrainGrid[terrainIndex(tx, ty)];
+  return terrain === TERRAIN_WATER ? ((moveMask & MOVE_WATER) !== 0) : ((moveMask & MOVE_LAND) !== 0);
+}
+function isTerrainPassableWorld(x, y, moveMask) {
+  return isTerrainPassableTile((x / TILE) | 0, (y / TILE) | 0, moveMask || MOVE_LAND);
+}
+function setTerrainTile(tx, ty, terrain) {
+  if (tx >= 0 && ty >= 0 && tx < MAP_SZ && ty < MAP_SZ) terrainGrid[terrainIndex(tx, ty)] = terrain;
+}
+function paintTerrainDisk(cx, cy, radius, terrain) {
+  const r = Math.max(1, radius | 0);
+  const r2 = r * r;
+  const x0 = Math.max(0, (cx - r) | 0);
+  const y0 = Math.max(0, (cy - r) | 0);
+  const x1 = Math.min(MAP_SZ - 1, (cx + r) | 0);
+  const y1 = Math.min(MAP_SZ - 1, (cy + r) | 0);
+  for (let y = y0; y <= y1; y++) {
+    const dy = y - cy;
+    for (let x = x0; x <= x1; x++) {
+      const dx = x - cx;
+      if (dx * dx + dy * dy <= r2) terrainGrid[terrainIndex(x, y)] = terrain;
+    }
+  }
+}
+function paintTerrainEllipse(cx, cy, rx, ry, terrain) {
+  const x0 = Math.max(0, Math.floor(cx - rx - 1));
+  const y0 = Math.max(0, Math.floor(cy - ry - 1));
+  const x1 = Math.min(MAP_SZ - 1, Math.ceil(cx + rx + 1));
+  const y1 = Math.min(MAP_SZ - 1, Math.ceil(cy + ry + 1));
+  const invX = 1 / Math.max(1, rx * rx);
+  const invY = 1 / Math.max(1, ry * ry);
+  for (let y = y0; y <= y1; y++) {
+    for (let x = x0; x <= x1; x++) {
+      const dx = x - cx;
+      const dy = y - cy;
+      const edgeNoise = (terrainNoise(x, y, 31) - 0.5) * 0.22;
+      if (dx * dx * invX + dy * dy * invY <= 1 + edgeNoise) terrainGrid[terrainIndex(x, y)] = terrain;
+    }
+  }
+}
+function carveOceans() {
+  const base = Math.max(3, Math.floor(MAP_SZ * 0.062));
+  for (let ty = 0; ty < MAP_SZ; ty++) {
+    for (let tx = 0; tx < MAP_SZ; tx++) {
+      const edge = Math.min(tx, ty, MAP_SZ - 1 - tx, MAP_SZ - 1 - ty);
+      if (edge < base) terrainGrid[terrainIndex(tx, ty)] = TERRAIN_WATER;
+    }
+  }
+}
+function carveRiver(index) {
+  const horizontal = terrainRand() < 0.5;
+  const margin = Math.max(8, Math.floor(MAP_SZ * 0.14));
+  const startA = margin + terrainRand() * (MAP_SZ - margin * 2);
+  const endA = margin + terrainRand() * (MAP_SZ - margin * 2);
+  const sx = horizontal ? -8 : startA;
+  const sy = horizontal ? startA : -8;
+  const ex = horizontal ? MAP_SZ + 8 : endA;
+  const ey = horizontal ? endA : MAP_SZ + 8;
+  const steps = Math.ceil(MAP_SZ * 1.45) + 24;
+  const amp = Math.max(3, MAP_SZ * (0.035 + terrainRand() * 0.025));
+  const phase = terrainRand() * Math.PI * 2;
+  const waves = 1.05 + terrainRand() * 0.45;
+  const width = Math.max(2, Math.floor(MAP_SZ / 42) + 1) + (terrainRand() < 0.35 ? 1 : 0);
+  const bridgeEvery = Math.max(28, Math.floor(MAP_SZ * 0.42));
+  const lakeT = 0.46 + terrainRand() * 0.08;
+  const lakeRx = width + Math.max(4, Math.floor(MAP_SZ * 0.045));
+  const lakeRy = width + Math.max(3, Math.floor(MAP_SZ * 0.032));
+  const bridgeX = [];
+  const bridgeY = [];
+
+  const riverPoint = (t) => {
+    const bend = Math.sin(t * Math.PI * waves + phase) * amp + Math.sin(t * Math.PI * 2.7 + phase * 0.5) * amp * 0.35;
+    return [
+      sx + (ex - sx) * t + (horizontal ? 0 : bend),
+      sy + (ey - sy) * t + (horizontal ? bend : 0)
+    ];
+  };
+
+  for (let step = 0; step <= steps; step++) {
+    const t = step / steps;
+    const p = riverPoint(t);
+    const centerPull = Math.max(0, 1 - Math.abs(t - lakeT) / 0.18);
+    const localWidth = width + Math.floor(centerPull * 1.5);
+    paintTerrainDisk(Math.round(p[0]), Math.round(p[1]), localWidth, TERRAIN_WATER);
+    if (step > 8 && step < steps - 8 && ((step + index * 7) % bridgeEvery) <= 1) {
+      bridgeX.push(Math.round(p[0]));
+      bridgeY.push(Math.round(p[1]));
+    }
+  }
+  const lake = riverPoint(lakeT);
+  paintTerrainEllipse(lake[0], lake[1], horizontal ? lakeRx : lakeRy, horizontal ? lakeRy : lakeRx, TERRAIN_WATER);
+  for (let i = 0; i < bridgeX.length; i++) paintTerrainDisk(bridgeX[i], bridgeY[i], width + 2, TERRAIN_LAND);
+}
+function carveLakes() {
+  const count = MAP_SZ >= 100 ? 5 : (MAP_SZ >= 76 ? 4 : 3);
+  const margin = Math.max(8, Math.floor(MAP_SZ * 0.16));
+  for (let i = 0; i < count; i++) {
+    const cx = margin + terrainRand() * (MAP_SZ - margin * 2);
+    const cy = margin + terrainRand() * (MAP_SZ - margin * 2);
+    const rx = Math.max(3, MAP_SZ * (0.045 + terrainRand() * 0.045));
+    const ry = Math.max(3, MAP_SZ * (0.035 + terrainRand() * 0.04));
+    paintTerrainEllipse(cx, cy, rx, ry, TERRAIN_WATER);
+  }
+}
+function hasAnyWaterInGrid() {
+  for (let i = 0; i < terrainGrid.length; i++) if (terrainGrid[i] === TERRAIN_WATER) return true;
+  return false;
+}
+function buildTerrainMiniMap() {
+  terrainMiniCanvas.width = MAP_SZ;
+  terrainMiniCanvas.height = MAP_SZ;
+  const img = terrainMiniCtx.createImageData(MAP_SZ, MAP_SZ);
+  for (let i = 0; i < terrainGrid.length; i++) {
+    const p = i * 4;
+    if (terrainGrid[i] === TERRAIN_WATER) {
+      img.data[p] = 38; img.data[p + 1] = 88; img.data[p + 2] = 118; img.data[p + 3] = 255;
+    } else {
+      img.data[p] = 23; img.data[p + 1] = 32; img.data[p + 2] = 27; img.data[p + 3] = 255;
+    }
+  }
+  terrainMiniCtx.putImageData(img, 0, 0);
+}
+function generateTerrain(waterMask) {
+  terrainGrid.fill(TERRAIN_LAND);
+  const mask = waterMask | 0;
+  seedTerrainRng((Engine.mapSeed ^ (MAP_SZ * 92821) ^ (mask * 68917)) | 0);
+  if (mask & WATER_OCEANS) carveOceans();
+  if (mask & WATER_RIVERS) {
+    const riverCount = MAP_SZ >= 120 ? 3 : (MAP_SZ >= 76 ? 2 : 1);
+    for (let i = 0; i < riverCount; i++) carveRiver(i);
+  }
+  if (mask & WATER_LAKES) carveLakes();
+  Engine.hasWater = hasAnyWaterInGrid();
+  buildTerrainMiniMap();
+}
+function hasWaterAdjacentToFootprint(tx, ty, w, h) {
+  for (let x = tx - 1; x <= tx + w; x++) {
+    if (isWaterTile(x, ty - 1) || isWaterTile(x, ty + h)) return true;
+  }
+  for (let y = ty; y < ty + h; y++) {
+    if (isWaterTile(tx - 1, y) || isWaterTile(tx + w, y)) return true;
+  }
+  return false;
+}
+function hasWaterNearTiles(tx, ty, radius) {
+  const r = Math.max(1, radius | 0);
+  const x0 = Math.max(0, tx - r);
+  const y0 = Math.max(0, ty - r);
+  const x1 = Math.min(MAP_SZ - 1, tx + r);
+  const y1 = Math.min(MAP_SZ - 1, ty + r);
+  for (let y = y0; y <= y1; y++) {
+    const row = y * MAP_SZ;
+    for (let x = x0; x <= x1; x++) if (terrainGrid[row + x] === TERRAIN_WATER) return true;
+  }
+  return false;
+}
+function nextQueryStamp() {
+  Engine.queryStamp = (Engine.queryStamp + 1) | 0;
+  if (Engine.queryStamp <= 0) {
+    Builds.queryMark.fill(0);
+    Engine.queryStamp = 1;
+  }
+  return Engine.queryStamp;
+}
+function findNearestEnemyUnitNear(fId, ignoreId, x, y, range, bestD, attackerId) {
+  const rr = range * range;
+  const base = hashIndex(x, y);
+  const hx = base % HASH_W;
+  const hy = (base / HASH_W) | 0;
+  const cellRadius = ((range / HASH_CELL_SIZE) | 0) + 1;
+  let bestId = -1;
+  let localBestD = Math.min(bestD, rr + 1);
+
+  for (let yy = hy - cellRadius; yy <= hy + cellRadius; yy++) {
+    if (yy < 0 || yy >= HASH_H) continue;
+    for (let xx = hx - cellRadius; xx <= hx + cellRadius; xx++) {
+      if (xx < 0 || xx >= HASH_W) continue;
+      let n = hashHead[yy * HASH_W + xx];
+      while (n !== -1) {
+        if (n !== ignoreId && Units.active[n] && areEnemies(fId, Units.faction[n]) && (attackerId === undefined || attackerId < 0 || canUnitAutoTargetUnit(attackerId, n))) {
+          const d = distSq(x, y, Units.x[n], Units.y[n]);
+          if (d < localBestD && d <= rr) {
+            localBestD = d;
+            bestId = n;
+          }
+        }
+        n = hashNext[n];
+      }
+    }
+  }
+
+  SearchResult[0] = bestId;
+  SearchResult[1] = localBestD;
+  return bestId !== -1;
+}
+function findNearestWoundedAllyUnitNear(fId, ignoreId, x, y, range, bestD) {
+  const rr = range * range;
+  const base = hashIndex(x, y);
+  const hx = base % HASH_W;
+  const hy = (base / HASH_W) | 0;
+  const cellRadius = ((range / HASH_CELL_SIZE) | 0) + 1;
+  let bestId = -1;
+  let localBestD = Math.min(bestD, rr + 1);
+
+  for (let yy = hy - cellRadius; yy <= hy + cellRadius; yy++) {
+    if (yy < 0 || yy >= HASH_H) continue;
+    for (let xx = hx - cellRadius; xx <= hx + cellRadius; xx++) {
+      if (xx < 0 || xx >= HASH_W) continue;
+      let n = hashHead[yy * HASH_W + xx];
+      while (n !== -1) {
+        if (n !== ignoreId && Units.active[n] && Units.faction[n] === fId) {
+          const kind = Units.kind[n] || U_SOLDIER;
+          const maxHp = UnitCfg.hp[kind] || 1;
+          if (Units.hp[n] < maxHp) {
+            const d = distSq(x, y, Units.x[n], Units.y[n]);
+            if (d < localBestD && d <= rr) {
+              localBestD = d;
+              bestId = n;
+            }
+          }
+        }
+        n = hashNext[n];
+      }
+    }
+  }
+
+  SearchResult[0] = bestId;
+  SearchResult[1] = localBestD;
+  return bestId !== -1;
+}
+function findNearestEnemyBuildingNear(fId, x, y, range, bestD) {
+  const rr = range * range;
+  const stamp = nextQueryStamp();
+  const minTx = clamp(((x - range) / TILE) | 0, 0, MAP_SZ - 1);
+  const maxTx = clamp(((x + range) / TILE) | 0, 0, MAP_SZ - 1);
+  const minTy = clamp(((y - range) / TILE) | 0, 0, MAP_SZ - 1);
+  const maxTy = clamp(((y + range) / TILE) | 0, 0, MAP_SZ - 1);
+  let bestId = -1;
+  let localBestD = Math.min(bestD, rr + 1);
+
+  for (let ty = minTy; ty <= maxTy; ty++) {
+    const row = ty * MAP_SZ;
+    for (let tx = minTx; tx <= maxTx; tx++) {
+      const bId = mapGrid[row + tx];
+      if (bId < 0 || Builds.queryMark[bId] === stamp) continue;
+      Builds.queryMark[bId] = stamp;
+      if (!Builds.active[bId] || !areEnemies(fId, Builds.faction[bId])) continue;
+      const d = distSqToBuildingFromPoint(x, y, bId);
+      if (d < localBestD && d <= rr) {
+        localBestD = d;
+        bestId = bId;
+      }
+    }
+  }
+
+  SearchResult[0] = bestId;
+  SearchResult[1] = localBestD;
+  return bestId !== -1;
+}
 function isInsideMapTile(tx, ty) { return tx >= 0 && ty >= 0 && tx < MAP_SZ && ty < MAP_SZ; }
 function factionColor(fid) {
   if (fid === 0) return '#5a8761';
@@ -910,25 +1310,54 @@ function unitGrainCost(type) { return UnitCfg.grainCost[type] || 0; }
 function unitProducerType(type) { return UnitCfg.producer[type] || 0; }
 function unitRequiredBuildingLevel(type) { return UnitCfg.buildingLevel[type] || 1; }
 function unitPopCost(type) { return UnitCfg.popCost[type] || 1; }
-function isMilitaryProducerType(type) { return type === B_BARR || type === B_WORKSHOP || type === B_STABLE; }
+function unitMoveMask(type) { return UnitCfg.moveMask[type] || MOVE_LAND; }
+function isWaterUnitType(type) { return unitMoveMask(type) === MOVE_WATER; }
+function producerMoveMaskForBuildingType(type) { return type === B_DOCK ? MOVE_WATER : MOVE_LAND; }
+function isMedicUnitType(type) { return type === U_MEDIC; }
+function isDiplomatUnitType(type) { return type === U_DIPLOMAT; }
+function isEngineerUnitType(type) { return type === U_ENGINEER; }
+function canUnitAutoAcquireEnemy(type) { return !isMedicUnitType(type) && !isDiplomatUnitType(type) && !isEngineerUnitType(type) && (UnitCfg.damage[type] || 0) > 0; }
+function canUnitAutoTargetUnit(attackerId, targetId) {
+  if (!Units.active[attackerId] || !Units.active[targetId]) return false;
+  if (!canUnitAutoAcquireEnemy(Units.kind[attackerId])) return false;
+  const attackerMask = unitMoveMask(Units.kind[attackerId]);
+  const targetMask = unitMoveMask(Units.kind[targetId]);
+  if ((attackerMask & targetMask) !== 0) return true;
+  return Units.attackRange[attackerId] >= 58;
+}
+function isMilitaryProducerType(type) { return type === B_BARR || type === B_WORKSHOP || type === B_STABLE || type === B_DOCK || type === B_ACADEMY; }
 function isEconomyBuildingType(type) { return type === B_MINE || type === B_WOOD || type === B_FARM; }
 function isDefenseBuildingType(type) { return type === B_TOWER || type === B_WALL; }
-function isUpgradeableBuildingType(type) { return type === B_HALL || type === B_BARR || type === B_WORKSHOP || type === B_STABLE || isEconomyBuildingType(type) || isDefenseBuildingType(type); }
+function isUpgradeableBuildingType(type) { return type === B_HALL || type === B_BARR || type === B_WORKSHOP || type === B_STABLE || type === B_DOCK || type === B_ACADEMY || isEconomyBuildingType(type) || isDefenseBuildingType(type); }
+function isEngineerOnlyBuilding(type) { return type === B_OUTPOST || type === B_TRAP; }
 function isImplementationActive() { return Engine.implementationTime > 0; }
-function implementationCostScale() { return isImplementationActive() ? IMPLEMENTATION_COST_MULT : 1; }
 function implementationTimeScale() { return isImplementationActive() ? IMPLEMENTATION_TIME_MULT : 1; }
-function scaledCost(v) { return Math.ceil(v * implementationCostScale()); }
-function buildCostW(type) { return scaledCost(BuildCfg[type].costW || 0); }
-function buildCostS(type) { return scaledCost(BuildCfg[type].costS || 0); }
-function buildCostG(type) { return scaledCost(BuildCfg[type].costG || 0); }
-function buildTimeFor(type) { return (BuildCfg[type].buildTime || 0) * implementationTimeScale(); }
+function isColonyHallBuild(fId, type, builderUnit) {
+  return type === B_HALL && isActiveEngineerForFaction(builderUnit, fId) && countBuildingsOfType(fId, B_HALL) > 0;
+}
+function buildCostMult(type, fId, builderUnit) { return isColonyHallBuild(fId, type, builderUnit) ? COLONY_HALL_COST_MULT : 1; }
+function buildCostW(type, fId, builderUnit) { return (BuildCfg[type].costW || 0) * buildCostMult(type, fId, builderUnit); }
+function buildCostS(type, fId, builderUnit) { return (BuildCfg[type].costS || 0) * buildCostMult(type, fId, builderUnit); }
+function buildCostG(type, fId, builderUnit) { return (BuildCfg[type].costG || 0) * buildCostMult(type, fId, builderUnit); }
+function captureZoneCountForFaction(fId) {
+  if (!CaptureZones.enabled) return 0;
+  let count = 0;
+  for (let i = 0; i < CaptureZones.count; i++) if (CaptureZones.owner[i] === fId) count++;
+  return count;
+}
+function resourceMultiplierForFaction(fId) { return 1 + captureZoneCountForFaction(fId) * CAPTURE_RESOURCE_BONUS; }
+function captureBuildTimeScale(fId) {
+  if (fId === undefined || fId < 0) return 1;
+  return Math.max(CAPTURE_BUILD_TIME_MIN, 1 - captureZoneCountForFaction(fId) * CAPTURE_BUILD_TIME_BONUS);
+}
+function buildTimeFor(type, fId) { return (BuildCfg[type].buildTime || 0) * implementationTimeScale() * captureBuildTimeScale(fId); }
 function costTimeText(w, s, g, t) {
   let txt = `${w}M ${s}P`;
   if (g > 0) txt += ` ${g}G`;
   txt += ` ${Math.ceil(t)}s`;
   return txt;
 }
-function buildCostText(type) { return costTimeText(buildCostW(type), buildCostS(type), buildCostG(type), buildTimeFor(type)); }
+function buildCostText(type, fId, builderUnit) { return costTimeText(buildCostW(type, fId, builderUnit), buildCostS(type, fId, builderUnit), buildCostG(type, fId, builderUnit), buildTimeFor(type, fId)); }
 function unitCostText(type) {
   let txt = '';
   const w = unitWoodCost(type), s = unitStoneCost(type), g = unitGrainCost(type);
@@ -941,12 +1370,21 @@ function startResourceText(index) {
   const i = clamp(index | 0, 0, START_RESOURCE_LABELS.length - 1);
   return `${START_RESOURCE_LABELS[i]}: ${START_RESOURCE_W[i]}M / ${START_RESOURCE_S[i]}P / ${START_RESOURCE_G[i]}G`;
 }
+function waterMaskText(mask) {
+  const parts = [];
+  if (mask & WATER_OCEANS) parts.push('oceanos');
+  if (mask & WATER_RIVERS) parts.push('rios');
+  if (mask & WATER_LAKES) parts.push('lagos');
+  return parts.length ? `Agua ativa: ${parts.join(', ')}.` : 'Sem agua: partida terrestre classica.';
+}
 function buildingMaxHp(type, level) {
   const base = BuildCfg[type].hp;
   if (type === B_HALL) return base + (level - 1) * 420;
   if (type === B_BARR) return base + (level - 1) * 240;
   if (type === B_WORKSHOP) return base + (level - 1) * 300;
   if (type === B_STABLE) return base + (level - 1) * 230;
+  if (type === B_DOCK) return base + (level - 1) * 250;
+  if (type === B_ACADEMY) return base + (level - 1) * 250;
   if (type === B_WALL) return base + (level - 1) * 240;
   if (type === B_TOWER) return base + (level - 1) * 220;
   return base + (level - 1) * 160;
@@ -956,6 +1394,8 @@ function upgradeBaseCostW(type, nextLevel) {
   if (type === B_BARR) return BARR_UPGRADE_W[nextLevel];
   if (type === B_WORKSHOP) return WORKSHOP_UPGRADE_W[nextLevel];
   if (type === B_STABLE) return STABLE_UPGRADE_W[nextLevel];
+  if (type === B_DOCK) return DOCK_UPGRADE_W[nextLevel];
+  if (type === B_ACADEMY) return ACADEMY_UPGRADE_W[nextLevel];
   if (isDefenseBuildingType(type)) return DEF_UPGRADE_W[nextLevel];
   if (isEconomyBuildingType(type)) return ECO_UPGRADE_W[nextLevel];
   return 0;
@@ -965,6 +1405,8 @@ function upgradeBaseCostS(type, nextLevel) {
   if (type === B_BARR) return BARR_UPGRADE_S[nextLevel];
   if (type === B_WORKSHOP) return WORKSHOP_UPGRADE_S[nextLevel];
   if (type === B_STABLE) return STABLE_UPGRADE_S[nextLevel];
+  if (type === B_DOCK) return DOCK_UPGRADE_S[nextLevel];
+  if (type === B_ACADEMY) return ACADEMY_UPGRADE_S[nextLevel];
   if (isDefenseBuildingType(type)) return DEF_UPGRADE_S[nextLevel];
   if (isEconomyBuildingType(type)) return ECO_UPGRADE_S[nextLevel];
   return 0;
@@ -974,22 +1416,26 @@ function upgradeBaseCostG(type, nextLevel) {
   if (type === B_BARR) return BARR_UPGRADE_G[nextLevel];
   if (type === B_WORKSHOP) return WORKSHOP_UPGRADE_G[nextLevel];
   if (type === B_STABLE) return STABLE_UPGRADE_G[nextLevel];
+  if (type === B_DOCK) return DOCK_UPGRADE_G[nextLevel];
+  if (type === B_ACADEMY) return ACADEMY_UPGRADE_G[nextLevel];
   if (isDefenseBuildingType(type)) return DEF_UPGRADE_G[nextLevel];
   if (isEconomyBuildingType(type)) return ECO_UPGRADE_G[nextLevel];
   return 0;
 }
-function upgradeCostW(type, nextLevel) { return scaledCost(upgradeBaseCostW(type, nextLevel)); }
-function upgradeCostS(type, nextLevel) { return scaledCost(upgradeBaseCostS(type, nextLevel)); }
-function upgradeCostG(type, nextLevel) { return scaledCost(upgradeBaseCostG(type, nextLevel)); }
-function upgradeTimeFor(type, nextLevel) {
+function upgradeCostW(type, nextLevel) { return upgradeBaseCostW(type, nextLevel); }
+function upgradeCostS(type, nextLevel) { return upgradeBaseCostS(type, nextLevel); }
+function upgradeCostG(type, nextLevel) { return upgradeBaseCostG(type, nextLevel); }
+function upgradeTimeFor(type, nextLevel, fId) {
   let t = 0;
   if (type === B_HALL) t = HALL_UPGRADE_TIME[nextLevel];
   else if (type === B_BARR) t = BARR_UPGRADE_TIME[nextLevel];
   else if (type === B_WORKSHOP) t = WORKSHOP_UPGRADE_TIME[nextLevel];
   else if (type === B_STABLE) t = STABLE_UPGRADE_TIME[nextLevel];
+  else if (type === B_DOCK) t = DOCK_UPGRADE_TIME[nextLevel];
+  else if (type === B_ACADEMY) t = ACADEMY_UPGRADE_TIME[nextLevel];
   else if (isDefenseBuildingType(type)) t = DEF_UPGRADE_TIME[nextLevel];
   else if (isEconomyBuildingType(type)) t = ECO_UPGRADE_TIME[nextLevel];
-  return t * implementationTimeScale();
+  return t * implementationTimeScale() * captureBuildTimeScale(fId);
 }
 function buildingAttackRange(type, level) {
   const base = BuildCfg[type].attackRange || 0;
@@ -1004,6 +1450,7 @@ function buildingAttackCooldown(type, level) {
   return base > 0 ? Math.max(0.35, base - Math.max(0, level - 1) * 0.08) : 0;
 }
 function canRotateBuilding(type) { return type === B_WALL; }
+function buildingClearanceTiles(type) { return (type === B_WALL || type === B_OUTPOST || type === B_TRAP) ? 0 : BUILD_CLEARANCE_TILES; }
 function buildingFootprintW(type, rot) {
   const cfg = BuildCfg[type];
   return canRotateBuilding(type) && (rot & 1) ? cfg.h : cfg.w;
@@ -1029,6 +1476,8 @@ function limitForBuildingAtHallLevel(type, hallLevel) {
   if (type === B_TOWER) return HALL_LIMIT_TOWER[lvl];
   if (type === B_WALL) return HALL_LIMIT_WALL[lvl];
   if (type === B_STABLE) return HALL_LIMIT_STABLE[lvl];
+  if (type === B_DOCK) return Engine.hasWater ? HALL_LIMIT_DOCK[lvl] : 0;
+  if (type === B_ACADEMY) return HALL_LIMIT_ACADEMY[lvl];
   return 0;
 }
 function requiredHallLevelForBuilding(type) {
@@ -1047,26 +1496,50 @@ function factionHallLevel(fId) {
   }
   return best;
 }
+
+function addLimitFromHall(f, hallLevel) {
+  for (const type of LIMITED_BUILD_TYPES) {
+    f.limits[type] = (f.limits[type] || 0) + limitForBuildingAtHallLevel(type, hallLevel);
+  }
+}
+
 function refreshFactionLimits(fId) {
   const f = Factions[fId];
   if (!f) return;
-  const level = factionHallLevel(fId);
-  f.limits[B_MINE] = limitForBuildingAtHallLevel(B_MINE, level);
-  f.limits[B_WOOD] = limitForBuildingAtHallLevel(B_WOOD, level);
-  f.limits[B_FARM] = limitForBuildingAtHallLevel(B_FARM, level);
-  f.limits[B_BARR] = limitForBuildingAtHallLevel(B_BARR, level);
-  f.limits[B_WORKSHOP] = limitForBuildingAtHallLevel(B_WORKSHOP, level);
-  f.limits[B_TOWER] = limitForBuildingAtHallLevel(B_TOWER, level);
-  f.limits[B_WALL] = limitForBuildingAtHallLevel(B_WALL, level);
-  f.limits[B_STABLE] = limitForBuildingAtHallLevel(B_STABLE, level);
+  for (const type of LIMITED_BUILD_TYPES) f.limits[type] = 0;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    addLimitFromHall(f, Builds.level[i]);
+  }
 }
+
+function hallLevelForBuildingTech(bId) {
+  const parent = Builds.parentHall[bId];
+  if (parent >= 0 && Builds.active[parent] && Builds.type[parent] === B_HALL && Builds.faction[parent] === Builds.faction[bId] && Builds.workState[parent] !== BUILD_WORK_CONSTRUCT) {
+    return Builds.level[parent];
+  }
+  const tx = Builds.tx[bId];
+  const ty = Builds.ty[bId];
+  const w = Builds.w[bId];
+  const h = Builds.h[bId];
+  let best = 0;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== Builds.faction[bId] || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    const range = hallBuildRangeTiles(Builds.level[i]);
+    if (distSqHallToFootprintTiles(i, tx, ty, w, h) <= range * range && Builds.level[i] > best) best = Builds.level[i];
+  }
+  return best;
+}
+
 function canUpgradeByTech(bId) {
   if (!Builds.active[bId] || isBuildingWorking(bId)) return false;
   const type = Builds.type[bId];
   if (!isUpgradeableBuildingType(type)) return false;
   if (Builds.level[bId] >= MAX_BUILD_LEVEL) return false;
   const next = Builds.level[bId] + 1;
-  if (type !== B_HALL && next > factionHallLevel(Builds.faction[bId])) return false;
+  if (type !== B_HALL && next > hallLevelForBuildingTech(bId)) return false;
   return true;
 }
 
@@ -1100,6 +1573,7 @@ function popUnitQueue(bId) {
 function clearSelection() {
   Sel.count = 0;
   Engine.selectedBuilding = -1;
+  Engine.inspectedUnit = -1;
   Engine.joinSquadMode = false;
   UI.actionMode = 'root';
   UI.updateSelectionInfo();
@@ -1109,6 +1583,17 @@ function setSingleSelection(id) {
   Sel.count = 1;
   Sel.ids[0] = id;
   Engine.selectedBuilding = -1;
+  Engine.inspectedUnit = -1;
+  Engine.joinSquadMode = false;
+  UI.actionMode = 'root';
+  UI.updateSelectionInfo();
+}
+
+function inspectUnit(id) {
+  if (id === -1 || !Units.active[id]) return;
+  Sel.count = 0;
+  Engine.selectedBuilding = -1;
+  Engine.inspectedUnit = id;
   Engine.joinSquadMode = false;
   UI.actionMode = 'root';
   UI.updateSelectionInfo();
@@ -1117,6 +1602,7 @@ function setSingleSelection(id) {
 function selectBuilding(id) {
   Sel.count = 0;
   Engine.selectedBuilding = id;
+  Engine.inspectedUnit = -1;
   Engine.joinSquadMode = false;
   UI.actionMode = Builds.active[id] && isHumanFaction(Builds.faction[id]) && isMilitaryProducerType(Builds.type[id]) && Builds.workState[id] === BUILD_WORK_NONE ? 'train' : 'root';
   UI.updateSelectionInfo();
@@ -1180,12 +1666,24 @@ function createFaction(isAI, teamId, difficulty) {
     wood: Engine.startWood,
     stone: Engine.startStone,
     grain: Engine.startGrain,
-    limits: { [B_MINE]: 0, [B_WOOD]: 0, [B_FARM]: 0, [B_BARR]: 0, [B_WORKSHOP]: 0, [B_TOWER]: 0, [B_WALL]: 0, [B_STABLE]: 0 },
-    current: { [B_MINE]: 0, [B_WOOD]: 0, [B_FARM]: 0, [B_BARR]: 0, [B_WORKSHOP]: 0, [B_TOWER]: 0, [B_WALL]: 0, [B_STABLE]: 0 },
+    limits: { [B_MINE]: 0, [B_WOOD]: 0, [B_FARM]: 0, [B_BARR]: 0, [B_WORKSHOP]: 0, [B_TOWER]: 0, [B_WALL]: 0, [B_STABLE]: 0, [B_DOCK]: 0, [B_ACADEMY]: 0 },
+    current: { [B_MINE]: 0, [B_WOOD]: 0, [B_FARM]: 0, [B_BARR]: 0, [B_WORKSHOP]: 0, [B_TOWER]: 0, [B_WALL]: 0, [B_STABLE]: 0, [B_DOCK]: 0, [B_ACADEMY]: 0 },
     aiPhase: 0,
     aiAttackCooldown: 0,
+    aiDefenseCooldown: 0,
+    aiDefenseTargetId: -1,
+    aiDefenseTargetUid: 0,
     aiTrainCooldown: isAI ? BotDiffCfg.trainDelay[aiDiff] : 0,
-    aiBuildCooldown: isAI ? BotDiffCfg.buildDelay[aiDiff] * 0.5 : 0
+    aiBuildCooldown: isAI ? BotDiffCfg.buildDelay[aiDiff] * 0.5 : 0,
+    aiScoutCooldown: isAI ? 5 + id * 0.75 : 0,
+    aiAlertTimer: 0,
+    aiAlertTargetId: -1,
+    aiAlertTargetUid: 0,
+    aiAlertX: 0,
+    aiAlertY: 0,
+    aiColonyTx: -1,
+    aiColonyTy: -1,
+    aiColonyCooldown: 0
   });
   return id;
 }
@@ -1201,23 +1699,23 @@ function isEnemyToPlayer(fId) {
   return areEnemies(0, fId);
 }
 
-function canAfford(fId, type) {
+function canAfford(fId, type, builderUnit) {
   const f = Factions[fId];
-  return f.wood >= buildCostW(type) && f.stone >= buildCostS(type) && f.grain >= buildCostG(type);
+  return f.wood >= buildCostW(type, fId, builderUnit) && f.stone >= buildCostS(type, fId, builderUnit) && f.grain >= buildCostG(type, fId, builderUnit);
 }
 
-function payForBuild(fId, type) {
+function payForBuild(fId, type, builderUnit) {
   const f = Factions[fId];
-  f.wood -= buildCostW(type);
-  f.stone -= buildCostS(type);
-  f.grain -= buildCostG(type);
+  f.wood -= buildCostW(type, fId, builderUnit);
+  f.stone -= buildCostS(type, fId, builderUnit);
+  f.grain -= buildCostG(type, fId, builderUnit);
 }
 
-function refundBuild(fId, type) {
+function refundBuild(fId, type, builderUnit) {
   const f = Factions[fId];
-  f.wood += buildCostW(type);
-  f.stone += buildCostS(type);
-  f.grain += buildCostG(type);
+  f.wood += buildCostW(type, fId, builderUnit);
+  f.stone += buildCostS(type, fId, builderUnit);
+  f.grain += buildCostG(type, fId, builderUnit);
 }
 
 function canUpgradeBuilding(bId) {
@@ -1230,12 +1728,68 @@ function canUpgradeBuilding(bId) {
   return f.wood >= upgradeCostW(type, next) && f.stone >= upgradeCostS(type, next) && f.grain >= upgradeCostG(type, next);
 }
 
-function canStartBuildingForFaction(fId, type) {
-  if (type === B_HALL) return findHall(fId) === -1;
+function isActiveEngineerForFaction(unitId, fId) {
+  return unitId >= 0 && Units.active[unitId] && Units.faction[unitId] === fId && Units.kind[unitId] === U_ENGINEER;
+}
+
+function selectedEngineerId() {
+  if (Sel.count !== 1) return -1;
+  const id = Sel.ids[0];
+  return isActiveEngineerForFaction(id, 0) ? id : -1;
+}
+
+function isLimitedBuildType(type) {
+  return LIMITED_BUILD_TYPES.indexOf(type) !== -1;
+}
+
+function countBuildingsForHall(hallId, type) {
+  let count = 0;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.type[i] !== type || Builds.parentHall[i] !== hallId) continue;
+    count++;
+  }
+  return count;
+}
+
+function findBuildAnchorHallForType(fId, type, tx, ty, rot) {
+  if (!isLimitedBuildType(type)) return -1;
+  const w = buildingFootprintW(type, rot || 0);
+  const h = buildingFootprintH(type, rot || 0);
+  let best = -1;
+  let bestD = 1e30;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    const limit = limitForBuildingAtHallLevel(type, Builds.level[i]);
+    if (limit <= 0 || countBuildingsForHall(i, type) >= limit) continue;
+    const d = distSqHallToFootprintTiles(i, tx, ty, w, h);
+    const range = hallBuildRangeTiles(Builds.level[i]);
+    if (d <= range * range && d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+function hasAnyBuildSlotForType(fId, type) {
+  if (!isLimitedBuildType(type)) return true;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    const limit = limitForBuildingAtHallLevel(type, Builds.level[i]);
+    if (limit > 0 && countBuildingsForHall(i, type) < limit) return true;
+  }
+  return false;
+}
+
+function canStartBuildingForFaction(fId, type, builderUnit) {
+  if (type === B_HALL) return findHall(fId) === -1 || isActiveEngineerForFaction(builderUnit, fId);
+  if (isEngineerOnlyBuilding(type)) return isActiveEngineerForFaction(builderUnit, fId);
   const f = Factions[fId];
   if (!f || !BuildCfg[type]) return false;
   refreshFactionLimits(fId);
-  return f.current[type] < (f.limits[type] || 0);
+  return f.current[type] < (f.limits[type] || 0) && hasAnyBuildSlotForType(fId, type);
 }
 
 function startImplementationPeriod() {
@@ -1249,7 +1803,7 @@ function upgradeBuilding(bId) {
   const type = Builds.type[bId];
   const f = Factions[Builds.faction[bId]];
   const next = Builds.level[bId] + 1;
-  const duration = upgradeTimeFor(type, next);
+  const duration = upgradeTimeFor(type, next, Builds.faction[bId]);
   f.wood -= upgradeCostW(type, next);
   f.stone -= upgradeCostS(type, next);
   f.grain -= upgradeCostG(type, next);
@@ -1271,11 +1825,24 @@ function upgradeBuilding(bId) {
 }
 
 function canPlaceBuilding(tx, ty, w, h) {
-  return canPlaceBuildingType(0, tx, ty, w, h);
+  return canPlaceBuildingType(B_HALL, tx, ty, w, h);
 }
 
 function canPlaceBuildingType(type, tx, ty, w, h) {
   return findBlockingBuildingForPlacementTyped(type, tx, ty, w, h) === -1 && findBlockingUnitForPlacement(type, tx, ty, w, h) === -1;
+}
+
+function isValidTerrainForBuildingType(type, tx, ty, w, h) {
+  const buildType = type || B_HALL;
+  if (tx < 0 || ty < 0 || tx + w > MAP_SZ || ty + h > MAP_SZ) return false;
+  for (let yy = ty; yy < ty + h; yy++) {
+    const row = yy * MAP_SZ;
+    for (let xx = tx; xx < tx + w; xx++) {
+      if (terrainGrid[row + xx] !== TERRAIN_LAND) return false;
+    }
+  }
+  if (buildType === B_DOCK && !hasWaterAdjacentToFootprint(tx, ty, w, h)) return false;
+  return true;
 }
 
 function distSqHallToFootprintTiles(hallId, tx, ty, w, h) {
@@ -1288,10 +1855,27 @@ function distSqHallToFootprintTiles(hallId, tx, ty, w, h) {
   return dx * dx + dy * dy;
 }
 
-function isWithinBuildRange(fId, type, tx, ty, rot) {
-  if (type === B_HALL) return true;
+function isWithinEngineerBuildRange(builderUnit, tx, ty, w, h) {
+  if (builderUnit < 0 || !Units.active[builderUnit] || Units.kind[builderUnit] !== U_ENGINEER) return false;
+  const ux = Units.x[builderUnit] / TILE;
+  const uy = Units.y[builderUnit] / TILE;
+  const cx = clamp(ux, tx, tx + w);
+  const cy = clamp(uy, ty, ty + h);
+  const dx = ux - cx;
+  const dy = uy - cy;
+  return dx * dx + dy * dy <= ENGINEER_BUILD_RANGE_TILES * ENGINEER_BUILD_RANGE_TILES;
+}
+
+function isWithinBuildRange(fId, type, tx, ty, rot, builderUnit) {
   const w = buildingFootprintW(type, rot || 0);
   const h = buildingFootprintH(type, rot || 0);
+  if (type === B_HALL) {
+    if (findHall(fId) === -1) return true;
+    return isActiveEngineerForFaction(builderUnit, fId) && isWithinEngineerBuildRange(builderUnit, tx, ty, w, h);
+  }
+  if (isEngineerOnlyBuilding(type)) {
+    return isActiveEngineerForFaction(builderUnit, fId) && isWithinEngineerBuildRange(builderUnit, tx, ty, w, h);
+  }
   for (let i = 0; i < MAX_B; i++) {
     if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== B_HALL) continue;
     if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
@@ -1301,12 +1885,17 @@ function isWithinBuildRange(fId, type, tx, ty, rot) {
   return false;
 }
 
-function canPlaceBuildingForFaction(fId, type, tx, ty, rot) {
+function canPlaceBuildingForFactionWithBuilder(fId, type, tx, ty, rot, builderUnit) {
   const w = buildingFootprintW(type, rot || 0);
   const h = buildingFootprintH(type, rot || 0);
+  if (isLimitedBuildType(type) && findBuildAnchorHallForType(fId, type, tx, ty, rot || 0) === -1) return false;
   return findBlockingBuildingForPlacementTyped(type, tx, ty, w, h) === -1
-    && isWithinBuildRange(fId, type, tx, ty, rot || 0)
+    && isWithinBuildRange(fId, type, tx, ty, rot || 0, builderUnit)
     && findBlockingUnitForPlacement(type, tx, ty, w, h) === -1;
+}
+
+function canPlaceBuildingForFaction(fId, type, tx, ty, rot) {
+  return canPlaceBuildingForFactionWithBuilder(fId, type, tx, ty, rot || 0, Engine.buildBuilderUnit);
 }
 
 function findBlockingBuildingForPlacement(tx, ty, w, h) {
@@ -1315,7 +1904,8 @@ function findBlockingBuildingForPlacement(tx, ty, w, h) {
 
 function findBlockingBuildingForPlacementTyped(type, tx, ty, w, h) {
   if (tx < 0 || ty < 0 || tx + w > MAP_SZ || ty + h > MAP_SZ) return -2;
-  const clearance = type === B_WALL ? 0 : BUILD_CLEARANCE_TILES;
+  if (!isValidTerrainForBuildingType(type, tx, ty, w, h)) return -3;
+  const clearance = buildingClearanceTiles(type);
   const x0 = Math.max(0, tx - clearance);
   const y0 = Math.max(0, ty - clearance);
   const x1 = Math.min(MAP_SZ, tx + w + clearance);
@@ -1336,27 +1926,44 @@ function findBlockingUnitForPlacement(type, tx, ty, w, h) {
   const y0 = ty * TILE;
   const x1 = (tx + w) * TILE;
   const y1 = (ty + h) * TILE;
-  for (let i = 0; i < MAX_U; i++) {
-    if (!Units.active[i]) continue;
-    const r = (UnitCfg.hitRadius[Units.kind[i]] || 8) + 3;
-    const cx = clamp(Units.x[i], x0, x1);
-    const cy = clamp(Units.y[i], y0, y1);
-    const dx = Units.x[i] - cx;
-    const dy = Units.y[i] - cy;
-    if (dx * dx + dy * dy <= r * r) return i;
+  const margin = 24;
+  const minHx = clamp(((x0 - margin) / HASH_CELL_SIZE) | 0, 0, HASH_W - 1);
+  const maxHx = clamp(((x1 + margin) / HASH_CELL_SIZE) | 0, 0, HASH_W - 1);
+  const minHy = clamp(((y0 - margin) / HASH_CELL_SIZE) | 0, 0, HASH_H - 1);
+  const maxHy = clamp(((y1 + margin) / HASH_CELL_SIZE) | 0, 0, HASH_H - 1);
+  for (let hy = minHy; hy <= maxHy; hy++) {
+    for (let hx = minHx; hx <= maxHx; hx++) {
+      let i = hashHead[hy * HASH_W + hx];
+      while (i !== -1) {
+        if (Units.active[i]) {
+          const r = (UnitCfg.hitRadius[Units.kind[i]] || 8) + 3;
+          const cx = clamp(Units.x[i], x0, x1);
+          const cy = clamp(Units.y[i], y0, y1);
+          const dx = Units.x[i] - cx;
+          const dy = Units.y[i] - cy;
+          if (dx * dx + dy * dy <= r * r) return i;
+        }
+        i = hashNext[i];
+      }
+    }
   }
   return -1;
 }
 
-function spawnBuilding(factionId, type, tx, ty, instantComplete, rot) {
+function spawnBuilding(factionId, type, tx, ty, instantComplete, rot, parentHall) {
   if (bFree.length === 0) return -1;
   const cfg = BuildCfg[type];
   const w = buildingFootprintW(type, rot || 0);
   const h = buildingFootprintH(type, rot || 0);
   if (!canPlaceBuildingType(type, tx, ty, w, h)) return -1;
+  let anchorHall = parentHall === undefined ? -1 : parentHall;
+  if (isLimitedBuildType(type)) {
+    if (anchorHall < 0) anchorHall = findBuildAnchorHallForType(factionId, type, tx, ty, rot || 0);
+    if (anchorHall < 0) return -1;
+  }
 
   const id = bFree.pop();
-  const duration = instantComplete ? 0 : buildTimeFor(type);
+  const duration = instantComplete ? 0 : buildTimeFor(type, factionId);
   const maxHp = buildingMaxHp(type, 1);
   Builds.active[id] = 1;
   Builds.uid[id] = ++Engine.uidGen;
@@ -1366,6 +1973,7 @@ function spawnBuilding(factionId, type, tx, ty, instantComplete, rot) {
   Builds.ty[id] = ty;
   Builds.w[id] = w;
   Builds.h[id] = h;
+  Builds.parentHall[id] = type === B_HALL ? id : anchorHall;
   Builds.level[id] = 1;
   Builds.hp[id] = duration > 0 ? 1 : maxHp;
   Builds.queue[id] = 0;
@@ -1388,10 +1996,10 @@ function spawnBuilding(factionId, type, tx, ty, instantComplete, rot) {
     }
   }
 
-  if (type !== B_HALL) {
-    Factions[factionId].current[type]++;
-  } else {
+  if (type === B_HALL) {
     refreshFactionLimits(factionId);
+  } else if (Factions[factionId].current[type] !== undefined) {
+    Factions[factionId].current[type]++;
   }
   return id;
 }
@@ -1460,6 +2068,7 @@ function destroyBuilding(id) {
   if (!Builds.active[id]) return;
   const type = Builds.type[id];
   const fId = Builds.faction[id];
+  const wasSelected = Engine.selectedBuilding === id;
   for (let yy = 0; yy < Builds.h[id]; yy++) {
     for (let xx = 0; xx < Builds.w[id]; xx++) {
       const gx = Builds.tx[id] + xx;
@@ -1470,15 +2079,16 @@ function destroyBuilding(id) {
     }
   }
   if (type !== B_HALL && Factions[fId].current[type] > 0) Factions[fId].current[type]--;
-  if (Engine.selectedBuilding === id) Engine.selectedBuilding = -1;
+  if (wasSelected) Engine.selectedBuilding = -1;
   if (Engine.rallyBuilding === id) Engine.rallyBuilding = -1;
   Builds.active[id] = 0;
+  Builds.parentHall[id] = -1;
   if (type === B_HALL) refreshFactionLimits(fId);
   bFree.push(id);
-  if (fId === 0) {
+  if (fId === 0 || wasSelected) {
     UI.updateLimits();
     UI.updateSelectionInfo();
-    UI.updateUnitHud();
+    if (fId === 0) UI.updateUnitHud();
   }
 }
 
@@ -1502,6 +2112,10 @@ function spawnUnit(factionId, x, y, unitType) {
   Units.targetType[id] = 0;
   Units.targetId[id] = -1;
   Units.targetUid[id] = 0;
+  Units.targetLock[id] = 0;
+  Units.targetLineX[id] = x;
+  Units.targetLineY[id] = y;
+  Units.targetLineAlpha[id] = 0;
   Units.cooldown[id] = 0;
   Units.scanTimer[id] = (id % 5) * 0.07;
   Units.flash[id] = 0;
@@ -1517,12 +2131,16 @@ function spawnUnit(factionId, x, y, unitType) {
   Units.order[id] = ORDER_NONE;
   Units.hasWaypoint[id] = 0;
   Units.blockedTime[id] = 0;
+  const h = hashIndex(x, y);
+  hashNext[id] = hashHead[h];
+  hashHead[h] = id;
   return id;
 }
 
 function killUnit(id) {
   if (!Units.active[id]) return;
   const wasPlayerUnit = Units.faction[id] === 0;
+  const wasInspected = Engine.inspectedUnit === id;
   if (Sel.count > 0) {
     let write = 0;
     for (let i = 0; i < Sel.count; i++) {
@@ -1531,25 +2149,58 @@ function killUnit(id) {
     Sel.count = write;
   }
   removeUnitFromSquads(id);
+  if (wasInspected) Engine.inspectedUnit = -1;
   Units.active[id] = 0;
   uFree.push(id);
-  if (wasPlayerUnit) {
-    UI.updateUnitHud();
+  if (wasPlayerUnit || wasInspected) {
+    if (wasPlayerUnit) UI.updateUnitHud();
     UI.updateSelectionInfo();
   }
 }
 
+function hasUnitTargetUnit(uId, targetId) {
+  return Units.active[targetId]
+    && Units.targetType[uId] === 1
+    && Units.targetId[uId] === targetId
+    && Units.targetUid[uId] === Units.uid[targetId];
+}
+
+function hasUnitTargetBuilding(uId, bId) {
+  return Builds.active[bId]
+    && Units.targetType[uId] === 2
+    && Units.targetId[uId] === bId
+    && Units.targetUid[uId] === Builds.uid[bId];
+}
+
+function targetLockDurationForUnit(uId) {
+  const f = Factions[Units.faction[uId]];
+  if (f && f.isAI) return 1.45;
+  return 0.65;
+}
+
 function setUnitTargetUnit(uId, targetId) {
+  if (hasUnitTargetUnit(uId, targetId)) {
+    Units.state[uId] = STATE_ATTACK;
+    Units.targetLock[uId] = Math.max(Units.targetLock[uId], targetLockDurationForUnit(uId));
+    return;
+  }
   Units.targetType[uId] = 1;
   Units.targetId[uId] = targetId;
   Units.targetUid[uId] = Units.uid[targetId];
+  Units.targetLock[uId] = targetLockDurationForUnit(uId);
   Units.state[uId] = STATE_ATTACK;
 }
 
 function setUnitTargetBuilding(uId, bId) {
+  if (hasUnitTargetBuilding(uId, bId)) {
+    Units.state[uId] = STATE_ATTACK;
+    Units.targetLock[uId] = Math.max(Units.targetLock[uId], targetLockDurationForUnit(uId));
+    return;
+  }
   Units.targetType[uId] = 2;
   Units.targetId[uId] = bId;
   Units.targetUid[uId] = Builds.uid[bId];
+  Units.targetLock[uId] = targetLockDurationForUnit(uId);
   Units.state[uId] = STATE_ATTACK;
 }
 
@@ -1562,6 +2213,7 @@ function clearUnitTarget(uId) {
   Units.targetType[uId] = 0;
   Units.targetId[uId] = -1;
   Units.targetUid[uId] = 0;
+  Units.targetLock[uId] = 0;
 }
 
 function resumeUnitOrder(uId) {
@@ -1619,6 +2271,8 @@ function isTargetVisibleToUnit(uId) {
 }
 
 function acquireVisibleTarget(uId) {
+  const kind = Units.kind[uId] || U_SOLDIER;
+  if (!canUnitAutoAcquireEnemy(kind)) return false;
   if (!findNearestEnemy(uId, Units.visionRange[uId])) return false;
   Units.homeX[uId] = Units.x[uId];
   Units.homeY[uId] = Units.y[uId];
@@ -1629,11 +2283,22 @@ function acquireVisibleTarget(uId) {
   return true;
 }
 
+function acquireMedicTarget(uId) {
+  if (!findNearestWoundedAllyUnitNear(Units.faction[uId], uId, Units.x[uId], Units.y[uId], Units.aggroRange[uId], 1e30)) return false;
+  Units.homeX[uId] = Units.x[uId];
+  Units.homeY[uId] = Units.y[uId];
+  clearWaypoint(uId);
+  setUnitTargetUnit(uId, SearchResult[0] | 0);
+  Units.state[uId] = STATE_ATTACK;
+  return true;
+}
+
 function issueMoveOrder(x, y) {
   if (Sel.count === 0) return;
   Engine.joinSquadMode = false;
   const cols = Math.min(Sel.count, 6);
   const spacing = 18;
+  let moved = 0;
   for (let i = 0; i < Sel.count; i++) {
     const id = Sel.ids[i];
     if (!Units.active[id]) continue;
@@ -1641,16 +2306,19 @@ function issueMoveOrder(x, y) {
     const row = (i / cols) | 0;
     const ox = (col - (cols - 1) * 0.5) * spacing;
     const oy = row * spacing;
-    Units.tx[id] = clamp(x + ox, 8, WORLD_SZ - 8);
-    Units.ty[id] = clamp(y + oy, 8, WORLD_SZ - 8);
+    if (!findNearestStandablePoint(x + ox, y + oy, unitMoveMask(Units.kind[id]), TargetPoint, 12)) continue;
+    Units.tx[id] = TargetPoint[0];
+    Units.ty[id] = TargetPoint[1];
     Units.homeX[id] = Units.tx[id];
     Units.homeY[id] = Units.ty[id];
     Units.state[id] = STATE_MOVE;
     Units.order[id] = ORDER_MOVE;
     clearWaypoint(id);
     clearUnitTarget(id);
+    moved++;
   }
-  addPing(x, y);
+  if (moved > 0) addPing(x, y);
+  else UI.msg('Nenhum ponto acessivel para a selecao.', true);
 }
 
 function issueAttackMoveOrder(x, y) {
@@ -1658,6 +2326,7 @@ function issueAttackMoveOrder(x, y) {
   Engine.joinSquadMode = false;
   const cols = Math.min(Sel.count, 6);
   const spacing = 18;
+  let moved = 0;
   for (let i = 0; i < Sel.count; i++) {
     const id = Sel.ids[i];
     if (!Units.active[id]) continue;
@@ -1665,8 +2334,9 @@ function issueAttackMoveOrder(x, y) {
     const row = (i / cols) | 0;
     const ox = (col - (cols - 1) * 0.5) * spacing;
     const oy = row * spacing;
-    Units.tx[id] = clamp(x + ox, 8, WORLD_SZ - 8);
-    Units.ty[id] = clamp(y + oy, 8, WORLD_SZ - 8);
+    if (!findNearestStandablePoint(x + ox, y + oy, unitMoveMask(Units.kind[id]), TargetPoint, 12)) continue;
+    Units.tx[id] = TargetPoint[0];
+    Units.ty[id] = TargetPoint[1];
     Units.homeX[id] = Units.x[id];
     Units.homeY[id] = Units.y[id];
     Units.state[id] = STATE_ATTACK_MOVE;
@@ -1674,8 +2344,10 @@ function issueAttackMoveOrder(x, y) {
     Units.scanTimer[id] = 0;
     clearWaypoint(id);
     clearUnitTarget(id);
+    moved++;
   }
-  addPing(x, y);
+  if (moved > 0) addPing(x, y);
+  else UI.msg('Nenhum ponto acessivel para ataque-movimento.', true);
 }
 
 function issueAttackOrderUnit(targetId) {
@@ -1788,39 +2460,19 @@ function rebuildHash() {
 function findNearestEnemy(unitId, range) {
   const ux = Units.x[unitId], uy = Units.y[unitId], uf = Units.faction[unitId];
   const rr = range * range;
-  const base = hashIndex(ux, uy);
-  const hx = base % HASH_W, hy = (base / HASH_W) | 0;
-  const cellRadius = ((range / HASH_CELL_SIZE) | 0) + 1;
   let bestType = 0;
   let bestId = -1;
   let bestD = rr + 1;
 
-  for (let yy = hy - cellRadius; yy <= hy + cellRadius; yy++) {
-    if (yy < 0 || yy >= HASH_H) continue;
-    for (let xx = hx - cellRadius; xx <= hx + cellRadius; xx++) {
-      if (xx < 0 || xx >= HASH_W) continue;
-      let n = hashHead[yy * HASH_W + xx];
-      while (n !== -1) {
-        if (n !== unitId && Units.active[n] && areEnemies(uf, Units.faction[n])) {
-          const d = distSq(ux, uy, Units.x[n], Units.y[n]);
-          if (d < bestD && d <= rr) {
-            bestD = d; bestId = n; bestType = 1;
-          }
-        }
-        n = hashNext[n];
-      }
-    }
+  if (findNearestEnemyUnitNear(uf, unitId, ux, uy, range, bestD, unitId)) {
+    bestD = SearchResult[1];
+    bestId = SearchResult[0] | 0;
+    bestType = 1;
   }
 
-  // Se não encontrou unidade, procura prédio inimigo próximo por varredura simples.
-  if (bestId === -1) {
-    for (let i = 0; i < MAX_B; i++) {
-      if (!Builds.active[i] || !areEnemies(uf, Builds.faction[i])) continue;
-      const d = distSqToBuildingFromPoint(ux, uy, i);
-      if (d < bestD && d <= rr) {
-        bestD = d; bestId = i; bestType = 2;
-      }
-    }
+  if (bestId === -1 && findNearestEnemyBuildingNear(uf, ux, uy, range, bestD)) {
+    bestId = SearchResult[0] | 0;
+    bestType = 2;
   }
 
   Temp[0] = bestType;
@@ -1847,6 +2499,17 @@ function dealDamageToUnit(attackerId, targetId, amount) {
     Units.homeX[targetId] = Units.x[targetId];
     Units.homeY[targetId] = Units.y[targetId];
   }
+}
+
+function healUnitFromUnit(healerId, targetId, amount) {
+  if (!Units.active[healerId] || !Units.active[targetId]) return;
+  if (Units.faction[healerId] !== Units.faction[targetId]) return;
+  const kind = Units.kind[targetId] || U_SOLDIER;
+  const maxHp = UnitCfg.hp[kind] || 1;
+  if (Units.hp[targetId] >= maxHp) return;
+  Units.hp[targetId] = Math.min(maxHp, Units.hp[targetId] + amount);
+  Units.healFx[targetId] = 0.35;
+  Units.flash[healerId] = FLASH_MAX * 0.35;
 }
 
 function dealBuildingDamageToUnit(attackerBId, targetId, amount) {
@@ -1897,15 +2560,60 @@ function dealSplashDamage(attackerId, cx, cy, radius, amount, primaryId) {
 
 function dealDamageToBuilding(targetId, amount) {
   if (!Builds.active[targetId]) return;
+  const attackerId = arguments.length > 2 ? arguments[2] : -1;
   Builds.hp[targetId] -= amount;
   if (Builds.workState[targetId] !== BUILD_WORK_NONE && Builds.workHp[targetId] > Builds.hp[targetId]) Builds.workHp[targetId] = Builds.hp[targetId];
   Builds.flash[targetId] = FLASH_MAX;
+  notifyBuildingDamaged(targetId, attackerId);
   if (Builds.hp[targetId] <= 0) destroyBuilding(targetId);
+}
+
+function notifyBuildingDamaged(bId, attackerId) {
+  if (!Builds.active[bId]) return;
+  const fId = Builds.faction[bId];
+  const f = Factions[fId];
+  if (!f || !f.isAI) return;
+  if (attackerId >= 0 && Units.active[attackerId] && !areEnemies(fId, Units.faction[attackerId])) return;
+  f.aiAlertTimer = 10.0;
+  f.aiAlertX = (Builds.tx[bId] + Builds.w[bId] * 0.5) * TILE;
+  f.aiAlertY = (Builds.ty[bId] + Builds.h[bId] * 0.5) * TILE;
+  if (attackerId >= 0 && Units.active[attackerId]) {
+    f.aiAlertTargetId = attackerId;
+    f.aiAlertTargetUid = Units.uid[attackerId];
+  } else {
+    f.aiAlertTargetId = -1;
+    f.aiAlertTargetUid = 0;
+  }
+}
+
+function refreshFunctionalHallCache() {
+  FunctionalHallCount = 0;
+  for (let i = 0; i < MAX_B; i++) {
+    if (!Builds.active[i] || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    FunctionalHallIds[FunctionalHallCount++] = i;
+  }
+}
+
+function isPointInsideFriendlyHallRange(fId, x, y) {
+  for (let slot = 0; slot < FunctionalHallCount; slot++) {
+    const i = FunctionalHallIds[slot];
+    if (!Builds.active[i] || Builds.faction[i] !== fId) continue;
+    const hx = (Builds.tx[i] + Builds.w[i] * 0.5) * TILE;
+    const hy = (Builds.ty[i] + Builds.h[i] * 0.5) * TILE;
+    const r = hallBuildRangeTiles(Builds.level[i]) * TILE;
+    if (distSq(x, y, hx, hy) <= r * r) return true;
+  }
+  return false;
 }
 
 function updateUnitRegen(id, dt) {
   const kind = Units.kind[id] || U_SOLDIER;
   const maxHp = UnitCfg.hp[kind] || 1;
+  if (!isPointInsideFriendlyHallRange(Units.faction[id], Units.x[id], Units.y[id])) {
+    Units.regenBank[id] = 0;
+    return;
+  }
   if (Units.combatTimer[id] > 0 || Units.state[id] === STATE_ATTACK || Units.state[id] === STATE_CHASE || Units.hp[id] >= maxHp) {
     Units.regenBank[id] = 0;
     return;
@@ -1925,11 +2633,59 @@ function blockedBuildingAt(x, y) {
   return mapGrid[gy * MAP_SZ + gx];
 }
 
-function isStandable(x, y) {
-  return x >= 8 && y >= 8 && x <= WORLD_SZ - 8 && y <= WORLD_SZ - 8 && blockedBuildingAt(x, y) === -1;
+function blockedMoveAt(x, y, moveMask) {
+  const gx = Math.floor(x / TILE);
+  const gy = Math.floor(y / TILE);
+  if (!isInsideMapTile(gx, gy)) return -2;
+  if (!isTerrainPassableTile(gx, gy, moveMask || MOVE_LAND)) return -3;
+  return mapGrid[gy * MAP_SZ + gx];
 }
 
-function hasClearStepToward(sx, sy, tx, ty) {
+function isStandable(x, y, moveMask) {
+  return x >= 8 && y >= 8 && x <= WORLD_SZ - 8 && y <= WORLD_SZ - 8 && blockedMoveAt(x, y, moveMask || MOVE_LAND) === -1;
+}
+
+function findNearestStandablePoint(x, y, moveMask, out, maxRing) {
+  const mask = moveMask || MOVE_LAND;
+  const px = clamp(x, 8, WORLD_SZ - 8);
+  const py = clamp(y, 8, WORLD_SZ - 8);
+  if (isStandable(px, py, mask)) {
+    out[0] = px;
+    out[1] = py;
+    return true;
+  }
+  const cx = clamp((px / TILE) | 0, 0, MAP_SZ - 1);
+  const cy = clamp((py / TILE) | 0, 0, MAP_SZ - 1);
+  const maxR = maxRing === undefined ? 10 : maxRing;
+  let bestX = 0;
+  let bestY = 0;
+  let bestD = 1e30;
+  for (let r = 1; r <= maxR; r++) {
+    for (let yy = cy - r; yy <= cy + r; yy++) {
+      if (yy < 0 || yy >= MAP_SZ) continue;
+      for (let xx = cx - r; xx <= cx + r; xx++) {
+        if (xx < 0 || xx >= MAP_SZ || (Math.abs(xx - cx) !== r && Math.abs(yy - cy) !== r)) continue;
+        const sx = xx * TILE + TILE * 0.5;
+        const sy = yy * TILE + TILE * 0.5;
+        if (!isStandable(sx, sy, mask)) continue;
+        const d = distSq(px, py, sx, sy);
+        if (d < bestD) {
+          bestD = d;
+          bestX = sx;
+          bestY = sy;
+        }
+      }
+    }
+    if (bestD < 1e29) {
+      out[0] = bestX;
+      out[1] = bestY;
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasClearStepToward(sx, sy, tx, ty, moveMask) {
   const dx = tx - sx;
   const dy = ty - sy;
   const d2 = dx * dx + dy * dy;
@@ -1938,15 +2694,16 @@ function hasClearStepToward(sx, sy, tx, ty) {
   const samples = Math.min(6, Math.max(1, Math.ceil(d / 24)));
   for (let i = 1; i <= samples; i++) {
     const t = i / samples;
-    if (blockedBuildingAt(sx + dx * t, sy + dy * t) !== -1) return false;
+    if (blockedMoveAt(sx + dx * t, sy + dy * t, moveMask || MOVE_LAND) !== -1) return false;
   }
   return true;
 }
 
-function trySetDetour(id, blockerId, finalX, finalY) {
+function trySetDetour(id, blockerId, finalX, finalY, moveMask) {
   if (blockerId < 0 || !Builds.active[blockerId]) return false;
   const ux = Units.x[id];
   const uy = Units.y[id];
+  const mask = moveMask || unitMoveMask(Units.kind[id]);
   let bestX = 0;
   let bestY = 0;
   let bestScore = 1e30;
@@ -1960,13 +2717,13 @@ function trySetDetour(id, blockerId, finalX, finalY) {
     for (let tx = leftTx; tx <= rightTx; tx++) {
       const x = tx * TILE + TILE * 0.5;
       const topY = topTy * TILE + TILE * 0.5;
-      if (isStandable(x, topY) && hasClearStepToward(ux, uy, x, topY)) {
+      if (isStandable(x, topY, mask) && hasClearStepToward(ux, uy, x, topY, mask)) {
         const fromUnit = distSq(ux, uy, x, topY);
         const score = distSq(x, topY, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = x; bestY = topY; }
       }
       const bottomY = bottomTy * TILE + TILE * 0.5;
-      if (isStandable(x, bottomY) && hasClearStepToward(ux, uy, x, bottomY)) {
+      if (isStandable(x, bottomY, mask) && hasClearStepToward(ux, uy, x, bottomY, mask)) {
         const fromUnit = distSq(ux, uy, x, bottomY);
         const score = distSq(x, bottomY, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = x; bestY = bottomY; }
@@ -1976,13 +2733,13 @@ function trySetDetour(id, blockerId, finalX, finalY) {
     for (let ty = topTy + 1; ty < bottomTy; ty++) {
       const y = ty * TILE + TILE * 0.5;
       const leftX = leftTx * TILE + TILE * 0.5;
-      if (isStandable(leftX, y) && hasClearStepToward(ux, uy, leftX, y)) {
+      if (isStandable(leftX, y, mask) && hasClearStepToward(ux, uy, leftX, y, mask)) {
         const fromUnit = distSq(ux, uy, leftX, y);
         const score = distSq(leftX, y, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = leftX; bestY = y; }
       }
       const rightX = rightTx * TILE + TILE * 0.5;
-      if (isStandable(rightX, y) && hasClearStepToward(ux, uy, rightX, y)) {
+      if (isStandable(rightX, y, mask) && hasClearStepToward(ux, uy, rightX, y, mask)) {
         const fromUnit = distSq(ux, uy, rightX, y);
         const score = distSq(rightX, y, finalX, finalY) + fromUnit * 0.25;
         if (fromUnit > 64 && score < bestScore) { bestScore = score; bestX = rightX; bestY = y; }
@@ -1998,21 +2755,22 @@ function trySetDetour(id, blockerId, finalX, finalY) {
   return true;
 }
 
-function findSpawnPointAroundBuilding(bId, out) {
+function findSpawnPointAroundBuilding(bId, out, unitType) {
   const centerX = (Builds.tx[bId] + Builds.w[bId] * 0.5) * TILE;
   const centerY = (Builds.ty[bId] + Builds.h[bId] * 0.5) * TILE;
+  const moveMask = unitType ? unitMoveMask(unitType) : producerMoveMaskForBuildingType(Builds.type[bId]);
   for (let ring = 0; ring <= 5; ring++) {
     const belowY = (Builds.ty[bId] + Builds.h[bId] + ring) * TILE + TILE * 0.5;
-    if (isStandable(centerX, belowY)) { out[0] = centerX; out[1] = belowY; return true; }
+    if (isStandable(centerX, belowY, moveMask)) { out[0] = centerX; out[1] = belowY; return true; }
 
     const rightX = (Builds.tx[bId] + Builds.w[bId] + ring) * TILE + TILE * 0.5;
-    if (isStandable(rightX, centerY)) { out[0] = rightX; out[1] = centerY; return true; }
+    if (isStandable(rightX, centerY, moveMask)) { out[0] = rightX; out[1] = centerY; return true; }
 
     const leftX = (Builds.tx[bId] - 1 - ring) * TILE + TILE * 0.5;
-    if (isStandable(leftX, centerY)) { out[0] = leftX; out[1] = centerY; return true; }
+    if (isStandable(leftX, centerY, moveMask)) { out[0] = leftX; out[1] = centerY; return true; }
 
     const aboveY = (Builds.ty[bId] - 1 - ring) * TILE + TILE * 0.5;
-    if (isStandable(centerX, aboveY)) { out[0] = centerX; out[1] = aboveY; return true; }
+    if (isStandable(centerX, aboveY, moveMask)) { out[0] = centerX; out[1] = aboveY; return true; }
 
     const leftTx = Builds.tx[bId] - 1 - ring;
     const rightTx = Builds.tx[bId] + Builds.w[bId] + ring;
@@ -2021,30 +2779,32 @@ function findSpawnPointAroundBuilding(bId, out) {
     for (let tx = leftTx; tx <= rightTx; tx++) {
       const x = tx * TILE + TILE * 0.5;
       const topY = topTy * TILE + TILE * 0.5;
-      if (isStandable(x, topY)) { out[0] = x; out[1] = topY; return true; }
+      if (isStandable(x, topY, moveMask)) { out[0] = x; out[1] = topY; return true; }
       const bottomY = bottomTy * TILE + TILE * 0.5;
-      if (isStandable(x, bottomY)) { out[0] = x; out[1] = bottomY; return true; }
+      if (isStandable(x, bottomY, moveMask)) { out[0] = x; out[1] = bottomY; return true; }
     }
     for (let ty = topTy + 1; ty < bottomTy; ty++) {
       const y = ty * TILE + TILE * 0.5;
       const leftX = leftTx * TILE + TILE * 0.5;
-      if (isStandable(leftX, y)) { out[0] = leftX; out[1] = y; return true; }
+      if (isStandable(leftX, y, moveMask)) { out[0] = leftX; out[1] = y; return true; }
       const rightX = rightTx * TILE + TILE * 0.5;
-      if (isStandable(rightX, y)) { out[0] = rightX; out[1] = y; return true; }
+      if (isStandable(rightX, y, moveMask)) { out[0] = rightX; out[1] = y; return true; }
     }
   }
   return false;
 }
 
 function setUnitMoveOrder(id, x, y) {
-  Units.tx[id] = clamp(x, 8, WORLD_SZ - 8);
-  Units.ty[id] = clamp(y, 8, WORLD_SZ - 8);
+  if (!findNearestStandablePoint(x, y, unitMoveMask(Units.kind[id]), TargetPoint, 12)) return false;
+  Units.tx[id] = TargetPoint[0];
+  Units.ty[id] = TargetPoint[1];
   Units.homeX[id] = Units.tx[id];
   Units.homeY[id] = Units.ty[id];
   Units.state[id] = STATE_MOVE;
   Units.order[id] = ORDER_MOVE;
   clearWaypoint(id);
   clearUnitTarget(id);
+  return true;
 }
 
 function chooseProducerLoiterPoint(bId, uId, out) {
@@ -2055,12 +2815,14 @@ function chooseProducerLoiterPoint(bId, uId, out) {
   const radius = 48 + (seed % 4) * 16;
   let x = clamp(cx + Math.cos(angle) * radius, 8, WORLD_SZ - 8);
   let y = clamp(cy + Math.sin(angle) * radius, 8, WORLD_SZ - 8);
-  if (!isStandable(x, y) && !findSpawnPointAroundBuilding(bId, out)) {
+  const unitType = Units.kind[uId] || U_SOLDIER;
+  const moveMask = unitMoveMask(unitType);
+  if (!isStandable(x, y, moveMask) && !findSpawnPointAroundBuilding(bId, out, unitType)) {
     out[0] = Units.x[uId];
     out[1] = Units.y[uId];
     return;
   }
-  if (isStandable(x, y)) {
+  if (isStandable(x, y, moveMask)) {
     out[0] = x;
     out[1] = y;
   }
@@ -2080,6 +2842,11 @@ function sendFreshUnitFromProducer(uId, bId) {
 function moveUnitStep(id, dt, targetX, targetY) {
   let moveX = targetX;
   let moveY = targetY;
+  const moveMask = unitMoveMask(Units.kind[id]);
+  if ((!isTerrainPassableWorld(moveX, moveY, moveMask) || blockedBuildingAt(moveX, moveY) >= 0) && findNearestStandablePoint(moveX, moveY, moveMask, SearchResult, 6)) {
+    moveX = SearchResult[0];
+    moveY = SearchResult[1];
+  }
   if (Units.hasWaypoint[id]) {
     const wdx = Units.wayX[id] - Units.x[id];
     const wdy = Units.wayY[id] - Units.y[id];
@@ -2105,7 +2872,7 @@ function moveUnitStep(id, dt, targetX, targetY) {
   const step = Units.speed[id] * dt;
   const nx = Units.x[id] + (dx / d) * step;
   const ny = Units.y[id] + (dy / d) * step;
-  let blocker = blockedBuildingAt(nx, ny);
+  let blocker = blockedMoveAt(nx, ny, moveMask);
 
   if (blocker === -1) {
     Units.x[id] = clamp(nx, 8, WORLD_SZ - 8);
@@ -2113,25 +2880,25 @@ function moveUnitStep(id, dt, targetX, targetY) {
     Units.blockedTime[id] = 0;
   } else {
     Units.blockedTime[id] += dt;
-    if (blocker >= 0 && !Units.hasWaypoint[id] && Units.blockedTime[id] > 0.05 && trySetDetour(id, blocker, targetX, targetY)) return false;
-    const blockX = blockedBuildingAt(nx, Units.y[id]);
-    const blockY = blockedBuildingAt(Units.x[id], ny);
+    if (blocker >= 0 && !Units.hasWaypoint[id] && Units.blockedTime[id] > 0.05 && trySetDetour(id, blocker, targetX, targetY, moveMask)) return false;
+    const blockX = blockedMoveAt(nx, Units.y[id], moveMask);
+    const blockY = blockedMoveAt(Units.x[id], ny, moveMask);
     if (blockX === -1) {
       Units.x[id] = clamp(nx, 8, WORLD_SZ - 8);
       if (blocker >= 0 && Units.blockedTime[id] > 0.12) {
-        if (trySetDetour(id, blocker, targetX, targetY)) return false;
+        if (trySetDetour(id, blocker, targetX, targetY, moveMask)) return false;
         Units.blockedTime[id] = 0;
       }
     } else if (blockY === -1) {
       Units.y[id] = clamp(ny, 8, WORLD_SZ - 8);
       if (blocker >= 0 && Units.blockedTime[id] > 0.12) {
-        if (trySetDetour(id, blocker, targetX, targetY)) return false;
+        if (trySetDetour(id, blocker, targetX, targetY, moveMask)) return false;
         Units.blockedTime[id] = 0;
       }
     } else {
       if (blocker < 0) blocker = blockX >= 0 ? blockX : blockY;
       if (Units.blockedTime[id] > 0.05 || !Units.hasWaypoint[id]) {
-        if (!trySetDetour(id, blocker, targetX, targetY)) Units.blockedTime[id] = 0;
+        if (!trySetDetour(id, blocker, targetX, targetY, moveMask)) Units.blockedTime[id] = 0;
       }
     }
   }
@@ -2145,6 +2912,7 @@ function updateUnits(dt) {
     if (Units.cooldown[i] > 0) Units.cooldown[i] -= dt;
     if (Units.cooldown[i] < 0) Units.cooldown[i] = 0;
     if (Units.scanTimer[i] > 0) Units.scanTimer[i] -= dt;
+    if (Units.targetLock[i] > 0) Units.targetLock[i] -= dt;
     if (Units.flash[i] > 0) Units.flash[i] -= dt;
     if (Units.combatTimer[i] > 0) Units.combatTimer[i] -= dt;
     if (Units.healFx[i] > 0) Units.healFx[i] -= dt;
@@ -2152,7 +2920,8 @@ function updateUnits(dt) {
     // Ordem manual de movimento tem prioridade; auto-ataque só assume tropas ociosas ou em ataque-movimento.
     if ((Units.state[i] === STATE_IDLE || Units.state[i] === STATE_ATTACK_MOVE) && Units.scanTimer[i] <= 0) {
       Units.scanTimer[i] = RETARGET_INTERVAL + (i % 3) * 0.03;
-      acquireVisibleTarget(i);
+      if (Units.kind[i] === U_MEDIC) acquireMedicTarget(i);
+      else acquireVisibleTarget(i);
     }
     updateUnitRegen(i, dt);
 
@@ -2180,7 +2949,7 @@ function updateUnits(dt) {
         continue;
       }
 
-      if (Units.order[i] !== ORDER_ATTACK && !isTargetVisibleToUnit(i)) {
+      if (Units.order[i] !== ORDER_ATTACK && Units.targetLock[i] <= 0 && !isTargetVisibleToUnit(i)) {
         resumeUnitOrder(i);
         continue;
       }
@@ -2199,18 +2968,36 @@ function updateUnits(dt) {
       if (d2 <= attackR2) {
         Units.state[i] = STATE_ATTACK;
         if (Units.cooldown[i] <= 0) {
-          addAttackFx(Units.kind[i], Units.x[i], Units.y[i], tx, ty, Units.faction[i]);
-          if (Units.targetType[i] === 1) {
+          const selfKind = Units.kind[i] || U_SOLDIER;
+          if (selfKind === U_MEDIC) {
+            if (Units.targetType[i] !== 1 || !Units.active[Units.targetId[i]] || Units.faction[Units.targetId[i]] !== Units.faction[i]) {
+              resumeUnitOrder(i);
+              continue;
+            }
+            const targetId = Units.targetId[i];
+            const maxHp = UnitCfg.hp[Units.kind[targetId] || U_SOLDIER] || 1;
+            if (Units.hp[targetId] >= maxHp) {
+              resumeUnitOrder(i);
+              continue;
+            }
+            healUnitFromUnit(i, targetId, Units.damage[i]);
+          } else if (!canUnitAutoAcquireEnemy(selfKind)) {
+            resumeUnitOrder(i);
+            continue;
+          } else {
+            addAttackFx(selfKind, Units.x[i], Units.y[i], tx, ty, Units.faction[i]);
+            if (Units.targetType[i] === 1) {
             const targetId = Units.targetId[i];
             const sx = Units.active[targetId] ? Units.x[targetId] : tx;
             const sy = Units.active[targetId] ? Units.y[targetId] : ty;
             dealDamageToUnit(i, targetId, Units.damage[i]);
-            dealSplashDamage(i, sx, sy, UnitCfg.splashRadius[Units.kind[i]] || 0, Units.damage[i], targetId);
-          } else if (Units.targetType[i] === 2) {
-            Units.combatTimer[i] = UNIT_REGEN_DELAY;
-            dealDamageToBuilding(Units.targetId[i], Units.damage[i]);
+              dealSplashDamage(i, sx, sy, UnitCfg.splashRadius[selfKind] || 0, Units.damage[i], targetId);
+            } else if (Units.targetType[i] === 2) {
+              Units.combatTimer[i] = UNIT_REGEN_DELAY;
+              dealDamageToBuilding(Units.targetId[i], Units.damage[i], i);
+            }
           }
-          Units.cooldown[i] = UnitCfg.cooldown[Units.kind[i]];
+          Units.cooldown[i] = UnitCfg.cooldown[selfKind];
         }
       } else {
         Units.state[i] = STATE_CHASE;
@@ -2221,10 +3008,35 @@ function updateUnits(dt) {
   }
 }
 
+function separationBalanceFactor(selfBalance, otherBalance) {
+  const self = Math.max(1, selfBalance);
+  const other = Math.max(1, otherBalance);
+  if (other < self) {
+    const ratio = other / self;
+    let factor = ratio * ratio * ratio * ratio * ratio;
+    const gap = self - other;
+    if (gap >= 15) factor *= 0.18;
+    if (gap >= 40) factor *= 0.35;
+    return clamp(factor, 0.006, 0.65);
+  }
+  const ratio = other / self;
+  return clamp(1 + (ratio - 1) * 0.9, 1, 2.45);
+}
+
+function separationCrowdDamp(selfBalance, closeCount) {
+  if (closeCount <= 1) return 1;
+  if (selfBalance >= 70) return 1 / (1 + closeCount * 0.75);
+  return 1 / Math.sqrt(closeCount);
+}
+
 function applyUnitSeparation(dt) {
   const strength = Math.min(1, dt * 30) * UNIT_SEPARATION_PUSH;
   for (let i = 0; i < MAX_U; i++) {
     if (!Units.active[i]) continue;
+    const selfKind = Units.kind[i] || U_SOLDIER;
+    const selfRadius = UnitCfg.hitRadius[selfKind];
+    const selfBalance = UnitCfg.equilibrio[selfKind] || 50;
+    const moveMask = unitMoveMask(selfKind);
     const ux = Units.x[i];
     const uy = Units.y[i];
     const base = hashIndex(ux, uy);
@@ -2241,21 +3053,24 @@ function applyUnitSeparation(dt) {
         let n = hashHead[yy * HASH_W + xx];
         while (n !== -1) {
           if (n !== i && Units.active[n]) {
-            const minDist = (UnitCfg.hitRadius[Units.kind[i]] + UnitCfg.hitRadius[Units.kind[n]]) * UNIT_SEPARATION_SCALE;
+            const otherKind = Units.kind[n] || U_SOLDIER;
+            const otherBalance = UnitCfg.equilibrio[otherKind] || 50;
+            const balanceFactor = separationBalanceFactor(selfBalance, otherBalance);
+            const minDist = (selfRadius + UnitCfg.hitRadius[otherKind]) * UNIT_SEPARATION_SCALE;
             const minD2 = minDist * minDist;
             let dx = ux - Units.x[n];
             let dy = uy - Units.y[n];
             let d2 = dx * dx + dy * dy;
             if (d2 > 0.01 && d2 < minD2) {
               const d = Math.sqrt(d2);
-              const force = (minDist - d) / minDist;
+              const force = ((minDist - d) / minDist) * balanceFactor;
               pushX += (dx / d) * force;
               pushY += (dy / d) * force;
               closeCount++;
             } else if (d2 <= 0.01) {
               const angle = (Units.uid[i] * 2.399963) + (n * 0.37);
-              pushX += Math.cos(angle);
-              pushY += Math.sin(angle);
+              pushX += Math.cos(angle) * balanceFactor;
+              pushY += Math.sin(angle) * balanceFactor;
               closeCount++;
             }
           }
@@ -2268,18 +3083,18 @@ function applyUnitSeparation(dt) {
     let pushD2 = pushX * pushX + pushY * pushY;
     if (pushD2 <= 0.0001) continue;
     let pushD = Math.sqrt(pushD2);
-    let step = Math.min(UNIT_SEPARATION_MAX, pushD * 10 * strength);
+    let step = Math.min(UNIT_SEPARATION_MAX, pushD * 10 * strength * separationCrowdDamp(selfBalance, closeCount));
     let nx = ux + (pushX / pushD) * step;
     let ny = uy + (pushY / pushD) * step;
 
-    if (isStandable(nx, ny)) {
+    if (isStandable(nx, ny, moveMask)) {
       Units.x[i] = nx;
       Units.y[i] = ny;
     } else {
       const onlyX = ux + (pushX / pushD) * step;
       const onlyY = uy + (pushY / pushD) * step;
-      if (isStandable(onlyX, uy)) Units.x[i] = onlyX;
-      else if (isStandable(ux, onlyY)) Units.y[i] = onlyY;
+      if (isStandable(onlyX, uy, moveMask)) Units.x[i] = onlyX;
+      else if (isStandable(ux, onlyY, moveMask)) Units.y[i] = onlyY;
     }
   }
 }
@@ -2304,14 +3119,13 @@ function updateBuildingCombat(dt) {
     const cy = (Builds.ty[b] + Builds.h[b] * 0.5) * TILE;
     const rr = range * range;
     let best = -1;
-    let bestD = rr + 1;
-    for (let u = 0; u < MAX_U; u++) {
-      if (!Units.active[u] || !areEnemies(Builds.faction[b], Units.faction[u])) continue;
-      const d = distSq(cx, cy, Units.x[u], Units.y[u]);
-      if (d < bestD && d <= rr) { bestD = d; best = u; }
-    }
+    if (findNearestEnemyUnitNear(Builds.faction[b], -1, cx, cy, range, rr + 1)) best = SearchResult[0] | 0;
     if (best !== -1) {
       dealBuildingDamageToUnit(b, best, buildingAttackDamage(type, Builds.level[b]));
+      if (type === B_TRAP) {
+        destroyBuilding(b);
+        continue;
+      }
       Builds.cooldown[b] = buildingAttackCooldown(type, Builds.level[b]);
     } else {
       Builds.cooldown[b] = 0.25;
@@ -2369,9 +3183,10 @@ function updateEconomy(dt) {
     const f = Factions[Builds.faction[i]];
     const inc = BuildCfg[Builds.type[i]].income;
     const level = Builds.level[i] || 1;
-    f.wood += inc[0] * level;
-    f.stone += inc[1] * level;
-    f.grain += inc[2] * level;
+    const mult = resourceMultiplierForFaction(Builds.faction[i]);
+    f.wood += inc[0] * level * mult;
+    f.stone += inc[1] * level * mult;
+    f.grain += inc[2] * level * mult;
   }
   UI.updateRes();
 }
@@ -2403,6 +3218,7 @@ function queueUnitFromProducer(bId, unitType) {
 }
 
 function updateProduction(dt) {
+  let hashDirty = false;
   for (let i = 0; i < MAX_B; i++) {
     if (!Builds.active[i] || !isMilitaryProducerType(Builds.type[i]) || Builds.queueCount[i] === 0) continue;
     if (Builds.workState[i] !== BUILD_WORK_NONE) continue;
@@ -2417,7 +3233,7 @@ function updateProduction(dt) {
         Builds.queue[i] = 0.5;
         continue;
       }
-      if (!findSpawnPointAroundBuilding(i, SpawnPoint)) {
+      if (!findSpawnPointAroundBuilding(i, SpawnPoint, unitType)) {
         Factions[fId].wood += refundW;
         Factions[fId].stone += refundS;
         Factions[fId].grain += refundG;
@@ -2443,10 +3259,12 @@ function updateProduction(dt) {
       Units.homeX[u] = Units.x[u];
       Units.homeY[u] = Units.y[u];
       sendFreshUnitFromProducer(u, i);
+      hashDirty = true;
       popUnitQueue(i);
       if (fId === 0) UI.updateUnitHud();
     }
   }
+  return hashDirty;
 }
 
 function updatePings(dt) {
@@ -2464,6 +3282,119 @@ function updatePings(dt) {
   }
 }
 
+function resetCaptureZones() {
+  CaptureZones.enabled = false;
+  CaptureZones.count = 0;
+  CaptureZones.owner.fill(-1);
+  CaptureZones.progress.fill(0);
+  CaptureZones.contender.fill(-1);
+}
+
+function isCaptureZoneFarEnough(x, y) {
+  const minZoneD = Math.max(360, WORLD_SZ * 0.12);
+  const minHallD = Math.max(300, WORLD_SZ * 0.10);
+  for (let i = 0; i < CaptureZones.count; i++) {
+    if (distSq(x, y, CaptureZones.x[i], CaptureZones.y[i]) < minZoneD * minZoneD) return false;
+  }
+  for (let b = 0; b < MAX_B; b++) {
+    if (!Builds.active[b] || Builds.type[b] !== B_HALL) continue;
+    const hx = (Builds.tx[b] + Builds.w[b] * 0.5) * TILE;
+    const hy = (Builds.ty[b] + Builds.h[b] * 0.5) * TILE;
+    if (distSq(x, y, hx, hy) < minHallD * minHallD) return false;
+  }
+  return true;
+}
+
+function generateCaptureZones(enabled) {
+  resetCaptureZones();
+  Engine.captureZonesEnabled = !!enabled;
+  CaptureZones.enabled = !!enabled;
+  if (!enabled) return;
+  const desired = Math.min(MAX_CAPTURE_ZONES, MAP_SZ >= 168 ? 7 : (MAP_SZ >= 120 ? 6 : (MAP_SZ >= 76 ? 5 : 3)));
+  const margin = Math.max(6, Math.floor(MAP_SZ * 0.12));
+  for (let attempt = 0; attempt < desired * 90 && CaptureZones.count < desired; attempt++) {
+    const tx = margin + ((terrainRand() * (MAP_SZ - margin * 2)) | 0);
+    const ty = margin + ((terrainRand() * (MAP_SZ - margin * 2)) | 0);
+    const x = tx * TILE + TILE * 0.5;
+    const y = ty * TILE + TILE * 0.5;
+    if (!isStandable(x, y, MOVE_LAND)) continue;
+    if (!isCaptureZoneFarEnough(x, y)) continue;
+    const id = CaptureZones.count++;
+    CaptureZones.x[id] = x;
+    CaptureZones.y[id] = y;
+    CaptureZones.owner[id] = -1;
+    CaptureZones.progress[id] = 0;
+    CaptureZones.contender[id] = -1;
+  }
+}
+
+function updateCaptureZones(dt) {
+  if (!CaptureZones.enabled) return;
+  const rr = CAPTURE_RADIUS * CAPTURE_RADIUS;
+  const cellRadius = ((CAPTURE_RADIUS / HASH_CELL_SIZE) | 0) + 1;
+  for (let z = 0; z < CaptureZones.count; z++) {
+    const x = CaptureZones.x[z];
+    const y = CaptureZones.y[z];
+    const base = hashIndex(x, y);
+    const hx = base % HASH_W;
+    const hy = (base / HASH_W) | 0;
+    let teamMask = 0;
+    let factionId = -1;
+    for (let yy = hy - cellRadius; yy <= hy + cellRadius; yy++) {
+      if (yy < 0 || yy >= HASH_H) continue;
+      for (let xx = hx - cellRadius; xx <= hx + cellRadius; xx++) {
+        if (xx < 0 || xx >= HASH_W) continue;
+        let n = hashHead[yy * HASH_W + xx];
+        while (n !== -1) {
+          if (Units.active[n] && unitMoveMask(Units.kind[n]) === MOVE_LAND && distSq(x, y, Units.x[n], Units.y[n]) <= rr) {
+            const fId = Units.faction[n];
+            const team = Factions[fId] ? Factions[fId].team : fId;
+            teamMask |= 1 << clamp(team, 0, 30);
+            if (factionId === -1) factionId = fId;
+          }
+          n = hashNext[n];
+        }
+      }
+    }
+    const singleTeam = teamMask !== 0 && (teamMask & (teamMask - 1)) === 0;
+    if (singleTeam && factionId !== -1 && CaptureZones.owner[z] !== factionId) {
+      if (CaptureZones.contender[z] !== factionId) {
+        CaptureZones.contender[z] = factionId;
+        CaptureZones.progress[z] = 0;
+      }
+      CaptureZones.progress[z] += dt / CAPTURE_TIME;
+      if (CaptureZones.progress[z] >= 1) {
+        CaptureZones.owner[z] = factionId;
+        CaptureZones.progress[z] = 0;
+      }
+    } else if (!singleTeam || factionId === -1) {
+      CaptureZones.progress[z] = Math.max(0, CaptureZones.progress[z] - dt * 0.18);
+      if (CaptureZones.progress[z] === 0) CaptureZones.contender[z] = -1;
+    } else {
+      CaptureZones.progress[z] = 0;
+      CaptureZones.contender[z] = -1;
+    }
+  }
+}
+
+function findCaptureZoneTargetForFaction(fId, enemyOnly) {
+  if (!CaptureZones.enabled || CaptureZones.count === 0) return -1;
+  const hall = findHall(fId);
+  const hx = hall !== -1 ? (Builds.tx[hall] + Builds.w[hall] * 0.5) * TILE : WORLD_SZ * 0.5;
+  const hy = hall !== -1 ? (Builds.ty[hall] + Builds.h[hall] * 0.5) * TILE : WORLD_SZ * 0.5;
+  let best = -1;
+  let bestScore = 1e30;
+  for (let z = 0; z < CaptureZones.count; z++) {
+    const owner = CaptureZones.owner[z];
+    if (owner === fId) continue;
+    if (enemyOnly && (owner < 0 || !areEnemies(fId, owner))) continue;
+    const d = distSq(hx, hy, CaptureZones.x[z], CaptureZones.y[z]);
+    const score = d + (owner < 0 ? 0 : -WORLD_SZ * 6);
+    if (score < bestScore) { bestScore = score; best = z; }
+  }
+  return best;
+}
+
 function updateAttackFx(dt) {
   for (let i = 0; i < MAX_ATTACK_FX; i++) {
     if (!AttackFx.active[i]) continue;
@@ -2472,9 +3403,46 @@ function updateAttackFx(dt) {
   }
 }
 
-function countUnitsByFaction(fId) {
+function updateTargetLines(dt) {
+  for (let i = 0; i < MAX_U; i++) {
+    if (!Units.active[i]) continue;
+    if ((Units.state[i] === STATE_ATTACK || Units.state[i] === STATE_CHASE) && getTargetPoint(i, TargetPoint)) {
+      const currentAlpha = Units.targetLineAlpha[i];
+      const targetX = TargetPoint[0];
+      const targetY = TargetPoint[1];
+      if (currentAlpha <= 0.02 || distSq(Units.targetLineX[i], Units.targetLineY[i], targetX, targetY) > 160 * 160) {
+        Units.targetLineX[i] = targetX;
+        Units.targetLineY[i] = targetY;
+      } else {
+        const blend = Math.min(1, dt * 8);
+        Units.targetLineX[i] += (targetX - Units.targetLineX[i]) * blend;
+        Units.targetLineY[i] += (targetY - Units.targetLineY[i]) * blend;
+      }
+      Units.targetLineAlpha[i] = Math.min(1, currentAlpha + dt * 5.5);
+    } else if (Units.targetLineAlpha[i] > 0) {
+      Units.targetLineAlpha[i] = Math.max(0, Units.targetLineAlpha[i] - dt * 4.2);
+    }
+  }
+}
+
+function countCombatUnitsByFaction(fId) {
   let c = 0;
-  for (let i = 0; i < MAX_U; i++) if (Units.active[i] && Units.faction[i] === fId) c++;
+  for (let i = 0; i < MAX_U; i++) {
+    if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    if (canUnitAutoAcquireEnemy(Units.kind[i] || U_SOLDIER)) c++;
+  }
+  return c;
+}
+
+function countUnitsOfKindByFaction(fId, kind) {
+  let c = 0;
+  for (let i = 0; i < MAX_U; i++) if (Units.active[i] && Units.faction[i] === fId && Units.kind[i] === kind) c++;
+  return c;
+}
+
+function countBuildingsOfType(fId, type) {
+  let c = 0;
+  for (let i = 0; i < MAX_B; i++) if (Builds.active[i] && Builds.faction[i] === fId && Builds.type[i] === type) c++;
   return c;
 }
 
@@ -2500,12 +3468,13 @@ function canQueueUnit(fId, unitType) {
 }
 
 function getUnitCap(fId) {
+  let cap = 0;
   for (let i = 0; i < MAX_B; i++) {
-    if (Builds.active[i] && Builds.faction[i] === fId && Builds.type[i] === B_HALL) {
-      return Builds.level[i] * HALL_UNIT_CAP_STEP;
-    }
+    if (!Builds.active[i] || Builds.faction[i] !== fId || Builds.type[i] !== B_HALL) continue;
+    if (Builds.workState[i] === BUILD_WORK_CONSTRUCT) continue;
+    cap += Builds.level[i] * HALL_UNIT_CAP_STEP;
   }
-  return 0;
+  return cap;
 }
 
 function canTrainUnit(fId, unitType) {
@@ -2547,7 +3516,7 @@ function findHall(fId) {
 }
 
 function findAnyBuildingOfFaction(fId) {
-  for (let i = 0; i < MAX_B; i++) if (Builds.active[i] && Builds.faction[i] === fId) return i;
+  for (let i = 0; i < MAX_B; i++) if (Builds.active[i] && Builds.faction[i] === fId && Builds.type[i] !== B_TRAP) return i;
   return -1;
 }
 
@@ -2558,6 +3527,7 @@ function factionHasAnyBuilding(fId) {
 function findVisibleEnemyForFaction(fId) {
   for (let i = 0; i < MAX_U; i++) {
     if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    if (!canUnitAutoAcquireEnemy(Units.kind[i] || U_SOLDIER)) continue;
     if (findNearestEnemy(i, Units.visionRange[i])) return true;
   }
 
@@ -2569,18 +3539,17 @@ function findVisibleEnemyForFaction(fId) {
     const cx = (Builds.tx[b] + Builds.w[b] * 0.5) * TILE;
     const cy = (Builds.ty[b] + Builds.h[b] * 0.5) * TILE;
     const vr = BuildCfg[Builds.type[b]].vision || 0;
-    const rr = vr * vr;
 
-    for (let u = 0; u < MAX_U; u++) {
-      if (!Units.active[u] || !areEnemies(fId, Units.faction[u])) continue;
-      const d = distSq(cx, cy, Units.x[u], Units.y[u]);
-      if (d <= rr && d < bestD) { bestD = d; bestType = 1; bestId = u; }
+    if (findNearestEnemyUnitNear(fId, -1, cx, cy, vr, bestD)) {
+      bestD = SearchResult[1];
+      bestType = 1;
+      bestId = SearchResult[0] | 0;
     }
 
-    for (let eb = 0; eb < MAX_B; eb++) {
-      if (!Builds.active[eb] || !areEnemies(fId, Builds.faction[eb])) continue;
-      const d = distSqToBuildingFromPoint(cx, cy, eb);
-      if (d <= rr && d < bestD) { bestD = d; bestType = 2; bestId = eb; }
+    if (findNearestEnemyBuildingNear(fId, cx, cy, vr, bestD)) {
+      bestD = SearchResult[1];
+      bestType = 2;
+      bestId = SearchResult[0] | 0;
     }
   }
 
@@ -2589,14 +3558,12 @@ function findVisibleEnemyForFaction(fId) {
   return bestId !== -1;
 }
 
-function tryBuildForFaction(fId, type, nearTx, nearTy, radius) {
-  const cfg = BuildCfg[type];
-  const f = Factions[fId];
-  if (!canStartBuildingForFaction(fId, type)) return false;
+function tryBuildForFaction(fId, type, nearTx, nearTy, radius, builderUnit) {
+  const builder = builderUnit === undefined ? -1 : builderUnit;
+  if (!canStartBuildingForFaction(fId, type, builder)) return false;
   if (bFree.length === 0) return false;
-  if (!canAfford(fId, type)) return false;
-  const hall = findHall(fId);
-  const maxRadius = hall === -1 ? radius : Math.min(radius, hallBuildRangeTiles(Builds.level[hall]));
+  if (!canAfford(fId, type, builder)) return false;
+  const maxRadius = type === B_HALL && builder >= 0 ? Math.min(radius, ENGINEER_BUILD_RANGE_TILES) : radius;
   const innerRadius = Math.max(1, Math.floor(maxRadius * 0.65));
 
   for (let r = 1; r <= maxRadius; r++) {
@@ -2605,9 +3572,10 @@ function tryBuildForFaction(fId, type, nearTx, nearTy, radius) {
         const tx = nearTx + dx;
         const ty = nearTy + dy;
         if (r > innerRadius && Math.abs(dx) < innerRadius && Math.abs(dy) < innerRadius) continue;
-        if (canPlaceBuildingForFaction(fId, type, tx, ty)) {
-          payForBuild(fId, type);
-          const b = spawnBuilding(fId, type, tx, ty);
+        if (canPlaceBuildingForFactionWithBuilder(fId, type, tx, ty, 0, builder)) {
+          const anchorHall = isLimitedBuildType(type) ? findBuildAnchorHallForType(fId, type, tx, ty, 0) : -1;
+          payForBuild(fId, type, builder);
+          const b = spawnBuilding(fId, type, tx, ty, false, 0, anchorHall);
           if (b !== -1) {
             if (fId === 0) {
               UI.updateRes();
@@ -2615,7 +3583,7 @@ function tryBuildForFaction(fId, type, nearTx, nearTy, radius) {
             }
             return true;
           }
-          refundBuild(fId, type);
+          refundBuild(fId, type, builder);
         }
       }
     }
@@ -2638,6 +3606,8 @@ function markBotDefenseReserve(fId, reserve) {
     let bestD = 1e30;
     for (let i = 0; i < MAX_U; i++) {
       if (!Units.active[i] || Units.faction[i] !== fId) continue;
+      const kind = Units.kind[i] || U_SOLDIER;
+      if (kind !== U_MEDIC && !canUnitAutoAcquireEnemy(kind)) continue;
       let already = false;
       for (let k = 0; k < found; k++) if (BotReserveIds[k] === i) { already = true; break; }
       if (already) continue;
@@ -2655,16 +3625,47 @@ function isReservedBotUnit(id, reserveCount) {
   return false;
 }
 
-function orderFactionAttackMove(fId, x, y, reserve) {
+function botDefenseReserveCount(diff, army, defenseThreat) {
+  const base = Math.max(BotDiffCfg.defenseReserve[diff] || 0, Math.ceil(army * BOT_MIN_DEFENSE_FRACTION));
+  return base + (defenseThreat ? 2 : 0);
+}
+
+function botStrategicGroupLimit(diff, army, reserve) {
+  const available = Math.max(0, army - reserve);
+  if (diff === BOT_DIFF_TRAINING) return Math.max(0, Math.min(available, Math.ceil(army * 0.55)));
+  if (diff === BOT_DIFF_NORMAL) return Math.max(0, Math.min(available, Math.ceil(army * 0.68)));
+  return available;
+}
+
+function botScoutGroupSize(diff, army) {
+  if (army < BOT_MIN_SCOUT_ARMY) return 0;
+  if (diff === BOT_DIFF_TRAINING) return 1;
+  if (diff === BOT_DIFF_NORMAL) return army >= 18 ? 2 : 1;
+  return army >= 24 ? 3 : 2;
+}
+
+function botScoutScore(kind) {
+  if (kind === U_CAVALRY) return 120;
+  if (kind === U_CHARIOT) return 105;
+  if (kind === U_ELEPHANT || kind === U_RAM || kind === U_BALLISTA || kind === U_CATAPULT) return -80;
+  return UnitCfg.speed[kind] || 0;
+}
+
+function orderFactionAttackMove(fId, x, y, reserve, groupLimit) {
   const reserveCount = markBotDefenseReserve(fId, reserve || 0);
   let count = 0;
+  const limit = groupLimit === undefined ? MAX_U : Math.max(0, groupLimit | 0);
   for (let i = 0; i < MAX_U; i++) {
+    if (count >= limit) break;
     if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    const kind = Units.kind[i] || U_SOLDIER;
+    if (kind !== U_MEDIC && !canUnitAutoAcquireEnemy(kind)) continue;
     if (isReservedBotUnit(i, reserveCount)) continue;
     const col = count % 6;
     const row = (count / 6) | 0;
-    Units.tx[i] = clamp(x + (col - 2.5) * 18, 8, WORLD_SZ - 8);
-    Units.ty[i] = clamp(y + row * 18, 8, WORLD_SZ - 8);
+    if (!findNearestStandablePoint(x + (col - 2.5) * 18, y + row * 18, unitMoveMask(kind), TargetPoint, 14)) continue;
+    Units.tx[i] = TargetPoint[0];
+    Units.ty[i] = TargetPoint[1];
     Units.homeX[i] = Units.x[i];
     Units.homeY[i] = Units.y[i];
     Units.order[i] = ORDER_ATTACK_MOVE;
@@ -2672,6 +3673,131 @@ function orderFactionAttackMove(fId, x, y, reserve) {
     clearWaypoint(i);
     clearUnitTarget(i);
     count++;
+  }
+  return count;
+}
+
+function orderBotScoutGroup(fId, x, y, diff, army, reserve) {
+  const groupSize = botScoutGroupSize(diff, army);
+  if (groupSize <= 0) return 0;
+  const reserveCount = markBotDefenseReserve(fId, reserve || 0);
+  BotGroupIds.fill(-1);
+  let found = 0;
+
+  for (let slot = 0; slot < groupSize && slot < BotGroupIds.length; slot++) {
+    let best = -1;
+    let bestScore = -1e30;
+    for (let i = 0; i < MAX_U; i++) {
+      if (!Units.active[i] || Units.faction[i] !== fId) continue;
+      if (isReservedBotUnit(i, reserveCount)) continue;
+      const kind = Units.kind[i] || U_SOLDIER;
+      if (!canUnitAutoAcquireEnemy(kind)) continue;
+      let already = false;
+      for (let k = 0; k < found; k++) if (BotGroupIds[k] === i) { already = true; break; }
+      if (already) continue;
+      const score = botScoutScore(kind) - distSq(Units.x[i], Units.y[i], x, y) * 0.00004;
+      if (score > bestScore) { bestScore = score; best = i; }
+    }
+    if (best === -1) break;
+    BotGroupIds[found++] = best;
+  }
+
+  for (let idx = 0; idx < found; idx++) {
+    const i = BotGroupIds[idx];
+    const kind = Units.kind[i] || U_SOLDIER;
+    const ox = (idx - (found - 1) * 0.5) * 16;
+    if (!findNearestStandablePoint(x + ox, y + idx * 12, unitMoveMask(kind), TargetPoint, 14)) continue;
+    Units.tx[i] = TargetPoint[0];
+    Units.ty[i] = TargetPoint[1];
+    Units.homeX[i] = Units.x[i];
+    Units.homeY[i] = Units.y[i];
+    Units.order[i] = ORDER_ATTACK_MOVE;
+    Units.state[i] = STATE_ATTACK_MOVE;
+    Units.scanTimer[i] = 0;
+    clearWaypoint(i);
+    clearUnitTarget(i);
+  }
+  return found;
+}
+
+function findFactionDefenseThreat(fId, range) {
+  const scanRange = range || 360;
+  let best = -1;
+  let bestD = 1e30;
+  for (let b = 0; b < MAX_B; b++) {
+    if (!Builds.active[b] || Builds.faction[b] !== fId) continue;
+    const cx = (Builds.tx[b] + Builds.w[b] * 0.5) * TILE;
+    const cy = (Builds.ty[b] + Builds.h[b] * 0.5) * TILE;
+    if (findNearestEnemyUnitNear(fId, -1, cx, cy, scanRange, bestD)) {
+      best = SearchResult[0] | 0;
+      bestD = SearchResult[1];
+    }
+  }
+  Temp[0] = best !== -1 ? 1 : 0;
+  Temp[1] = best;
+  return best !== -1;
+}
+
+function orderFactionDefendUnit(fId, targetId, diff) {
+  if (!Units.active[targetId]) return;
+  const tx = Units.x[targetId];
+  const ty = Units.y[targetId];
+  const hall = findHall(fId);
+  const hx = hall !== -1 ? (Builds.tx[hall] + Builds.w[hall] * 0.5) * TILE : tx;
+  const hy = hall !== -1 ? (Builds.ty[hall] + Builds.h[hall] * 0.5) * TILE : ty;
+  const callRadius = diff === BOT_DIFF_TRAINING ? 430 : (diff === BOT_DIFF_NORMAL ? 560 : 820);
+  const callR2 = callRadius * callRadius;
+  const targetR2 = (callRadius * 0.75) * (callRadius * 0.75);
+  for (let i = 0; i < MAX_U; i++) {
+    if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    const kind = Units.kind[i] || U_SOLDIER;
+    if (kind !== U_MEDIC && !canUnitAutoAcquireEnemy(kind)) continue;
+    const nearBase = distSq(Units.x[i], Units.y[i], hx, hy) <= callR2;
+    const nearThreat = distSq(Units.x[i], Units.y[i], tx, ty) <= targetR2;
+    if (!nearBase && !nearThreat && diff !== BOT_DIFF_COUNT - 1) continue;
+    Units.homeX[i] = Units.x[i];
+    Units.homeY[i] = Units.y[i];
+    Units.order[i] = ORDER_ATTACK_MOVE;
+    if (kind === U_MEDIC || !canUnitAutoTargetUnit(i, targetId)) {
+      clearWaypoint(i);
+      clearUnitTarget(i);
+      if (findNearestStandablePoint(tx, ty, unitMoveMask(kind), TargetPoint, 14)) {
+        Units.tx[i] = TargetPoint[0];
+        Units.ty[i] = TargetPoint[1];
+        Units.state[i] = STATE_ATTACK_MOVE;
+      }
+    } else if (hasUnitTargetUnit(i, targetId)) {
+      Units.state[i] = STATE_ATTACK;
+    } else {
+      clearWaypoint(i);
+      setUnitTargetUnit(i, targetId);
+    }
+  }
+}
+
+function orderFactionEmergencyDefense(fId, targetId, x, y) {
+  const hasTarget = targetId >= 0 && Units.active[targetId] && areEnemies(fId, Units.faction[targetId]);
+  for (let i = 0; i < MAX_U; i++) {
+    if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    const kind = Units.kind[i] || U_SOLDIER;
+    if (kind !== U_MEDIC && !canUnitAutoAcquireEnemy(kind)) continue;
+    Units.homeX[i] = Units.x[i];
+    Units.homeY[i] = Units.y[i];
+    Units.order[i] = ORDER_ATTACK_MOVE;
+    if (hasTarget && kind !== U_MEDIC && canUnitAutoTargetUnit(i, targetId)) {
+      clearWaypoint(i);
+      setUnitTargetUnit(i, targetId);
+      Units.state[i] = STATE_ATTACK;
+      continue;
+    }
+    clearWaypoint(i);
+    clearUnitTarget(i);
+    if (findNearestStandablePoint(x, y, unitMoveMask(kind), TargetPoint, 18)) {
+      Units.tx[i] = TargetPoint[0];
+      Units.ty[i] = TargetPoint[1];
+      Units.state[i] = STATE_ATTACK_MOVE;
+      Units.scanTimer[i] = 0;
+    }
   }
 }
 
@@ -2693,15 +3819,37 @@ function orderFactionAttackVisible(fId, targetType, targetId, reserve) {
   const reserveCount = markBotDefenseReserve(fId, reserve || 0);
   for (let i = 0; i < MAX_U; i++) {
     if (!Units.active[i] || Units.faction[i] !== fId) continue;
+    const kind = Units.kind[i] || U_SOLDIER;
+    if (kind !== U_MEDIC && !canUnitAutoAcquireEnemy(kind)) continue;
     if (isReservedBotUnit(i, reserveCount)) continue;
+    if (targetType === 1 && kind !== U_MEDIC && !canUnitAutoTargetUnit(i, targetId)) continue;
+    if (kind === U_MEDIC || !canUnitAutoAcquireEnemy(kind)) {
+      if (!findNearestStandablePoint(tx, ty, unitMoveMask(kind), TargetPoint, 14)) continue;
+      Units.tx[i] = TargetPoint[0];
+      Units.ty[i] = TargetPoint[1];
+      Units.state[i] = STATE_ATTACK_MOVE;
+      Units.order[i] = ORDER_ATTACK_MOVE;
+      clearWaypoint(i);
+      clearUnitTarget(i);
+      continue;
+    }
     Units.tx[i] = tx;
     Units.ty[i] = ty;
     Units.homeX[i] = Units.x[i];
     Units.homeY[i] = Units.y[i];
     Units.order[i] = ORDER_ATTACK_MOVE;
-    clearWaypoint(i);
-    if (targetType === 1) setUnitTargetUnit(i, targetId);
-    else setUnitTargetBuilding(i, targetId);
+    if (targetType === 1) {
+      if (hasUnitTargetUnit(i, targetId)) Units.state[i] = STATE_ATTACK;
+      else {
+        clearWaypoint(i);
+        setUnitTargetUnit(i, targetId);
+      }
+    } else if (hasUnitTargetBuilding(i, targetId)) {
+      Units.state[i] = STATE_ATTACK;
+    } else {
+      clearWaypoint(i);
+      setUnitTargetBuilding(i, targetId);
+    }
   }
 }
 
@@ -2731,6 +3879,167 @@ function chooseBotScoutPoint(fId) {
   Temp[1] = clamp(ty, TILE * 2, WORLD_SZ - TILE * 2);
 }
 
+function findBotUnitOfKind(fId, kind) {
+  let best = -1;
+  let bestHp = -1;
+  for (let i = 0; i < MAX_U; i++) {
+    if (!Units.active[i] || Units.faction[i] !== fId || Units.kind[i] !== kind) continue;
+    if (Units.hp[i] > bestHp) { bestHp = Units.hp[i]; best = i; }
+  }
+  return best;
+}
+
+function setBotMoveOrder(uId, x, y) {
+  if (!Units.active[uId]) return false;
+  if (!findNearestStandablePoint(x, y, unitMoveMask(Units.kind[uId]), TargetPoint, 16)) return false;
+  Units.tx[uId] = TargetPoint[0];
+  Units.ty[uId] = TargetPoint[1];
+  Units.homeX[uId] = Units.tx[uId];
+  Units.homeY[uId] = Units.ty[uId];
+  Units.state[uId] = STATE_MOVE;
+  Units.order[uId] = ORDER_MOVE;
+  clearWaypoint(uId);
+  clearUnitTarget(uId);
+  return true;
+}
+
+function findExpansionTileForFaction(fId, minDistTiles) {
+  const hall = findHall(fId);
+  if (hall === -1) return false;
+  const cfg = BuildCfg[B_HALL];
+  const step = MAP_SZ >= 144 ? 5 : 4;
+  const start = 2 + ((fId * 7 + Factions[fId].aiPhase) % step);
+  const ownTx = Builds.tx[hall];
+  const ownTy = Builds.ty[hall];
+  const minOwnD2 = minDistTiles * minDistTiles;
+  const minAnyD2 = Math.max(12, minDistTiles * 0.45);
+  let bestTx = -1;
+  let bestTy = -1;
+  let bestScore = -1;
+
+  for (let ty = start; ty <= MAP_SZ - cfg.h - 2; ty += step) {
+    for (let tx = start; tx <= MAP_SZ - cfg.w - 2; tx += step) {
+      if (!canPlaceBuildingType(B_HALL, tx, ty, cfg.w, cfg.h)) continue;
+      const ownD2 = distSqBetweenHallTiles(tx, ty, ownTx, ownTy);
+      if (ownD2 < minOwnD2) continue;
+      const anyD2 = minDistSqToExistingHalls(tx, ty);
+      if (anyD2 < minAnyD2 * minAnyD2) continue;
+      const edge = Math.min(tx, ty, MAP_SZ - tx - cfg.w, MAP_SZ - ty - cfg.h);
+      const centerX = tx + cfg.w * 0.5 - MAP_SZ * 0.5;
+      const centerY = ty + cfg.h * 0.5 - MAP_SZ * 0.5;
+      const centerD2 = centerX * centerX + centerY * centerY;
+      const score = ownD2 * 0.62 + anyD2 * 0.35 + centerD2 * 0.08 + edge * 2;
+      if (score > bestScore) { bestScore = score; bestTx = tx; bestTy = ty; }
+    }
+  }
+
+  if (bestTx === -1) return false;
+  Temp[0] = bestTx;
+  Temp[1] = bestTy;
+  return true;
+}
+
+function tryBotColony(fId, diff, academy, armyPop) {
+  const f = Factions[fId];
+  if (diff === BOT_DIFF_TRAINING || MAP_SZ < 96 || academy === -1) return false;
+  if (f.aiColonyCooldown > 0) return false;
+  const hallCount = countBuildingsOfType(fId, B_HALL);
+  const maxHalls = diff === BOT_DIFF_COUNT - 1 ? (MAP_SZ >= 144 ? 3 : 2) : 2;
+  if (hallCount >= maxHalls || armyPop < (diff === BOT_DIFF_NORMAL ? 12 : 9)) return false;
+  const engineer = findBotUnitOfKind(fId, U_ENGINEER);
+  if (engineer === -1) return false;
+  if (!canAfford(fId, B_HALL, engineer)) return false;
+
+  const cfg = BuildCfg[B_HALL];
+  if (f.aiColonyTx < 0 || !canPlaceBuildingType(B_HALL, f.aiColonyTx, f.aiColonyTy, cfg.w, cfg.h)) {
+    if (!findExpansionTileForFaction(fId, MAP_SZ >= 144 ? 34 : 26)) {
+      f.aiColonyCooldown = 14;
+      return false;
+    }
+    f.aiColonyTx = Temp[0] | 0;
+    f.aiColonyTy = Temp[1] | 0;
+  }
+
+  const cx = (f.aiColonyTx + cfg.w * 0.5) * TILE;
+  const cy = (f.aiColonyTy + cfg.h * 0.5) * TILE;
+  const buildR = ENGINEER_BUILD_RANGE_TILES * TILE * 0.72;
+  if (distSq(Units.x[engineer], Units.y[engineer], cx, cy) > buildR * buildR) {
+    setBotMoveOrder(engineer, cx, cy);
+    return false;
+  }
+
+  if (tryBuildForFaction(fId, B_HALL, f.aiColonyTx, f.aiColonyTy, ENGINEER_BUILD_RANGE_TILES, engineer)) {
+    f.aiColonyTx = -1;
+    f.aiColonyTy = -1;
+    f.aiColonyCooldown = 25;
+    return true;
+  }
+  f.aiColonyTx = -1;
+  f.aiColonyTy = -1;
+  f.aiColonyCooldown = 8;
+  return false;
+}
+
+function botCoreBuildSlotsFull(fId) {
+  refreshFactionLimits(fId);
+  const f = Factions[fId];
+  if (!f) return false;
+  const coreTypes = Engine.hasWater
+    ? [B_MINE, B_WOOD, B_FARM, B_BARR, B_STABLE, B_TOWER, B_WORKSHOP, B_ACADEMY, B_DOCK]
+    : [B_MINE, B_WOOD, B_FARM, B_BARR, B_STABLE, B_TOWER, B_WORKSHOP, B_ACADEMY];
+  let checked = 0;
+  for (let i = 0; i < coreTypes.length; i++) {
+    const type = coreTypes[i];
+    const limit = f.limits[type] || 0;
+    if (limit <= 0) continue;
+    checked++;
+    if ((f.current[type] || 0) < limit) return false;
+  }
+  return checked > 0;
+}
+
+function tryBuildWallForFaction(fId, hall) {
+  const f = Factions[fId];
+  if (!f || hall < 0 || !Builds.active[hall]) return false;
+  if (!canStartBuildingForFaction(fId, B_WALL, -1) || !canAfford(fId, B_WALL)) return false;
+  const baseTx = Builds.tx[hall];
+  const baseTy = Builds.ty[hall];
+  const spanX = Builds.w[hall];
+  const spanY = Builds.h[hall];
+  const patterns = [
+    [baseTx - 2, baseTy - 5, 1],
+    [baseTx + spanX - 1, baseTy - 5, 1],
+    [baseTx - 2, baseTy + spanY + 3, 1],
+    [baseTx + spanX - 1, baseTy + spanY + 3, 1],
+    [baseTx - 5, baseTy - 2, 0],
+    [baseTx - 5, baseTy + spanY - 1, 0],
+    [baseTx + spanX + 3, baseTy - 2, 0],
+    [baseTx + spanX + 3, baseTy + spanY - 1, 0],
+    [baseTx - 8, baseTy - 5, 1],
+    [baseTx + spanX + 5, baseTy - 5, 1],
+    [baseTx - 8, baseTy + spanY + 3, 1],
+    [baseTx + spanX + 5, baseTy + spanY + 3, 1],
+    [baseTx - 5, baseTy - 8, 0],
+    [baseTx - 5, baseTy + spanY + 5, 0],
+    [baseTx + spanX + 3, baseTy - 8, 0],
+    [baseTx + spanX + 3, baseTy + spanY + 5, 0]
+  ];
+  const start = (f.current[B_WALL] + f.aiPhase + fId) % patterns.length;
+  for (let n = 0; n < patterns.length; n++) {
+    const p = patterns[(start + n) % patterns.length];
+    const tx = p[0] | 0;
+    const ty = p[1] | 0;
+    const rot = p[2] | 0;
+    if (!canPlaceBuildingForFactionWithBuilder(fId, B_WALL, tx, ty, rot, -1)) continue;
+    const anchorHall = findBuildAnchorHallForType(fId, B_WALL, tx, ty, rot);
+    payForBuild(fId, B_WALL);
+    const b = spawnBuilding(fId, B_WALL, tx, ty, false, rot, anchorHall);
+    if (b !== -1) return true;
+    refundBuild(fId, B_WALL);
+  }
+  return false;
+}
+
 function updateBots(dt) {
   if (Engine.placingStart) return;
   Engine.botAcc += dt;
@@ -2743,8 +4052,12 @@ function updateBots(dt) {
     if (!f.isAI) continue;
     const diff = clamp(f.difficulty | 0, 0, BOT_DIFF_COUNT - 1);
     if (f.aiAttackCooldown > 0) f.aiAttackCooldown -= BOT_INTERVAL;
+    if (f.aiDefenseCooldown > 0) f.aiDefenseCooldown -= BOT_INTERVAL;
     if (f.aiTrainCooldown > 0) f.aiTrainCooldown -= BOT_INTERVAL;
     if (f.aiBuildCooldown > 0) f.aiBuildCooldown -= BOT_INTERVAL;
+    if (f.aiScoutCooldown > 0) f.aiScoutCooldown -= BOT_INTERVAL;
+    if (f.aiAlertTimer > 0) f.aiAlertTimer -= BOT_INTERVAL;
+    if (f.aiColonyCooldown > 0) f.aiColonyCooldown -= BOT_INTERVAL;
 
     const hall = findHall(fId);
     const buildRadius = BotDiffCfg.buildRadius[diff];
@@ -2758,23 +4071,57 @@ function updateBots(dt) {
     }
     const baseTx = Builds.tx[hall];
     const baseTy = Builds.ty[hall];
-    const army = countUnitsByFaction(fId);
+    const army = countCombatUnitsByFaction(fId);
     const armyPop = countUnitPopByFaction(fId);
     const queuedPop = countQueuedPopByFaction(fId);
     const barr = findBuildingOfType(fId, B_BARR);
     const workshop = findBuildingOfType(fId, B_WORKSHOP);
     const stable = findBuildingOfType(fId, B_STABLE);
+    const dock = findBuildingOfType(fId, B_DOCK);
+    const academy = findBuildingOfType(fId, B_ACADEMY);
     refreshFactionLimits(fId);
+    const defenseScanRange = diff === BOT_DIFF_TRAINING ? 320 : (diff === BOT_DIFF_NORMAL ? 470 : 680);
+    const defenseThreat = findFactionDefenseThreat(fId, defenseScanRange);
+    const defenseThreatId = defenseThreat ? (Temp[1] | 0) : -1;
+    const alertTargetAlive = f.aiAlertTargetId >= 0
+      && Units.active[f.aiAlertTargetId]
+      && Units.uid[f.aiAlertTargetId] === f.aiAlertTargetUid
+      && areEnemies(fId, Units.faction[f.aiAlertTargetId]);
+    if (f.aiAlertTimer > 0 && f.aiDefenseCooldown <= 0) {
+      orderFactionEmergencyDefense(fId, alertTargetAlive ? f.aiAlertTargetId : -1, f.aiAlertX || ((baseTx + 1.5) * TILE), f.aiAlertY || ((baseTy + 1.5) * TILE));
+      f.aiDefenseCooldown = diff === BOT_DIFF_TRAINING ? 2.2 : (diff === BOT_DIFF_NORMAL ? 1.55 : 1.0);
+    }
+    const defenseTargetAlive = f.aiDefenseTargetId >= 0
+      && Units.active[f.aiDefenseTargetId]
+      && Units.uid[f.aiDefenseTargetId] === f.aiDefenseTargetUid;
+    if (!defenseThreat) {
+      f.aiDefenseTargetId = -1;
+      f.aiDefenseTargetUid = 0;
+    } else if (f.aiDefenseCooldown <= 0 || !defenseTargetAlive) {
+      orderFactionDefendUnit(fId, defenseThreatId, diff);
+      f.aiDefenseTargetId = defenseThreatId;
+      f.aiDefenseTargetUid = Units.uid[defenseThreatId];
+      f.aiDefenseCooldown = diff === BOT_DIFF_TRAINING ? 3.0 : (diff === BOT_DIFF_NORMAL ? 2.0 : 1.25);
+    }
 
     if (f.aiBuildCooldown <= 0) {
       let built = false;
+      if (!built && defenseThreat && f.current[B_TOWER] < f.limits[B_TOWER] && canAfford(fId, B_TOWER)) {
+        const tx = Units.active[defenseThreatId] ? ((Units.x[defenseThreatId] / TILE) | 0) : baseTx;
+        const ty = Units.active[defenseThreatId] ? ((Units.y[defenseThreatId] / TILE) | 0) : baseTy;
+        built = tryBuildForFaction(fId, B_TOWER, tx, ty, Math.min(buildRadius, 9));
+      }
       if (!built && f.current[B_MINE] < f.limits[B_MINE]) built = tryBuildForFaction(fId, B_MINE, baseTx + 4, baseTy + 1, buildRadius);
       if (!built && f.current[B_WOOD] < f.limits[B_WOOD]) built = tryBuildForFaction(fId, B_WOOD, baseTx - 4, baseTy + 1, buildRadius);
       if (!built && f.current[B_FARM] < f.limits[B_FARM]) built = tryBuildForFaction(fId, B_FARM, baseTx, baseTy + 6, buildRadius + 2);
       if (!built && f.current[B_BARR] < f.limits[B_BARR]) built = tryBuildForFaction(fId, B_BARR, baseTx + 5, baseTy - 4, buildRadius);
       if (!built && f.current[B_STABLE] < f.limits[B_STABLE] && army >= 2) built = tryBuildForFaction(fId, B_STABLE, baseTx - 6, baseTy - 2, buildRadius);
+      if (!built && Engine.hasWater && f.current[B_DOCK] < f.limits[B_DOCK] && army >= 2 && hasWaterNearTiles(baseTx, baseTy, buildRadius + 8)) built = tryBuildForFaction(fId, B_DOCK, baseTx, baseTy + 5, buildRadius + 8);
       if (!built && f.current[B_TOWER] < f.limits[B_TOWER] && army >= 3) built = tryBuildForFaction(fId, B_TOWER, baseTx + 1, baseTy - 6, Math.min(buildRadius, 8));
       if (!built && f.current[B_WORKSHOP] < f.limits[B_WORKSHOP] && armyPop >= 8) built = tryBuildForFaction(fId, B_WORKSHOP, baseTx - 6, baseTy - 5, buildRadius);
+      if (!built && f.current[B_ACADEMY] < f.limits[B_ACADEMY] && armyPop >= 7) built = tryBuildForFaction(fId, B_ACADEMY, baseTx + 6, baseTy + 4, buildRadius);
+      if (!built && botCoreBuildSlotsFull(fId) && f.current[B_WALL] < f.limits[B_WALL] && Builds.level[hall] >= requiredHallLevelForBuilding(B_WALL)) built = tryBuildWallForFaction(fId, hall);
+      if (!built && tryBotColony(fId, diff, academy, armyPop)) built = true;
       if (!built && Builds.level[hall] < MAX_BUILD_LEVEL && armyPop >= BotDiffCfg.hallUpgradeArmy[diff] + Builds.level[hall] && canUpgradeBuilding(hall)) built = upgradeBuilding(hall);
       if (!built && barr !== -1 && armyPop >= BotDiffCfg.barrUpgradeArmy[diff]) {
         const upBarr = findUpgradeableBuildingOfType(fId, B_BARR);
@@ -2787,6 +4134,14 @@ function updateBots(dt) {
       if (!built && workshop !== -1 && armyPop >= 10) {
         const upWorkshop = findUpgradeableBuildingOfType(fId, B_WORKSHOP);
         if (upWorkshop !== -1) built = upgradeBuilding(upWorkshop);
+      }
+      if (!built && dock !== -1 && armyPop >= 8) {
+        const upDock = findUpgradeableBuildingOfType(fId, B_DOCK);
+        if (upDock !== -1) built = upgradeBuilding(upDock);
+      }
+      if (!built && academy !== -1 && armyPop >= 8) {
+        const upAcademy = findUpgradeableBuildingOfType(fId, B_ACADEMY);
+        if (upAcademy !== -1) built = upgradeBuilding(upAcademy);
       }
       if (!built && f.current[B_TOWER] > 0 && armyPop >= 6) {
         const upTower = findUpgradeableBuildingOfType(fId, B_TOWER);
@@ -2805,9 +4160,25 @@ function updateBots(dt) {
       const siegeMix = diff === BOT_DIFF_TRAINING ? 11 : (diff === BOT_DIFF_NORMAL ? 8 : 6);
       const beastMix = diff === BOT_DIFF_TRAINING ? 9 : (diff === BOT_DIFF_NORMAL ? 6 : 4);
       const mageMix = diff === BOT_DIFF_TRAINING ? 8 : (diff === BOT_DIFF_NORMAL ? 5 : 3);
+      const navalMix = diff === BOT_DIFF_TRAINING ? 13 : (diff === BOT_DIFF_NORMAL ? 10 : 7);
+      const supportMix = diff === BOT_DIFF_TRAINING ? 10 : (diff === BOT_DIFF_NORMAL ? 6 : 4);
       const pulse = armyPop + army + fId + f.aiPhase;
       let unitType = U_SOLDIER;
-      if (workshop !== -1 && armyPop >= 8 && (pulse % siegeMix === 0)) {
+      if (academy !== -1 && armyPop >= 6 && (pulse % supportMix === 0)) {
+        const medicGoal = diff === BOT_DIFF_TRAINING ? 1 : Math.max(1, Math.min(5, (armyPop / (diff === BOT_DIFF_NORMAL ? 12 : 8)) | 0));
+        const engineerGoal = MAP_SZ >= 120 ? (diff === BOT_DIFF_COUNT - 1 ? 2 : 1) : 1;
+        const medicCount = countUnitsOfKindByFaction(fId, U_MEDIC);
+        const engineerCount = countUnitsOfKindByFaction(fId, U_ENGINEER);
+        const diplomatCount = countUnitsOfKindByFaction(fId, U_DIPLOMAT);
+        const diplomatGoal = diff === BOT_DIFF_COUNT - 1 ? 1 : 0;
+        if (medicCount < medicGoal && Builds.level[academy] >= unitRequiredBuildingLevel(U_MEDIC)) unitType = U_MEDIC;
+        else if (diplomatCount < diplomatGoal && Builds.level[academy] >= unitRequiredBuildingLevel(U_DIPLOMAT) && (pulse % (supportMix * 2) === 0)) unitType = U_DIPLOMAT;
+        else if (engineerCount < engineerGoal && Builds.level[academy] >= unitRequiredBuildingLevel(U_ENGINEER)) unitType = U_ENGINEER;
+      } else if (dock !== -1 && armyPop >= 6 && (pulse % navalMix === 0)) {
+        if (Builds.level[dock] >= unitRequiredBuildingLevel(U_SIEGE_SHIP) && armyPop >= 18) unitType = U_SIEGE_SHIP;
+        else if (Builds.level[dock] >= unitRequiredBuildingLevel(U_GALE) && armyPop >= 12) unitType = U_GALE;
+        else unitType = U_BOAT;
+      } else if (workshop !== -1 && armyPop >= 8 && (pulse % siegeMix === 0)) {
         if (Builds.level[workshop] >= unitRequiredBuildingLevel(U_CATAPULT) && armyPop >= 18) unitType = U_CATAPULT;
         else if (Builds.level[workshop] >= unitRequiredBuildingLevel(U_BALLISTA) && armyPop >= 12) unitType = U_BALLISTA;
         else unitType = U_RAM;
@@ -2835,14 +4206,38 @@ function updateBots(dt) {
       f.aiTrainCooldown = queued ? BotDiffCfg.trainDelay[diff] : BotDiffCfg.failedTrainDelay[diff];
     }
 
-    if ((army >= BotDiffCfg.attackMinArmy[diff] || armyPop >= BotDiffCfg.attackMinArmy[diff] + 4) && f.aiAttackCooldown <= 0) {
-      const reserve = BotDiffCfg.defenseReserve[diff];
-      if (findVisibleEnemyForFaction(fId)) orderFactionAttackVisible(fId, Temp[0], Temp[1], reserve);
-      else {
-        chooseBotScoutPoint(fId);
-        orderFactionAttackMove(fId, Temp[0], Temp[1], reserve);
+    const reserve = botDefenseReserveCount(diff, army, defenseThreat);
+    const strategicReady = (army >= BotDiffCfg.attackMinArmy[diff] || armyPop >= BotDiffCfg.attackMinArmy[diff] + 4)
+      && f.aiAttackCooldown <= 0
+      && f.aiAlertTimer <= 0
+      && (!defenseThreat || diff === BOT_DIFF_COUNT - 1 || armyPop >= desiredPop);
+    if (strategicReady) {
+      let issuedStrategic = false;
+      if (findVisibleEnemyForFaction(fId)) {
+        orderFactionAttackVisible(fId, Temp[0], Temp[1], reserve);
+        issuedStrategic = true;
+      } else {
+        const enemyZone = findCaptureZoneTargetForFaction(fId, true);
+        if (enemyZone !== -1) {
+          const groupLimit = botStrategicGroupLimit(diff, army, reserve);
+          issuedStrategic = orderFactionAttackMove(fId, CaptureZones.x[enemyZone], CaptureZones.y[enemyZone], reserve, groupLimit) > 0;
+        }
       }
-      f.aiAttackCooldown = BotDiffCfg.attackCooldown[diff];
+      if (issuedStrategic) f.aiAttackCooldown = BotDiffCfg.attackCooldown[diff];
+    }
+
+    if (f.aiAlertTimer <= 0 && !defenseThreat && f.aiScoutCooldown <= 0 && army >= BOT_MIN_SCOUT_ARMY) {
+      const zone = findCaptureZoneTargetForFaction(fId, false);
+      if (zone !== -1) {
+        if (orderBotScoutGroup(fId, CaptureZones.x[zone], CaptureZones.y[zone], diff, army, reserve) > 0) {
+          f.aiScoutCooldown = diff === BOT_DIFF_TRAINING ? 24 : (diff === BOT_DIFF_NORMAL ? 16 : 10);
+        }
+      } else {
+        chooseBotScoutPoint(fId);
+        if (orderBotScoutGroup(fId, Temp[0], Temp[1], diff, army, reserve) > 0) {
+          f.aiScoutCooldown = diff === BOT_DIFF_TRAINING ? 28 : (diff === BOT_DIFF_NORMAL ? 19 : 12);
+        }
+      }
     }
   }
 }
@@ -2889,6 +4284,10 @@ function buildingFill(type, enemy) {
     if (type === B_TOWER) return '#5e4650';
     if (type === B_WALL) return '#5a5153';
     if (type === B_STABLE) return '#684b36';
+    if (type === B_DOCK) return '#4d4135';
+    if (type === B_ACADEMY) return '#51415f';
+    if (type === B_OUTPOST) return '#4a4d3d';
+    if (type === B_TRAP) return '#42392f';
     if (type === B_MINE) return '#5f4b52';
     if (type === B_WOOD) return '#6b4b30';
     if (type === B_FARM) return '#6c6430';
@@ -2900,6 +4299,10 @@ function buildingFill(type, enemy) {
   if (type === B_TOWER) return '#5b5d63';
   if (type === B_WALL) return '#60676b';
   if (type === B_STABLE) return '#5b4f36';
+  if (type === B_DOCK) return '#5a4a34';
+  if (type === B_ACADEMY) return '#4f4764';
+  if (type === B_OUTPOST) return '#4c563d';
+  if (type === B_TRAP) return '#493f32';
   if (type === B_MINE) return '#4c4f55';
   if (type === B_WOOD) return '#5e4a2d';
   if (type === B_FARM) return '#6c7136';
@@ -2916,6 +4319,10 @@ function buildingAccent(type, enemy) {
   if (type === B_TOWER) return '#bfc6d1';
   if (type === B_WALL) return '#c9ced0';
   if (type === B_STABLE) return '#d8aa72';
+  if (type === B_DOCK) return '#8fd1e8';
+  if (type === B_ACADEMY) return '#c9b5ff';
+  if (type === B_OUTPOST) return '#e2ca91';
+  if (type === B_TRAP) return '#ffb36e';
   return '#d8aa72';
 }
 
@@ -3009,6 +4416,49 @@ function drawBuildingDetails(id, x, y, w, h) {
     ctx.moveTo(x + w * 0.48, y + h * 0.52);
     ctx.lineTo(x + w * 0.72, y + h * 0.38);
     ctx.stroke();
+  } else if (type === B_DOCK) {
+    ctx.strokeStyle = accent;
+    ctx.strokeRect(x + w * 0.12, y + h * 0.26, w * 0.76, h * 0.48);
+    ctx.fillStyle = enemy ? 'rgba(46,31,25,0.82)' : 'rgba(62,44,28,0.82)';
+    for (let k = 0; k < 4; k++) {
+      const px = x + w * (0.2 + k * 0.18);
+      ctx.fillRect(px, y + h * 0.18, 4 / Engine.cam.z, h * 0.64);
+    }
+    ctx.strokeStyle = 'rgba(143,209,232,0.72)';
+    ctx.beginPath();
+    ctx.arc(x + w * 0.5, y + h * 0.5, Math.min(w, h) * 0.18, 0, Math.PI * 2);
+    ctx.stroke();
+  } else if (type === B_ACADEMY) {
+    ctx.strokeStyle = accent;
+    ctx.strokeRect(x + w * 0.18, y + h * 0.18, w * 0.64, h * 0.64);
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.5, y + h * 0.12);
+    ctx.lineTo(x + w * 0.78, y + h * 0.36);
+    ctx.lineTo(x + w * 0.64, y + h * 0.78);
+    ctx.lineTo(x + w * 0.36, y + h * 0.78);
+    ctx.lineTo(x + w * 0.22, y + h * 0.36);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(x + w * 0.46, y + h * 0.32, w * 0.08, h * 0.34);
+  } else if (type === B_OUTPOST) {
+    ctx.strokeStyle = accent;
+    ctx.strokeRect(x + w * 0.28, y + h * 0.22, w * 0.44, h * 0.62);
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.2, y + h * 0.22);
+    ctx.lineTo(x + w * 0.5, y + h * 0.06);
+    ctx.lineTo(x + w * 0.8, y + h * 0.22);
+    ctx.stroke();
+    ctx.fillRect(x + w * 0.45, y + h * 0.48, w * 0.1, h * 0.2);
+  } else if (type === B_TRAP) {
+    ctx.strokeStyle = accent;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.18, y + h * 0.5);
+    ctx.lineTo(x + w * 0.38, y + h * 0.24);
+    ctx.lineTo(x + w * 0.5, y + h * 0.64);
+    ctx.lineTo(x + w * 0.62, y + h * 0.24);
+    ctx.lineTo(x + w * 0.82, y + h * 0.5);
+    ctx.stroke();
   }
 }
 
@@ -3020,7 +4470,12 @@ function drawMinimap() {
   const scale = s / WORLD_SZ;
 
   ctx.save();
-  ctx.fillStyle = 'rgba(8, 12, 10, 0.82)';
+  if (terrainMiniCanvas.width === MAP_SZ) ctx.drawImage(terrainMiniCanvas, x, y, s, s);
+  else {
+    ctx.fillStyle = 'rgba(8, 12, 10, 0.82)';
+    ctx.fillRect(x, y, s, s);
+  }
+  ctx.fillStyle = 'rgba(8, 12, 10, 0.20)';
   ctx.fillRect(x, y, s, s);
   ctx.strokeStyle = 'rgba(230,230,230,0.72)';
   ctx.lineWidth = 1;
@@ -3146,6 +4601,29 @@ function drawUnitShape(id, uType, hitRadius) {
     ctx.strokeStyle = 'rgba(126,214,255,0.92)';
     ctx.lineWidth = 1.5 / Engine.cam.z;
     ctx.beginPath(); ctx.arc(x, y, hitRadius + 2, 0, Math.PI * 2); ctx.stroke();
+  } else if (uType === U_ENGINEER) {
+    drawRegularPolygon(x, y, hitRadius + 1, 4, Math.PI / 4);
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(255,235,170,0.85)';
+    ctx.lineWidth = 1.4 / Engine.cam.z;
+    ctx.beginPath();
+    ctx.moveTo(x - hitRadius * 0.65, y + hitRadius * 0.2);
+    ctx.lineTo(x + hitRadius * 0.65, y - hitRadius * 0.45);
+    ctx.moveTo(x + hitRadius * 0.2, y - hitRadius * 0.75);
+    ctx.lineTo(x + hitRadius * 0.78, y - hitRadius * 0.18);
+    ctx.stroke();
+  } else if (uType === U_MEDIC) {
+    drawRegularPolygon(x, y, hitRadius + 2, 8, Math.PI / 8);
+    ctx.fill(); strokeUnitShape();
+    ctx.fillStyle = 'rgba(120,223,136,0.92)';
+    ctx.fillRect(x - 1.6, y - hitRadius - 1, 3.2, hitRadius * 2 + 2);
+    ctx.fillRect(x - hitRadius - 1, y - 1.6, hitRadius * 2 + 2, 3.2);
+  } else if (uType === U_DIPLOMAT) {
+    drawRegularPolygon(x, y, hitRadius + 2, 5, -Math.PI / 2);
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(255,245,190,0.9)';
+    ctx.lineWidth = 1.4 / Engine.cam.z;
+    ctx.beginPath(); ctx.arc(x, y, hitRadius + 4, 0, Math.PI * 2); ctx.stroke();
   } else if (uType === U_RAM) {
     ctx.beginPath();
     ctx.moveTo(x - hitRadius, y - hitRadius * 0.75);
@@ -3213,13 +4691,45 @@ function drawUnitShape(id, uType, hitRadius) {
     ctx.beginPath(); ctx.moveTo(x - hitRadius * 0.45, y + hitRadius * 0.25); ctx.lineTo(x + hitRadius * 0.8, y - hitRadius - 5); ctx.stroke();
     ctx.fillStyle = '#1b1b1b';
     ctx.beginPath(); ctx.arc(x + hitRadius * 0.95, y - hitRadius - 6, 3.5, 0, Math.PI * 2); ctx.fill();
+  } else if (uType === U_BOAT) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - hitRadius - 3);
+    ctx.lineTo(x + hitRadius + 6, y);
+    ctx.lineTo(x, y + hitRadius + 3);
+    ctx.lineTo(x - hitRadius - 6, y);
+    ctx.closePath();
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(210,244,255,0.86)';
+    ctx.lineWidth = 1.4 / Engine.cam.z;
+    ctx.beginPath(); ctx.moveTo(x - hitRadius * 0.55, y); ctx.lineTo(x + hitRadius * 0.55, y); ctx.stroke();
+  } else if (uType === U_GALE) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - hitRadius - 4);
+    ctx.lineTo(x + hitRadius + 7, y - hitRadius * 0.12);
+    ctx.lineTo(x + hitRadius * 0.65, y + hitRadius + 4);
+    ctx.lineTo(x - hitRadius * 0.65, y + hitRadius + 4);
+    ctx.lineTo(x - hitRadius - 7, y - hitRadius * 0.12);
+    ctx.closePath();
+    ctx.fill(); strokeUnitShape();
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.fillRect(x - 2, y - hitRadius * 0.85, 4, hitRadius * 1.55);
+    ctx.strokeStyle = 'rgba(210,244,255,0.72)';
+    ctx.beginPath(); ctx.moveTo(x - hitRadius * 0.68, y + hitRadius * 0.35); ctx.lineTo(x + hitRadius * 0.68, y + hitRadius * 0.35); ctx.stroke();
+  } else if (uType === U_SIEGE_SHIP) {
+    drawRegularPolygon(x, y, hitRadius + 2, 6, Math.PI / 6);
+    ctx.fill(); strokeUnitShape();
+    ctx.strokeStyle = 'rgba(255,226,166,0.9)';
+    ctx.lineWidth = 2 / Engine.cam.z;
+    ctx.beginPath(); ctx.moveTo(x - hitRadius * 0.5, y); ctx.lineTo(x + hitRadius + 8, y - hitRadius * 0.45); ctx.stroke();
+    ctx.fillStyle = '#1b1b1b';
+    ctx.beginPath(); ctx.arc(x + hitRadius * 0.72, y - hitRadius * 0.5, 3.6, 0, Math.PI * 2); ctx.fill();
   } else {
     drawRegularPolygon(x, y, hitRadius, 5, -Math.PI / 2);
     ctx.fill(); strokeUnitShape();
   }
 }
 
-function drawAttackEffects() {
+function drawAttackEffects(cullLeft, cullTop, cullRight, cullBottom) {
   for (let i = 0; i < MAX_ATTACK_FX; i++) {
     if (!AttackFx.active[i]) continue;
     const kind = AttackFx.kind[i];
@@ -3229,6 +4739,13 @@ function drawAttackEffects() {
     const tx = AttackFx.tx[i], ty = AttackFx.ty[i];
     const dx = tx - sx, dy = ty - sy;
     const color = factionColor(AttackFx.faction[i]);
+    if (cullLeft !== undefined) {
+      const minX = Math.min(sx, tx) - RENDER_CULL_PAD;
+      const maxX = Math.max(sx, tx) + RENDER_CULL_PAD;
+      const minY = Math.min(sy, ty) - RENDER_CULL_PAD;
+      const maxY = Math.max(sy, ty) + RENDER_CULL_PAD;
+      if (maxX < cullLeft || minX > cullRight || maxY < cullTop || minY > cullBottom) continue;
+    }
 
     if (kind === U_MAGE) {
       const px = sx + dx * p;
@@ -3265,6 +4782,16 @@ function drawAttackEffects() {
       ctx.strokeStyle = `rgba(255,221,150,${0.85 * Math.max(0, p - 0.45)})`;
       ctx.lineWidth = 2.4 / Engine.cam.z;
       ctx.beginPath(); ctx.arc(tx, ty, 10 + 30 * p, 0, Math.PI * 2); ctx.stroke();
+    } else if (kind === U_BOAT || kind === U_GALE || kind === U_SIEGE_SHIP) {
+      const fast = kind === U_BOAT ? 1.45 : 1.15;
+      const px = sx + dx * Math.min(1, p * fast);
+      const py = sy + dy * Math.min(1, p * fast);
+      const heavy = kind === U_SIEGE_SHIP;
+      ctx.strokeStyle = heavy ? `rgba(255,220,150,${0.72 * inv})` : `rgba(190,238,255,${0.82 * inv})`;
+      ctx.lineWidth = (heavy ? 3 : 2) / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(px, py); ctx.stroke();
+      ctx.fillStyle = heavy ? `rgba(255,170,70,${0.42 * inv})` : `rgba(126,214,255,${0.34 * inv})`;
+      ctx.beginPath(); ctx.arc(tx, ty, (heavy ? 9 : 5) + (heavy ? 24 : 12) * p, 0, Math.PI * 2); ctx.fill();
     } else if (kind === U_CHARIOT) {
       const len = Math.sqrt(dx * dx + dy * dy) || 1;
       const nx = -dy / len, ny = dx / len;
@@ -3293,11 +4820,99 @@ function drawAttackEffects() {
       ctx.beginPath(); ctx.arc(tx, ty, 12 + 22 * p, 0, Math.PI * 2); ctx.fill();
     }
 
-    if (kind === U_BALLISTA || kind === U_CATAPULT || kind === U_CHARIOT || kind === U_ELEPHANT) {
+    if (kind === U_BALLISTA || kind === U_CATAPULT || kind === U_CHARIOT || kind === U_ELEPHANT || kind === U_BOAT || kind === U_GALE || kind === U_SIEGE_SHIP) {
       ctx.strokeStyle = `${color}88`;
       ctx.lineWidth = 1 / Engine.cam.z;
       ctx.beginPath(); ctx.arc(sx, sy, 4 + 10 * inv, 0, Math.PI * 2); ctx.stroke();
     }
+  }
+}
+
+function drawTerrain(viewLeft, viewTop, viewRight, viewBottom) {
+  if (!Engine.hasWater) return;
+  const tx0 = clamp(Math.floor(viewLeft / TILE) - 1, 0, MAP_SZ - 1);
+  const ty0 = clamp(Math.floor(viewTop / TILE) - 1, 0, MAP_SZ - 1);
+  const tx1 = clamp(Math.ceil(viewRight / TILE) + 1, 0, MAP_SZ - 1);
+  const ty1 = clamp(Math.ceil(viewBottom / TILE) + 1, 0, MAP_SZ - 1);
+
+  ctx.fillStyle = '#255876';
+  for (let ty = ty0; ty <= ty1; ty++) {
+    let runStart = -1;
+    const row = ty * MAP_SZ;
+    for (let tx = tx0; tx <= tx1 + 1; tx++) {
+      const water = tx <= tx1 && terrainGrid[row + tx] === TERRAIN_WATER;
+      if (water && runStart === -1) runStart = tx;
+      else if (!water && runStart !== -1) {
+        ctx.fillRect(runStart * TILE, ty * TILE, (tx - runStart) * TILE, TILE);
+        runStart = -1;
+      }
+    }
+  }
+
+  ctx.strokeStyle = 'rgba(126,214,255,0.34)';
+  ctx.lineWidth = 1.2 / Engine.cam.z;
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      if (!isWaterTile(tx, ty)) continue;
+      const x = tx * TILE;
+      const y = ty * TILE;
+      ctx.beginPath();
+      if (!isWaterTile(tx - 1, ty)) { ctx.moveTo(x, y); ctx.lineTo(x, y + TILE); }
+      if (!isWaterTile(tx + 1, ty)) { ctx.moveTo(x + TILE, y); ctx.lineTo(x + TILE, y + TILE); }
+      if (!isWaterTile(tx, ty - 1)) { ctx.moveTo(x, y); ctx.lineTo(x + TILE, y); }
+      if (!isWaterTile(tx, ty + 1)) { ctx.moveTo(x, y + TILE); ctx.lineTo(x + TILE, y + TILE); }
+      ctx.stroke();
+    }
+  }
+}
+
+function drawCaptureZones(viewLeft, viewTop, viewRight, viewBottom) {
+  if (!CaptureZones.enabled) return;
+  const pad = CAPTURE_RADIUS + 12;
+  for (let i = 0; i < CaptureZones.count; i++) {
+    const x = CaptureZones.x[i];
+    const y = CaptureZones.y[i];
+    if (x + pad < viewLeft || x - pad > viewRight || y + pad < viewTop || y - pad > viewBottom) continue;
+    const owner = CaptureZones.owner[i];
+    const contender = CaptureZones.contender[i];
+    const ownerColor = owner >= 0 ? factionColor(owner) : '#d6bd73';
+    const contenderColor = contender >= 0 ? factionColor(contender) : ownerColor;
+    const pulse = 0.5 + 0.5 * Math.sin(Engine.pulse * 2.2 + i);
+
+    ctx.fillStyle = owner >= 0 ? `${ownerColor}18` : 'rgba(214,189,115,0.10)';
+    ctx.strokeStyle = owner >= 0 ? `${ownerColor}aa` : 'rgba(214,189,115,0.72)';
+    ctx.lineWidth = 2.2 / Engine.cam.z;
+    ctx.beginPath();
+    ctx.arc(x, y, CAPTURE_RADIUS, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255,245,205,0.22)';
+    ctx.lineWidth = 1 / Engine.cam.z;
+    ctx.beginPath();
+    ctx.arc(x, y, CAPTURE_RADIUS * 0.68, 0, Math.PI * 2);
+    ctx.stroke();
+
+    if (CaptureZones.progress[i] > 0 && contender >= 0) {
+      ctx.strokeStyle = contenderColor;
+      ctx.lineWidth = 5 / Engine.cam.z;
+      ctx.beginPath();
+      ctx.arc(x, y, CAPTURE_RADIUS + 4, -Math.PI * 0.5, -Math.PI * 0.5 + Math.PI * 2 * CaptureZones.progress[i]);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = ownerColor;
+    ctx.beginPath();
+    ctx.arc(x, y, 12 + pulse * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(20,24,20,0.82)';
+    ctx.lineWidth = 2 / Engine.cam.z;
+    ctx.beginPath();
+    ctx.moveTo(x - 2, y + 18);
+    ctx.lineTo(x - 2, y - 20);
+    ctx.lineTo(x + 18, y - 13);
+    ctx.lineTo(x - 2, y - 6);
+    ctx.stroke();
   }
 }
 
@@ -3317,16 +4932,22 @@ function render() {
   const viewRight = Engine.cam.x + canvas.width * 0.5 / Engine.cam.z;
   const viewTop = Engine.cam.y - canvas.height * 0.5 / Engine.cam.z;
   const viewBottom = Engine.cam.y + canvas.height * 0.5 / Engine.cam.z;
+  const cullLeft = viewLeft - RENDER_CULL_PAD;
+  const cullRight = viewRight + RENDER_CULL_PAD;
+  const cullTop = viewTop - RENDER_CULL_PAD;
+  const cullBottom = viewBottom + RENDER_CULL_PAD;
   const startX = Math.max(0, Math.floor(viewLeft / TILE) * TILE);
   const endX = Math.min(WORLD_SZ, Math.ceil(viewRight / TILE) * TILE);
   const startY = Math.max(0, Math.floor(viewTop / TILE) * TILE);
   const endY = Math.min(WORLD_SZ, Math.ceil(viewBottom / TILE) * TILE);
+  drawTerrain(viewLeft, viewTop, viewRight, viewBottom);
   for (let i = startX; i <= endX; i += TILE) {
     ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, WORLD_SZ); ctx.stroke();
   }
   for (let i = startY; i <= endY; i += TILE) {
     ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(WORLD_SZ, i); ctx.stroke();
   }
+  drawCaptureZones(viewLeft, viewTop, viewRight, viewBottom);
 
   if (Engine.selectedBuilding !== -1 && Builds.active[Engine.selectedBuilding] && Builds.type[Engine.selectedBuilding] === B_HALL && Builds.workState[Engine.selectedBuilding] !== BUILD_WORK_CONSTRUCT) {
     const hId = Engine.selectedBuilding;
@@ -3350,6 +4971,7 @@ function render() {
     const y = Builds.ty[i] * TILE;
     const w = Builds.w[i] * TILE;
     const h = Builds.h[i] * TILE;
+    if (x > cullRight || y > cullBottom || x + w < cullLeft || y + h < cullTop) continue;
 
     ctx.fillStyle = buildingFill(Builds.type[i], isEnemyToPlayer(Builds.faction[i]));
     ctx.fillRect(x, y, w, h);
@@ -3423,21 +5045,24 @@ function render() {
   // Unidades
   for (let i = 0; i < MAX_U; i++) {
     if (!Units.active[i]) continue;
+    if (Units.x[i] < cullLeft || Units.x[i] > cullRight || Units.y[i] < cullTop || Units.y[i] > cullBottom) continue;
     const uType = Units.kind[i] || U_SOLDIER;
     const hitRadius = UnitCfg.hitRadius[uType];
     drawUnitShape(i, uType, hitRadius);
 
-    if (Units.state[i] === STATE_ATTACK || Units.state[i] === STATE_CHASE) {
-      const pulse = 0.45 + 0.25 * Math.sin(Engine.pulse * 8 + i);
+    const attacking = Units.state[i] === STATE_ATTACK || Units.state[i] === STATE_CHASE;
+    if (attacking) {
+      const pulse = 0.48 + 0.14 * Math.sin(Engine.pulse * 4 + i);
       ctx.strokeStyle = `rgba(255,176,76,${pulse})`;
       ctx.lineWidth = 2 / Engine.cam.z;
       ctx.beginPath(); ctx.arc(Units.x[i], Units.y[i], 13 + pulse * 2, 0, Math.PI * 2); ctx.stroke();
-      if (getTargetPoint(i, TargetPoint)) {
-        const ranged = isRangedUnitType(uType);
-        ctx.strokeStyle = ranged ? `rgba(126,214,255,${0.32 + pulse * 0.35})` : `rgba(255,92,70,${0.22 + pulse * 0.25})`;
-        ctx.lineWidth = (ranged ? 1.4 : 1) / Engine.cam.z;
-        ctx.beginPath(); ctx.moveTo(Units.x[i], Units.y[i]); ctx.lineTo(TargetPoint[0], TargetPoint[1]); ctx.stroke();
-      }
+    }
+    const lineAlpha = Units.targetLineAlpha[i];
+    if (lineAlpha > 0.04) {
+      const ranged = isRangedUnitType(uType);
+      ctx.strokeStyle = ranged ? `rgba(126,214,255,${0.42 * lineAlpha})` : `rgba(255,92,70,${0.34 * lineAlpha})`;
+      ctx.lineWidth = (ranged ? 1.4 : 1) / Engine.cam.z;
+      ctx.beginPath(); ctx.moveTo(Units.x[i], Units.y[i]); ctx.lineTo(Units.targetLineX[i], Units.targetLineY[i]); ctx.stroke();
     }
 
     if (Units.flash[i] > 0) {
@@ -3461,7 +5086,7 @@ function render() {
     ctx.fillStyle = '#78df88';
     ctx.fillRect(Units.x[i] - 10, Units.y[i] - 16, 20 * hpRatio, 3);
 
-    if (isSelectedUnit(i)) {
+    if (isSelectedUnit(i) || Engine.inspectedUnit === i) {
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 2 / Engine.cam.z;
       drawRegularPolygon(Units.x[i], Units.y[i], hitRadius + 6, 8, Math.PI / 8);
@@ -3470,28 +5095,37 @@ function render() {
   }
 
   // Preview de construção
-  drawAttackEffects();
+  drawAttackEffects(cullLeft, cullTop, cullRight, cullBottom);
 
   if (Engine.buildType !== 0) {
     const bw = buildingFootprintW(Engine.buildType, Engine.buildRot);
     const bh = buildingFootprintH(Engine.buildType, Engine.buildRot);
     ctx.strokeStyle = 'rgba(126,214,255,0.26)';
     ctx.lineWidth = 1.5 / Engine.cam.z;
-    for (let hId = 0; hId < MAX_B; hId++) {
-      if (!Builds.active[hId] || Builds.faction[hId] !== 0 || Builds.type[hId] !== B_HALL) continue;
-      if (Builds.workState[hId] === BUILD_WORK_CONSTRUCT) continue;
-      const hx = (Builds.tx[hId] + Builds.w[hId] * 0.5) * TILE;
-      const hy = (Builds.ty[hId] + Builds.h[hId] * 0.5) * TILE;
+    if ((Engine.buildType === B_HALL || isEngineerOnlyBuilding(Engine.buildType)) && isActiveEngineerForFaction(Engine.buildBuilderUnit, 0)) {
+      ctx.strokeStyle = 'rgba(178,220,255,0.58)';
+      ctx.fillStyle = 'rgba(178,220,255,0.05)';
       ctx.beginPath();
-      ctx.arc(hx, hy, hallBuildRangeTiles(Builds.level[hId]) * TILE, 0, Math.PI * 2);
+      ctx.arc(Units.x[Engine.buildBuilderUnit], Units.y[Engine.buildBuilderUnit], ENGINEER_BUILD_RANGE_TILES * TILE, 0, Math.PI * 2);
+      ctx.fill();
       ctx.stroke();
+    } else {
+      for (let hId = 0; hId < MAX_B; hId++) {
+        if (!Builds.active[hId] || Builds.faction[hId] !== 0 || Builds.type[hId] !== B_HALL) continue;
+        if (Builds.workState[hId] === BUILD_WORK_CONSTRUCT) continue;
+        const hx = (Builds.tx[hId] + Builds.w[hId] * 0.5) * TILE;
+        const hy = (Builds.ty[hId] + Builds.h[hId] * 0.5) * TILE;
+        ctx.beginPath();
+        ctx.arc(hx, hy, hallBuildRangeTiles(Builds.level[hId]) * TILE, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     }
     const gx = (Engine.drag.wx / TILE) | 0;
     const gy = (Engine.drag.wy / TILE) | 0;
-    const ok = canPlaceBuildingForFaction(0, Engine.buildType, gx, gy, Engine.buildRot) && canAfford(0, Engine.buildType) && canStartBuildingForFaction(0, Engine.buildType);
+    const ok = canPlaceBuildingForFaction(0, Engine.buildType, gx, gy, Engine.buildRot) && canAfford(0, Engine.buildType, Engine.buildBuilderUnit) && canStartBuildingForFaction(0, Engine.buildType, Engine.buildBuilderUnit);
     ctx.fillStyle = ok ? 'rgba(0,255,100,0.28)' : 'rgba(255,0,0,0.28)';
     ctx.fillRect(gx * TILE, gy * TILE, bw * TILE, bh * TILE);
-    const clearTiles = Engine.buildType === B_WALL ? 0 : BUILD_CLEARANCE_TILES;
+    const clearTiles = buildingClearanceTiles(Engine.buildType);
     const cx0 = Math.max(0, gx - clearTiles);
     const cy0 = Math.max(0, gy - clearTiles);
     const cx1 = Math.min(MAP_SZ, gx + bw + clearTiles);
@@ -3659,6 +5293,7 @@ function selectSquadUnits(slot) {
   const count = cleanSquad(slot);
   Sel.count = 0;
   Engine.selectedBuilding = -1;
+  Engine.inspectedUnit = -1;
   UI.actionMode = 'root';
   for (let i = 0; i < count; i++) {
     addUnitToSelection(Squads.ids[squadOffset(slot) + i]);
@@ -3670,6 +5305,7 @@ function selectSquadUnits(slot) {
 function selectUnitsOfType(unitType) {
   Sel.count = 0;
   Engine.selectedBuilding = -1;
+  Engine.inspectedUnit = -1;
   Engine.joinSquadMode = false;
   UI.actionMode = 'root';
   for (let i = 0; i < MAX_U && Sel.count < MAX_SELECTION; i++) {
@@ -3686,6 +5322,7 @@ function finalizeSelectionBox() {
   const y1 = Math.max(Engine.drag.boxY0, Engine.drag.boxY1);
   Sel.count = 0;
   Engine.selectedBuilding = -1;
+  Engine.inspectedUnit = -1;
   UI.actionMode = 'root';
   addUnitToSelection(Engine.drag.overOwnUnit);
   for (let i = 0; i < MAX_U && Sel.count < MAX_SELECTION; i++) {
@@ -3745,6 +5382,8 @@ function handlePrimaryTap(wx, wy, pointerType, sx, sy) {
   }
   const ownUnit = pickUnitAt(wx, wy, 0);
   const ownBuilding = findOwnBuildingAt(wx, wy, 0);
+  const enemyUnit = pickEnemyUnitAt(wx, wy, 0);
+  const enemyBuilding = pickEnemyBuildingAt(wx, wy, 0);
 
   if (ownUnit !== -1) {
     const now = performance.now();
@@ -3775,6 +5414,14 @@ function handlePrimaryTap(wx, wy, pointerType, sx, sy) {
     } else {
       issueCommandAt(wx, wy, sx, sy);
     }
+  } else if (enemyUnit !== -1) {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
+    inspectUnit(enemyUnit);
+  } else if (enemyBuilding !== -1) {
+    Engine.lastTapTime = 0;
+    Engine.lastTapKind = 0;
+    selectBuilding(enemyBuilding);
   } else {
     Engine.lastTapTime = 0;
     Engine.lastTapKind = 0;
@@ -3956,27 +5603,32 @@ canvas.addEventListener('pointerup', (e) => {
     const bh = buildingFootprintH(type, Engine.buildRot);
     const gx = (Engine.drag.wx / TILE) | 0;
     const gy = (Engine.drag.wy / TILE) | 0;
-    if (!canStartBuildingForFaction(0, type)) {
+    if (!canStartBuildingForFaction(0, type, Engine.buildBuilderUnit)) {
       const req = requiredHallLevelForBuilding(type);
-      if (type === B_HALL) UI.msg('Voce ja possui uma prefeitura.', true);
+      if (type === B_HALL) UI.msg('Selecione um Engenheiro para fundar uma nova Prefeitura.', true);
+      else if (isEngineerOnlyBuilding(type)) UI.msg(`Selecione um Engenheiro para construir ${buildingLabel(type)}.`, true);
+      else if (type === B_DOCK && !Engine.hasWater) UI.msg('Esta partida nao tem agua para Porto.', true);
       else if (factionHallLevel(0) < req) UI.msg(`${buildingLabel(type)} exige Prefeitura Nv ${req}.`, true);
       else UI.msg('Limite atingido para esta construcao.', true);
     }
     else if (bFree.length === 0) UI.msg('Limite global de construcoes atingido.', true);
-    else if (!canAfford(0, type)) UI.msg('Recursos insuficientes.', true);
+    else if (!canAfford(0, type, Engine.buildBuilderUnit)) UI.msg('Recursos insuficientes.', true);
+    else if (!isValidTerrainForBuildingType(type, gx, gy, bw, bh)) UI.msg(type === B_DOCK ? 'Porto precisa ficar em terra encostado na agua.' : 'Construa apenas em terreno firme.', true);
     else if (findBlockingBuildingForPlacementTyped(type, gx, gy, bw, bh) !== -1) UI.msg('Local invalido, ocupado ou perto demais.', true);
     else if (findBlockingUnitForPlacement(type, gx, gy, bw, bh) >= 0) UI.msg('Nao construa sobre tropas. Elas podem ficar presas.', true);
-    else if (!isWithinBuildRange(0, type, gx, gy, Engine.buildRot)) UI.msg('Fora do alcance da prefeitura.', true);
+    else if (!isWithinBuildRange(0, type, gx, gy, Engine.buildRot, Engine.buildBuilderUnit)) UI.msg(type === B_HALL || isEngineerOnlyBuilding(type) ? 'Fora do alcance do Engenheiro.' : 'Fora do alcance da prefeitura.', true);
+    else if (isLimitedBuildType(type) && findBuildAnchorHallForType(0, type, gx, gy, Engine.buildRot) === -1) UI.msg('Limite local desta Prefeitura atingido.', true);
     else {
-      payForBuild(0, type);
-      const b = spawnBuilding(0, type, gx, gy, false, Engine.buildRot);
+      const anchorHall = isLimitedBuildType(type) ? findBuildAnchorHallForType(0, type, gx, gy, Engine.buildRot) : -1;
+      payForBuild(0, type, Engine.buildBuilderUnit);
+      const b = spawnBuilding(0, type, gx, gy, false, Engine.buildRot, anchorHall);
       if (b !== -1) {
         UI.updateRes();
         UI.updateLimits();
-        UI.msg(`${buildingLabel(type)} em construcao (${Math.ceil(buildTimeFor(type))}s).`, false);
+        UI.msg(`${buildingLabel(type)} em construcao (${Math.ceil(buildTimeFor(type, 0))}s).`, false);
         UI.cancelBuild();
       } else {
-        refundBuild(0, type);
+        refundBuild(0, type, Engine.buildBuilderUnit);
         UI.updateRes();
         UI.msg('Nao foi possivel iniciar a obra.', true);
       }
@@ -4036,6 +5688,7 @@ const UI = {
   implEnding: false,
   implActiveState: false,
   limitCache: {},
+  costCache: {},
   selectionText: '',
   spawnVisible: false,
   spawnText: '',
@@ -4088,6 +5741,8 @@ const UI = {
   normalizeLobby() {
     Lobby.botCount = clamp(Lobby.botCount | 0, 1, MAX_BOTS);
     Lobby.difficulty = clamp(Lobby.difficulty | 0, 0, BOT_DIFF_COUNT - 1);
+    Lobby.waterMask = 0;
+    Lobby.captureZones = Lobby.captureZones !== false;
     for (let i = 1; i <= MAX_BOTS; i++) {
       if (Lobby.botDifficulty[i] >= BOT_DIFF_COUNT) Lobby.botDifficulty[i] = Lobby.difficulty;
     }
@@ -4126,6 +5781,27 @@ const UI = {
     const resLabel = document.getElementById('startResourceLabel');
     if (resSlider) resSlider.value = Lobby.startResourceIndex;
     if (resLabel) resLabel.textContent = startResourceText(Lobby.startResourceIndex);
+    const noneToggle = document.getElementById('waterNoneToggle');
+    const oceanToggle = document.getElementById('waterOceanToggle');
+    const riverToggle = document.getElementById('waterRiverToggle');
+    const lakeToggle = document.getElementById('waterLakeToggle');
+    const waterInfo = document.getElementById('waterInfo');
+    const captureZonesToggle = document.getElementById('captureZonesToggle');
+    const captureZonesInfo = document.getElementById('captureZonesInfo');
+    if (noneToggle) noneToggle.classList.toggle('active', Lobby.waterMask === 0);
+    if (oceanToggle) oceanToggle.classList.toggle('active', (Lobby.waterMask & WATER_OCEANS) !== 0);
+    if (riverToggle) riverToggle.classList.toggle('active', (Lobby.waterMask & WATER_RIVERS) !== 0);
+    if (lakeToggle) lakeToggle.classList.toggle('active', (Lobby.waterMask & WATER_LAKES) !== 0);
+    if (waterInfo) waterInfo.textContent = 'Em desenvolvimento: agua desabilitada para proteger o pathfinding.';
+    if (captureZonesToggle) {
+      captureZonesToggle.textContent = Lobby.captureZones ? 'Ligado' : 'Desligado';
+      captureZonesToggle.classList.toggle('active', Lobby.captureZones);
+    }
+    if (captureZonesInfo) {
+      captureZonesInfo.textContent = Lobby.captureZones
+        ? 'Pontos neutros aparecem no mapa e concedem bonus de economia e obra.'
+        : 'Partida sem areas neutras de bonus.';
+    }
     if (teamToggle) {
       teamToggle.textContent = Lobby.teamsEnabled ? 'Ligado' : 'Desligado';
       teamToggle.classList.toggle('active', Lobby.teamsEnabled);
@@ -4243,6 +5919,19 @@ const UI = {
     Lobby.startResourceIndex = clamp(index | 0, 0, START_RESOURCE_LABELS.length - 1);
     UI.updateLobby();
   },
+  toggleLobbyCaptureZones() {
+    Lobby.captureZones = !Lobby.captureZones;
+    UI.updateLobby();
+  },
+  toggleLobbyWater(flag) {
+    Lobby.waterMask = 0;
+    UI.updateLobby();
+    UI.lobbyWarning('Agua procedural esta em desenvolvimento e fica desabilitada por enquanto.');
+  },
+  setLobbyWaterNone() {
+    Lobby.waterMask = 0;
+    UI.updateLobby();
+  },
   balanceLobbyTeams() {
     UI.normalizeLobby();
     if (!Lobby.teamsEnabled) return;
@@ -4264,11 +5953,20 @@ const UI = {
   toBotMenu() {
     setConfigScroll(true);
     document.getElementById('mainMenu').classList.add('hidden');
+    document.getElementById('uiLayer').classList.add('hidden');
     document.getElementById('endMenu').classList.add('hidden');
     document.getElementById('botMenu').classList.remove('hidden');
     Lobby.teamsEnabled = false;
     Lobby.observer = false;
     UI.updateLobby();
+  },
+  toMainMenu() {
+    setConfigScroll(false);
+    document.getElementById('uiLayer').classList.add('hidden');
+    document.getElementById('botMenu').classList.add('hidden');
+    document.getElementById('endMenu').classList.add('hidden');
+    document.getElementById('mainMenu').classList.remove('hidden');
+    Engine.uiMeasureDirty = true;
   },
   showEnd(victory) {
     setConfigScroll(false);
@@ -4327,15 +6025,27 @@ const UI = {
       UI.msg('Escolha a prefeitura inicial primeiro.', true);
       return;
     }
-    if (!canStartBuildingForFaction(0, type)) {
+    const builderUnit = (type === B_HALL || isEngineerOnlyBuilding(type)) ? selectedEngineerId() : -1;
+    if (!canStartBuildingForFaction(0, type, builderUnit)) {
       const req = requiredHallLevelForBuilding(type);
-      if (type === B_HALL) UI.msg('Voce ja possui uma prefeitura.', true);
+      if (type === B_HALL) UI.msg('Selecione um Engenheiro para fundar uma nova Prefeitura.', true);
+      else if (isEngineerOnlyBuilding(type)) UI.msg(`Selecione um Engenheiro para construir ${buildingLabel(type)}.`, true);
+      else if (type === B_DOCK && !Engine.hasWater) UI.msg('Esta partida nao tem agua para Porto.', true);
       else if (factionHallLevel(0) < req) UI.msg(`${buildingLabel(type)} exige Prefeitura Nv ${req}.`, true);
       else UI.msg('Limite atingido para esta construcao.', true);
       return;
     }
+    if (bFree.length === 0) {
+      UI.msg('Limite global de construcoes atingido.', true);
+      return;
+    }
+    if (!canAfford(0, type, builderUnit)) {
+      UI.msg(`Recursos insuficientes para ${buildingLabel(type)}.`, true);
+      return;
+    }
     Engine.buildType = type;
     Engine.buildRot = 0;
+    Engine.buildBuilderUnit = builderUnit;
     Engine.rallyBuilding = -1;
     UI.actionMode = 'build';
     document.getElementById('cancelBuild').classList.remove('hidden');
@@ -4354,6 +6064,7 @@ const UI = {
   cancelBuild() {
     Engine.buildType = 0;
     Engine.buildRot = 0;
+    Engine.buildBuilderUnit = -1;
     document.getElementById('cancelBuild').classList.add('hidden');
     const rotate = document.getElementById('rotateBuild');
     if (rotate) {
@@ -4427,21 +6138,7 @@ const UI = {
       UI.unitStatus = status;
     }
   },
-  updateLimits() {
-    const f = Factions[0];
-    if (!f) return;
-    refreshFactionLimits(0);
-    for (const type of [B_HALL, B_MINE, B_WOOD, B_FARM, B_BARR, B_WORKSHOP, B_TOWER, B_WALL, B_STABLE]) {
-      const costEl = document.getElementById('cost-' + type);
-      if (costEl) costEl.textContent = buildCostText(type);
-    }
-    for (const type of [B_MINE, B_WOOD, B_FARM, B_BARR, B_WORKSHOP, B_TOWER, B_WALL, B_STABLE]) {
-      const txt = `(${f.current[type]}/${f.limits[type]})`;
-      if (UI.limitCache[type] === txt) continue;
-      const el = document.getElementById('lim-' + type);
-      if (el) el.textContent = txt;
-      UI.limitCache[type] = txt;
-    }
+  updateImplementationInfo() {
     const implBox = document.getElementById('implementationInfo');
     const implVal = document.getElementById('valImplementation');
     const implBar = document.getElementById('implementationBar');
@@ -4476,6 +6173,26 @@ const UI = {
       }
     }
   },
+  updateLimits() {
+    const f = Factions[0];
+    if (!f) return;
+    refreshFactionLimits(0);
+    for (const type of BUILD_UI_TYPES) {
+      const txt = buildCostText(type);
+      if (UI.costCache[type] === txt) continue;
+      const costEl = document.getElementById('cost-' + type);
+      if (costEl) costEl.textContent = txt;
+      UI.costCache[type] = txt;
+    }
+    for (const type of LIMITED_BUILD_TYPES) {
+      const txt = `(${f.current[type]}/${f.limits[type]})`;
+      if (UI.limitCache[type] === txt) continue;
+      const el = document.getElementById('lim-' + type);
+      if (el) el.textContent = txt;
+      UI.limitCache[type] = txt;
+    }
+    UI.updateImplementationInfo();
+  },
   updateSelectionInfo() {
     const label = document.getElementById('selectionInfo');
     const spawn = document.getElementById('spawnUnit');
@@ -4487,9 +6204,19 @@ const UI = {
     const elephant = document.getElementById('spawnElephant');
     const ballista = document.getElementById('spawnBallista');
     const catapult = document.getElementById('spawnCatapult');
+    const boat = document.getElementById('spawnBoat');
+    const gale = document.getElementById('spawnGale');
+    const siegeShip = document.getElementById('spawnSiegeShip');
+    const engineer = document.getElementById('spawnEngineer');
+    const medic = document.getElementById('spawnMedic');
+    const diplomat = document.getElementById('spawnDiplomat');
     const rally = document.getElementById('setRally');
     const upgrade = document.getElementById('upgradeBuilding');
     const squadActions = document.getElementById('squadActions');
+    const engineerActions = document.getElementById('engineerActions');
+    const engineerHallBuild = document.getElementById('engineerHallBuild');
+    const engineerOutpostBuild = document.getElementById('engineerOutpostBuild');
+    const engineerTrapBuild = document.getElementById('engineerTrapBuild');
     const joinSquad = document.getElementById('joinSquad');
     const trainInfo = document.getElementById('trainInfo');
     let text = 'Sem selecao';
@@ -4499,6 +6226,7 @@ const UI = {
     let showRally = false;
     let showUpgrade = false;
     let showSquadActions = false;
+    let showEngineerActions = false;
     let spawnHtml = `Soldado<small>${unitCostText(U_SOLDIER)} Hab ${unitPopCost(U_SOLDIER)}</small>`;
     let archerHtml = `Arqueiro<small>${unitCostText(U_ARCHER)} Hab ${unitPopCost(U_ARCHER)}</small>`;
     let ramHtml = `Ariete<small>${unitCostText(U_RAM)} Hab ${unitPopCost(U_RAM)}</small>`;
@@ -4517,11 +6245,23 @@ const UI = {
     } else if (Engine.buildType !== 0) {
       text = 'Posicione: ' + buildingLabel(Engine.buildType);
       if (canRotateBuilding(Engine.buildType)) text += Engine.buildRot ? ' 6x2' : ' 2x6';
+    } else if (Engine.inspectedUnit !== -1 && Units.active[Engine.inspectedUnit]) {
+      const u = Engine.inspectedUnit;
+      const kind = Units.kind[u] || U_SOLDIER;
+      const relation = Units.faction[u] === 0 ? 'Sua tropa' : (areEnemies(0, Units.faction[u]) ? 'Inimigo' : 'Aliado');
+      text = `${relation}: ${unitLabel(kind)} HP ${Units.hp[u]}/${UnitCfg.hp[kind]} ATQ ${Units.damage[u]} RNG ${Math.round(Units.attackRange[u])} VEL ${Math.round(Units.speed[u])} EQ ${Math.round(UnitCfg.equilibrio[kind])}`;
+      trainText = 'Inspecionando tropa.';
     } else if (Engine.selectedBuilding !== -1) {
       const bId = Engine.selectedBuilding;
       const bType = Builds.type[bId];
       const working = Builds.workState[bId] !== BUILD_WORK_NONE;
       text = buildingLabel(bType);
+      if (Builds.faction[bId] !== 0) {
+        const relation = areEnemies(0, Builds.faction[bId]) ? 'Inimigo' : 'Aliado';
+        text = `${relation}: ${buildingLabel(bType)} Nv ${Builds.level[bId]} HP ${Builds.hp[bId]}/${buildingHpBarMax(bId)}`;
+        if (buildingAttackRange(bType, Builds.level[bId]) > 0) text += ` ATQ ${buildingAttackDamage(bType, Builds.level[bId])} RNG ${Math.round(buildingAttackRange(bType, Builds.level[bId]))}`;
+        trainText = 'Inspecionando construcao.';
+      } else {
 
       if (working) {
         const t = Math.max(0, Math.ceil(Builds.workTime[bId]));
@@ -4538,7 +6278,7 @@ const UI = {
         if (Builds.faction[bId] === 0 && canUpgradeByTech(bId)) {
           const next = Builds.level[bId] + 1;
           showUpgrade = true;
-          upgradeHtml = `Melhorar<small>${upgradeCostW(bType, next)}M ${upgradeCostS(bType, next)}P ${upgradeCostG(bType, next)}G ${Math.ceil(upgradeTimeFor(bType, next))}s</small>`;
+          upgradeHtml = `Melhorar<small>${upgradeCostW(bType, next)}M ${upgradeCostS(bType, next)}P ${upgradeCostG(bType, next)}G ${Math.ceil(upgradeTimeFor(bType, next, Builds.faction[bId]))}s</small>`;
         }
       }
 
@@ -4559,11 +6299,13 @@ const UI = {
         showRam = Builds.faction[bId] === 0 && bType === B_WORKSHOP;
         showRally = Builds.faction[bId] === 0;
       }
+      }
     } else if (Sel.count > 0) {
       if (Sel.count === 1 && Units.active[Sel.ids[0]]) {
         const u = Sel.ids[0];
         const kind = Units.kind[u] || U_SOLDIER;
-        text = `${unitLabel(kind)} HP ${Units.hp[u]}/${UnitCfg.hp[kind]} ATQ ${Units.damage[u]} RNG ${Math.round(Units.attackRange[u])} VEL ${Math.round(Units.speed[u])}`;
+        text = `${unitLabel(kind)} HP ${Units.hp[u]}/${UnitCfg.hp[kind]} ATQ ${Units.damage[u]} RNG ${Math.round(Units.attackRange[u])} VEL ${Math.round(Units.speed[u])} EQ ${Math.round(UnitCfg.equilibrio[kind])}`;
+        showEngineerActions = kind === U_ENGINEER;
       } else {
         text = `${Sel.count} unidades selecionadas`;
       }
@@ -4630,6 +6372,12 @@ const UI = {
     syncTrainButton(elephant, U_ELEPHANT);
     syncTrainButton(ballista, U_BALLISTA);
     syncTrainButton(catapult, U_CATAPULT);
+    syncTrainButton(boat, U_BOAT);
+    syncTrainButton(gale, U_GALE);
+    syncTrainButton(siegeShip, U_SIEGE_SHIP);
+    syncTrainButton(medic, U_MEDIC);
+    syncTrainButton(diplomat, U_DIPLOMAT);
+    syncTrainButton(engineer, U_ENGINEER);
     if (rally && UI.rallyVisible !== showRally) {
       rally.classList.toggle('hidden', !showRally);
       UI.rallyVisible = showRally;
@@ -4652,6 +6400,29 @@ const UI = {
       squadActions.classList.toggle('hidden', !showSquadActions);
       UI.squadActionsVisible = showSquadActions;
       layoutChanged = true;
+    }
+    if (engineerActions) {
+      const wasEngineerHidden = engineerActions.classList.contains('hidden');
+      engineerActions.classList.toggle('hidden', !showEngineerActions);
+      if (wasEngineerHidden === showEngineerActions) layoutChanged = true;
+      if (showEngineerActions) {
+        const engineerId = selectedEngineerId();
+        const hallHtml = `Colonia<small>${buildCostText(B_HALL, 0, engineerId)}</small>`;
+        const outpostHtml = `Outpost<small>${buildCostText(B_OUTPOST, 0, engineerId)}</small>`;
+        const trapHtml = `Armadilha<small>${buildCostText(B_TRAP, 0, engineerId)}</small>`;
+        if (engineerHallBuild && engineerHallBuild.dataset.html !== hallHtml) {
+          engineerHallBuild.innerHTML = hallHtml;
+          engineerHallBuild.dataset.html = hallHtml;
+        }
+        if (engineerOutpostBuild && engineerOutpostBuild.dataset.html !== outpostHtml) {
+          engineerOutpostBuild.innerHTML = outpostHtml;
+          engineerOutpostBuild.dataset.html = outpostHtml;
+        }
+        if (engineerTrapBuild && engineerTrapBuild.dataset.html !== trapHtml) {
+          engineerTrapBuild.innerHTML = trapHtml;
+          engineerTrapBuild.dataset.html = trapHtml;
+        }
+      }
     }
     if (joinSquad) {
       const anySquad = hasAnySquad();
@@ -4685,11 +6456,15 @@ const UI = {
 const Game = {
   reset() {
     mapGrid.fill(-1);
+    terrainGrid.fill(TERRAIN_LAND);
     hashHead.fill(-1);
     for (let i = 0; i < MAX_U; i++) Units.active[i] = 0;
     for (let i = 0; i < MAX_B; i++) Builds.active[i] = 0;
+    Builds.parentHall.fill(-1);
+    Builds.queryMark.fill(0);
     AttackFx.active.fill(0);
     AttackFx.cursor = 0;
+    FunctionalHallCount = 0;
     uFree.length = 0; bFree.length = 0;
     for (let i = MAX_U - 1; i >= 0; i--) uFree.push(i);
     for (let i = MAX_B - 1; i >= 0; i--) bFree.push(i);
@@ -4698,12 +6473,16 @@ const Game = {
     Engine.selectedBuilding = -1;
     Engine.buildType = 0;
     Engine.buildRot = 0;
+    Engine.buildBuilderUnit = -1;
+    Engine.inspectedUnit = -1;
     Engine.rallyBuilding = -1;
     Engine.joinSquadMode = false;
     Engine.observer = false;
     Engine.placingStart = false;
     Engine.pendingBotCount = 0;
     Engine.implementationTime = 0;
+    Engine.hasWater = false;
+    Engine.captureZonesEnabled = false;
     Engine.msgTimer = 0;
     UI.actionMode = 'root';
     UI.panelMode = '';
@@ -4714,6 +6493,8 @@ const Game = {
     UI.implPct = '';
     UI.implEnding = false;
     UI.implActiveState = false;
+    UI.limitCache = {};
+    UI.costCache = {};
     UI.spawnVisible = false;
     UI.spawnText = '';
     UI.archerVisible = false;
@@ -4741,7 +6522,7 @@ const Game = {
     if (archerBtn) archerBtn.classList.add('hidden');
     const ramBtn = document.getElementById('spawnRam');
     if (ramBtn) ramBtn.classList.add('hidden');
-    for (const id of ['spawnMage', 'spawnCavalry', 'spawnChariot', 'spawnElephant', 'spawnBallista', 'spawnCatapult']) {
+    for (const id of ['spawnMage', 'spawnCavalry', 'spawnChariot', 'spawnElephant', 'spawnBallista', 'spawnCatapult', 'spawnBoat', 'spawnGale', 'spawnSiegeShip', 'spawnEngineer', 'spawnMedic', 'spawnDiplomat']) {
       const btn = document.getElementById(id);
       if (btn) btn.classList.add('hidden');
     }
@@ -4751,6 +6532,8 @@ const Game = {
     if (upgradeBtn) upgradeBtn.classList.add('hidden');
     const squadActions = document.getElementById('squadActions');
     if (squadActions) squadActions.classList.add('hidden');
+    const engineerActions = document.getElementById('engineerActions');
+    if (engineerActions) engineerActions.classList.add('hidden');
     const squadBar = document.getElementById('squadBar');
     if (squadBar) squadBar.classList.add('hidden');
     const settingsPanel = document.getElementById('settingsPanel');
@@ -4758,6 +6541,8 @@ const Game = {
     UI.applyHudOptions();
     Engine.econAcc = 0;
     Engine.botAcc = 0;
+    Engine.implRefresh = 0;
+    Engine.queryStamp = 1;
     Engine.selectionRefresh = 0;
     Engine.uidGen = 1;
     Engine.cam.x = WORLD_SZ / 2;
@@ -4766,6 +6551,7 @@ const Game = {
     Engine.lastTapTime = 0;
     Engine.lastTapKind = 0;
     Pings.count = 0;
+    resetCaptureZones();
   },
   startFromLobby() {
     UI.normalizeLobby();
@@ -4802,6 +6588,8 @@ const Game = {
       difficulty: Lobby.difficulty,
       difficulties: difficultyPlan,
       startResourceIndex: Lobby.startResourceIndex,
+      waterMask: Lobby.waterMask,
+      captureZones: Lobby.captureZones,
       observer: Lobby.observer
     });
   },
@@ -4809,6 +6597,9 @@ const Game = {
     const cfg = options || {};
     configureMap(cfg.mapSize || MAP_SIZE_TILES[1]);
     Game.reset();
+    Engine.mapSeed = ((Date.now() | 0) ^ ((cfg.mapSize || MAP_SIZE_TILES[1]) << 8) ^ ((cfg.waterMask || 0) * 92821) ^ ((botCount || 0) * 131)) | 0;
+    generateTerrain(cfg.waterMask || 0);
+    Engine.captureZonesEnabled = cfg.captureZones !== false;
     const resIndex = clamp((cfg.startResourceIndex === undefined ? Lobby.startResourceIndex : cfg.startResourceIndex) | 0, 0, START_RESOURCE_LABELS.length - 1);
     Engine.startWood = START_RESOURCE_W[resIndex];
     Engine.startStone = START_RESOURCE_S[resIndex];
@@ -4826,6 +6617,7 @@ const Game = {
         createFaction(true, cfg.teams ? cfg.teams[botIndex] : botIndex, botDiff);
       }
       const placedBots = placeBotStarts(botCount, 0);
+      generateCaptureZones(Engine.captureZonesEnabled);
       Engine.placingStart = false;
       Engine.pendingBotCount = 0;
       startImplementationPeriod();
@@ -4879,6 +6671,7 @@ const Game = {
 
     const requestedBots = Engine.pendingBotCount;
     const placedBots = placeBotStarts(requestedBots, 1);
+    generateCaptureZones(Engine.captureZonesEnabled);
     Engine.placingStart = false;
     Engine.pendingBotCount = 0;
     startImplementationPeriod();
@@ -4898,13 +6691,21 @@ const Game = {
     UI.cancelBuild();
     UI.showEnd(victory);
   },
+  abandonToMainMenu() {
+    if (Engine.running) Engine.running = false;
+    UI.cancelBuild();
+    Game.reset();
+    Engine.running = false;
+    UI.toMainMenu();
+  },
   setRallyPoint(bId, wx, wy) {
     if (!Builds.active[bId] || !isMilitaryProducerType(Builds.type[bId]) || Builds.faction[bId] !== 0) return;
     if (Builds.workState[bId] !== BUILD_WORK_NONE) return;
     const x = clamp(wx, 8, WORLD_SZ - 8);
     const y = clamp(wy, 8, WORLD_SZ - 8);
-    if (!isStandable(x, y)) {
-      UI.msg('Escolha um ponto livre para a reuniao.', true);
+    const moveMask = producerMoveMaskForBuildingType(Builds.type[bId]);
+    if (!isStandable(x, y, moveMask)) {
+      UI.msg(moveMask === MOVE_WATER ? 'Escolha um ponto livre na agua para a reuniao.' : 'Escolha um ponto livre em terra para a reuniao.', true);
       return;
     }
     Builds.hasRally[bId] = 1;
@@ -4988,7 +6789,7 @@ const Game = {
       return;
     }
     const next = Builds.level[bId] + 1;
-    if (type !== B_HALL && next > factionHallLevel(Builds.faction[bId])) {
+    if (type !== B_HALL && next > hallLevelForBuildingTech(bId)) {
       UI.msg(`${buildingLabel(type)} Nv ${next} exige Prefeitura Nv ${next}.`, true);
       return;
     }
@@ -5045,25 +6846,44 @@ const Game = {
 function update(dt) {
   Engine.pulse += dt;
   if (Engine.pulse > Math.PI * 2) Engine.pulse -= Math.PI * 2;
-  if (Engine.implementationTime > 0) Engine.implementationTime = Math.max(0, Engine.implementationTime - dt);
+  const implementationWasActive = Engine.implementationTime > 0;
+  if (implementationWasActive) {
+    Engine.implementationTime = Math.max(0, Engine.implementationTime - dt);
+    if (Engine.implementationTime === 0) {
+      UI.costCache = {};
+      UI.updateLimits();
+      UI.updateSelectionInfo();
+    }
+  }
   rebuildHash();
+  refreshFunctionalHallCache();
   updateUnits(dt);
   rebuildHash();
+  updateCaptureZones(dt);
   applyUnitSeparation(dt);
   updateBuildingFeedback(dt);
   updateBuildingCombat(dt);
   updateConstruction(dt);
-  updateProduction(dt);
+  if (updateProduction(dt)) rebuildHash();
   updatePings(dt);
   updateAttackFx(dt);
+  updateTargetLines(dt);
   updateEconomy(dt);
   updateBots(dt);
   checkGameOver();
-  if (Sel.count === 1) {
+  if (Sel.count === 1 || Engine.inspectedUnit !== -1 || Engine.selectedBuilding !== -1 || Engine.rallyBuilding !== -1 || Engine.buildType !== 0 || Engine.placingStart) {
     Engine.selectionRefresh -= dt;
     if (Engine.selectionRefresh <= 0) {
-      Engine.selectionRefresh = 0.35;
+      Engine.selectionRefresh = UI_REFRESH_INTERVAL;
       UI.updateSelectionInfo();
+    }
+  }
+
+  if (Engine.implementationTime > 0 || UI.implActiveState) {
+    Engine.implRefresh -= dt;
+    if (Engine.implRefresh <= 0) {
+      Engine.implRefresh = IMPLEMENTATION_UI_INTERVAL;
+      UI.updateImplementationInfo();
     }
   }
 
@@ -5071,10 +6891,6 @@ function update(dt) {
     Engine.msgTimer -= dt;
     if (Engine.msgTimer <= 0) document.getElementById('msgBox').style.opacity = '0';
   }
-
-  UI.updateSelectionInfo();
-  UI.updateLimits();
-  UI.updateRes();
 }
 
 function loop(now) {
